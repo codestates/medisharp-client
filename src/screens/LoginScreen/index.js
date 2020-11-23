@@ -1,13 +1,25 @@
 import React, { Component } from 'react';
 import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 
-class Login extends Component {
+export default class LoginScreen extends Component {
+  static navigationOptions = {
+    headerShown: false,
+  };
+
+  doLogin() {
+    this.props.navigation.replace('TabNavigator');
+  }
+
   render() {
     return (
       <View style={styles.loginContainer}>
         <Image
-          style={{ width: 310, height: 111, marginTop: '50%' }}
-          source={require('../img/loginMain.png')}
+          style={{
+            top: '20%',
+            width: 310 * 0.85,
+            height: 111 * 0.85,
+          }}
+          source={require('../../img/loginMain.png')}
         />
         <View style={styles.LoginBox}>
           <Text style={{ color: 'white', fontSize: 16 }}>ID</Text>
@@ -51,9 +63,14 @@ class Login extends Component {
               padding: 10,
               marginBottom: 30,
             }}
-            onPress={this.onPress}
+            onPress={this.doLogin.bind(this)}
           >
-            <Text style={{ color: '#649A8D', fontSize: 18, fontWeight: 'bold' }}>들어가기</Text>
+            <Text
+              style={{ color: '#649A8D', fontSize: 18, fontWeight: 'bold' }}
+              onPress={this.doLogin}
+            >
+              들어가기
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={{
@@ -71,7 +88,7 @@ class Login extends Component {
           >
             <Image
               style={{ width: 35, height: 40, marginRight: 30 }}
-              source={require('../img/kakaoLogo.png')}
+              source={require('../../img/kakaoLogo.png')}
             />
             <Text style={{ color: '#391B1B', fontSize: 18, fontWeight: 'bold' }}>
               카카오 로그인
@@ -86,17 +103,20 @@ class Login extends Component {
 const styles = StyleSheet.create({
   loginContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
+    height: '100%',
+    position: 'relative',
   },
   LoginBox: {
-    borderRadius: 50,
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
     backgroundColor: '#8AB3A9',
     alignItems: 'center',
     justifyContent: 'center',
     height: '55%',
+    position: 'absolute',
+    bottom: 0,
     width: '100%',
-    marginTop: 100,
+    marginTop: 30,
+    paddingTop: 30,
   },
 });
-
-export default Login;

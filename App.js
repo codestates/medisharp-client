@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
-import Login from './src/components/Login';
-import Home from './src/components/Home';
+import React from 'react';
+import AppStack from './src/screens';
 
-export default function App() {
-  const [isLogin, setIsLogin] = useState(true);
-  return <View>{isLogin ? <Home /> : <Login />}</View>;
-}
+const App = () => {
+  return <AppStack />;
+};
+
+export default App;

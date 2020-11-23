@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, Dimensions } from 'react-native';
-import CountdownTimer from './CountdownTimer';
-import AlarmList from './AlarmList';
-import TabBar from './TabBar';
+import CountdownTimer from '../../components/CountdownTimer';
+import AlarmList from '../../components/AlarmList';
 
 // Get Today Checked _주간 복용 현황
 const fakeGetTodayChecked = { 1: [true, true, true, true, false, true, false] };
@@ -26,7 +25,7 @@ const fakeGetAlarmList = {
 
 const window = Dimensions.get('window');
 
-const Home = () => {
+const HomeScreen = () => {
   return (
     <View
       style={{
@@ -87,13 +86,8 @@ const Home = () => {
         </View>
         <AlarmList alarmsOnToday={fakeGetAlarmList} />
       </View>
-      <TabBar
-        style={{
-          height: 70,
-        }}
-      />
     </View>
   );
 };
 
-export default Home;
+export default HomeScreen;

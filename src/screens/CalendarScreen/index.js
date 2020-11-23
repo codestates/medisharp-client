@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-const TabBar = () => {
+const Calendar = () => {
   return (
     <View>
-      <Text>TabBar</Text>
+      <Text>Calendar</Text>
     </View>
   );
 };
 
-export default TabBar;
+export default Calendar;
