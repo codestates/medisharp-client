@@ -1,10 +1,79 @@
 import React, { Component } from 'react';
 import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+//import { Linking } from 'expo';
+
+import * as Linking from 'expo-linking';
+
+import { AsyncStorage } from '@react-native-community/async-storage';
+
+//import axios from 'axios';
 
 export default class LoginScreen extends Component {
   static navigationOptions = {
     headerShown: false,
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: '',
+      password: '',
+      isAuthorized: false,
+      auth: '',
+    };
+  }
+
+  _storeData = async () => {
+    await AsyncStorage.setItem('yagOlim', Json.stringify(this.state.auth));
+  };
+
+  _retrieveData = async () => {
+    const value = await AsyncStorage.getItem('yagOlim');
+    if (value !== null) {
+      // We have data!!
+      console.log(value);
+    }
+  };
+
+  componentDidMount() {
+    Linking.getInitialURL().then((url) => {
+      let newURL = Linking.parse(url);
+      let auth = newURL.queryParams.authorization;
+      this.setState({ auth: auth });
+      if (auth !== undefined) {
+        this._storeData(this.state.auth);
+        console.log(this.state.auth);
+        this.setState({ isAuthorized: true });
+        console.log(this.state.isAuthorized);
+      }
+    });
+    this._retrieveData();
+  }
+
+  //일반 로그인을 위해 필요한 부분. 서버는 아직 구현하지 못했지만, 클라는 소셜로그인 API 진행하는 겸사 구현하겠습니다.
+  onEmailChange = (email) => {
+    this.setState({ email });
+  };
+
+  onPasswordChange = (password) => {
+    this.setState({ password });
+  };
+
+  // 일반 로그인
+  // onPressLogin() {
+  //   axios({
+  //     method: 'get',
+  //     url: 'http://localhost:5000/users',
+  //     data: {
+  //       email: this.state.email,
+  //       password: this.state.password,
+  //     },
+  //   }).then((data) => {
+  //     console.log(data);
+  //   });
+  //   //.then(onSuccess)
+  //   //.catch(onFailure);
+  // }
 
   doLogin() {
     this.props.navigation.replace('TabNavigator');
@@ -24,8 +93,14 @@ export default class LoginScreen extends Component {
         <View style={styles.LoginBox}>
           <Text style={{ color: 'white', fontSize: 16 }}>ID</Text>
           <TextInput
+            value={this.state.email}
             autoCompleteType={'email'}
             placeholder={'e-mail'}
+            autoCapitalize="none"
+            autoCorrect={false}
+            onChangeText={this.onEmailChange}
+            underlineColorAndroid="transparent"
+            placeholderTextColor="#999"
             style={{
               borderRadius: 10,
               height: 40,
@@ -42,6 +117,9 @@ export default class LoginScreen extends Component {
             placeholder={'password'}
             keyboardType={'password'}
             secureTextEntry={true}
+            onChangeText={this.onPasswordChange}
+            underlineColorAndroid="transparent"
+            placeholderTextColor="#999"
             style={{
               borderRadius: 10,
               height: 40,
@@ -84,7 +162,7 @@ export default class LoginScreen extends Component {
               marginBottom: 50,
               flexDirection: 'row',
             }}
-            // onPress={this.onPress}
+            onPress={() => Linking.openURL('http://localhost:5000/oauth/kakao')}
           >
             <Image
               style={{ width: 35, height: 40, marginRight: 30 }}
