@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-const AlarmList = () => {
+const MedicineBox = () => {
   return (
     <View>
-      <Text>AlarmList</Text>
+      <Text>MedicineBox</Text>
     </View>
   );
 };
 
-export default AlarmList;
+export default MedicineBox;

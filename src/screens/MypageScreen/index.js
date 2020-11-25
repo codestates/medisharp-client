@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-const AlarmList = () => {
+const Mypage = () => {
   return (
     <View>
-      <Text>AlarmList</Text>
+      <Text>Mypage</Text>
     </View>
   );
 };
 
-export default AlarmList;
+export default Mypage;
