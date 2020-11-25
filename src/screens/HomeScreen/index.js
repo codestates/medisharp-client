@@ -114,14 +114,16 @@ const HomeScreen = () => {
                   index === 0 && { color: 'white', backgroundColor: '#6a9c90' },
                 ]}
               >
-                <Text style={{ fontSize: 20, fontWeight: 500 }}>{item[2][1]}</Text>
-                <Text style={{ marginTop: 10, marginBottom: 10, fontWeight: 300 }}>
+                <Text style={[styles.firstItemInAlarm, index === 0 && { color: 'white' }]}>
+                  {item[2][1]}
+                </Text>
+                <Text style={[styles.secondItemInAlarm, index === 0 && { color: 'white' }]}>
                   {item[2][3]}
                 </Text>
-                <Text style={{ position: 'absolute', bottom: 20, fontWeight: 300 }}>
+                <Text style={[styles.thirdItemInAlarm, index === 0 && { color: 'white' }]}>
                   {item[2][2]}일 마다
                 </Text>
-                <Text style={{ position: 'absolute', bottom: 20, right: 10, fontWeight: 300 }}>
+                <Text style={[styles.fourthItemInAlarm, index === 0 && { color: 'white' }]}>
                   {item[1]}
                 </Text>
               </View>
@@ -161,23 +163,15 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 10,
   },
-  HomeAlarmFirstChile: {
-    padding: 10,
-    paddingTop: 20,
-    width: 145,
-    height: 145,
-    borderRadius: 30,
-    backgroundColor: '#e9efee',
-    margin: 15,
-    marginLeft: 0,
-    shadowColor: '#313131',
-    shadowOffset: {
-      width: 5,
-      height: 5,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 10,
+  firstItemInAlarm: { fontSize: 20, fontWeight: 600, color: '#313131' },
+  secondItemInAlarm: { marginTop: 10, marginBottom: 10, fontWeight: 400, color: '#313131' },
+  thirdItemInAlarm: { position: 'absolute', bottom: 20, fontWeight: 400, color: '#313131' },
+  fourthItemInAlarm: {
+    position: 'absolute',
+    bottom: 20,
+    right: 10,
+    fontWeight: 400,
+    color: '#313131',
   },
 });
 
