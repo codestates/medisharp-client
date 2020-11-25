@@ -4,7 +4,8 @@ import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'reac
 
 import * as Linking from 'expo-linking';
 
-import { AsyncStorage } from '@react-native-community/async-storage';
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem, setItem } = useAsyncStorage('@yag_olim');
 
 //import axios from 'axios';
 
@@ -18,46 +19,47 @@ export default class LoginScreen extends Component {
     this.state = {
       email: '',
       password: '',
-      isAuthorized: false,
-      auth: '',
+      //isAuthorized: false, 필요해지면 써요
     };
   }
 
-  _storeData = async () => {
-    await AsyncStorage.setItem('yagOlim', Json.stringify(this.state.auth));
+  _storeData = async (auth) => {
+    await setItem(auth);
+    //setValue(this.state.auth);
+    //this.setState({ isAuthorized: true });
+    console.log('success');
+    this.props.navigation.replace('TabNavigator');
   };
 
   _retrieveData = async () => {
-    const value = await AsyncStorage.getItem('yagOlim');
+    const value = await getItem();
     if (value !== null) {
-      // We have data!!
       console.log(value);
+      //this.setState({ isAuthorized: true });
+      console.log('success');
+      this.props.navigation.replace('TabNavigator');
     }
   };
 
   componentDidMount() {
+    this._retrieveData();
     Linking.getInitialURL().then((url) => {
       let newURL = Linking.parse(url);
       let auth = newURL.queryParams.authorization;
-      this.setState({ auth: auth });
       if (auth !== undefined) {
-        this._storeData(this.state.auth);
-        console.log(this.state.auth);
-        this.setState({ isAuthorized: true });
-        console.log(this.state.isAuthorized);
+        this._storeData(auth);
       }
     });
-    this._retrieveData();
   }
 
   //일반 로그인을 위해 필요한 부분. 서버는 아직 구현하지 못했지만, 클라는 소셜로그인 API 진행하는 겸사 구현하겠습니다.
-  onEmailChange = (email) => {
+  onEmailChange(email) {
     this.setState({ email });
-  };
+  }
 
-  onPasswordChange = (password) => {
+  onPasswordChange(password) {
     this.setState({ password });
-  };
+  }
 
   // 일반 로그인
   // onPressLogin() {
