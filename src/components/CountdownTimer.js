@@ -1,23 +1,28 @@
 import React from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import moment from 'moment';
-// import RNMomentCountDown from 'react-native-moment-countdown';
-/*
-src/screens/HomeScreen/index.js에서 
-const fakeGetAlarmList = {
-  1: [false, '13:00:00', { 1: '비염약', 2: '0', 3: '환절기만 되면 이러네 에라이...' }],
-  2: [false, '18:30:00', { 1: '밀키천식약', 2: '2', 3: '밀키약 너무 비싸다..ㅠ' }],
-};
-을 중 
-<CountdownTimer upcomingAlarm={fakeGetAlarmList[1]} />
-이렇게 내려주고 있으므로 나는 
-[false, '13:00:00', { 1: '비염약', 2: '0', 3: '환절기만 되면 이러네 에라이...' }]을 기준으로 시간 countdown을 구현하면 된다. 
-*/
+
 class CountdownTimer extends React.Component {
   constructor(props) {
     super(props);
+    const fakeAlarmListArry = this.props.upcomingAlarm;
+    // console.log('fake: ', fakeAlarmListArry); // [[false, '13:00:00', { 1: '비염약', 2: '0', 3: '환절기만 되면 이러네 에라이...' }],[false, '18:30:00', { 1: '밀키천식약', 2: '2', 3: '밀키약 너무 비싸다..ㅠ' }],];
+
+    const getRecentAlarm = () => {
+      for (let time of fakeAlarmListArry) {
+        //time이 정렬되어있는 fakeAlarmListArray.
+        let now = moment();
+        let then = moment(time[1], 'hh:mm');
+        let term = moment.duration(then.diff(now));
+        if (term.hours() >= 0 && term.minutes() >= 0) {
+          return time[1];
+        }
+      }
+    };
+    //이러고 있다가 0시간 0분 차이가 되면 '약 복용 시간입니다'를 잠깐 보여주고 다시 리로딩되면서
+    //getRecentAlarm이 다시 실행되어야함. 그래서 그 다음번 알람이 주어져야 한다.
     this.props = props;
-    this.timeTillDate = this.props.upcomingAlarm[1];
+    this.timeTillDate = getRecentAlarm();
     this.timeFormat = 'hh:mm';
     this.then = moment(this.timeTillDate, this.timeFormat);
     this.now = moment();
@@ -47,10 +52,16 @@ class CountdownTimer extends React.Component {
   render() {
     const { hours, minutes } = this.state;
 
-    if (minutes <= 0) {
+    if (minutes < 0) {
       return (
         <div>
           <Text>오늘은 복용할 약이 없습니다. 내일도 오늘 같기를!</Text>
+        </div>
+      );
+    } else if (hours == 0 && minute == 0) {
+      return (
+        <div>
+          <Text>약 복용하실 시간입니다~</Text>
         </div>
       );
     }

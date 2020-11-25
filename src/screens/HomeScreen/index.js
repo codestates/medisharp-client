@@ -91,7 +91,8 @@ const HomeScreen = () => {
             textAlign: 'center',
           }}
         >
-          <CountdownTimer upcomingAlarm={fakeGetAlarmList[1]} />
+          {/* <CountdownTimer upcomingAlarm={fakeGetAlarmList[1]} /> */}
+          <CountdownTimer upcomingAlarm={fakeAlarmListArry} />
         </View>
         <View>
           <Text style={{ fontSize: 18, fontWeight: 300, marginBottom: 10, marginTop: 10 }}>
