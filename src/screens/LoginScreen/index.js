@@ -2,10 +2,12 @@ import React, { Component } from 'react';
 import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 
 //import * as Linking from 'expo-linking';
+import SocialWebviewModal from './SocialWebviewModal';
+
+import { AsyncStorage } from '@react-native-community/async-storage';
 
 import { useAsyncStorage } from '@react-native-community/async-storage';
-import SocialWebviewModal from './SocialWebviewModal';
-const { getItem, setItem } = useAsyncStorage('@yag_olim');
+const { getItem, removeItem } = useAsyncStorage('@yag_olim');
 
 //import axios from 'axios';
 
@@ -30,29 +32,23 @@ export default class LoginScreen extends Component {
   //   this.props.navigation.replace('TabNavigator');
   // };
 
-  // read = async () => {
-  //   try {
-  //     const value = await getItem();
-  //     if (value) {
-  //       console.log('success');
-  //       this.props.navigation.replace('TabNavigator');
-  //     }
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // };
+  read = async () => {
+    try {
+      const value = await getItem();
+      if (value) {
+        console.log('success');
+        console.log(value);
+        this.props.navigation.replace('TabNavigator');
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
-  // componentDidMount() {
-  //   this.read();
-  //   this._storeData('auth');
-  // Linking.getInitialURL().then((url) => {
-  //   let newURL = Linking.parse(url);
-  //   let auth = newURL.queryParams.authorization;
-  //   if (auth !== undefined) {
-  //     this._storeData(auth);
-  //   }
-  // });
-  //}
+  componentDidMount = async () => {
+    await this.read();
+    //await removeItem();
+  };
 
   //일반 로그인을 위해 필요한 부분. 서버는 아직 구현하지 못했지만, 클라는 소셜로그인 API 진행하는 겸사 구현하겠습니다.
   onEmailChange(email) {
@@ -71,10 +67,20 @@ export default class LoginScreen extends Component {
     });
   };
 
-  closeSocialModal = () => {
+  closeSocialModal = async () => {
     this.setState({
       socialModalVisible: !this.state.socialModalVisible,
     });
+    try {
+      const value = await getItem();
+      if (value) {
+        console.log('success');
+        console.log(value);
+        this.props.navigation.replace('TabNavigator');
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   // 일반 로그인

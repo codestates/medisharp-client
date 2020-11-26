@@ -1,5 +1,7 @@
 import React from 'react';
-import Modal from 'react-native-simple-modal';
+import { StyleSheet } from 'react-native';
+
+import Modal from 'react-native-modal';
 import SocialWebview from './SocialWebview';
 
 const SocialWebviewModal = (props) => {
@@ -8,16 +10,20 @@ const SocialWebviewModal = (props) => {
       animationType="slide"
       transparent={true}
       visible={props.visible}
-      //style={styles.container}
+      style={styles.container}
     >
-      <SocialWebview source={{ uri: props.source }} closeSocialModal={props.closeSocialModal} />
+      <SocialWebview
+        source={{ uri: props.source }}
+        closeSocialModal={props.closeSocialModal}
+        readToken={props.readToken}
+      />
     </Modal>
   );
 };
 export default SocialWebviewModal;
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//   },
-// });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
