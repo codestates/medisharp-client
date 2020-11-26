@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
-//import { Linking } from 'expo';
 
-import * as Linking from 'expo-linking';
+//import * as Linking from 'expo-linking';
 
 import { useAsyncStorage } from '@react-native-community/async-storage';
+import SocialWebviewModal from './SocialWebviewModal';
 const { getItem, setItem } = useAsyncStorage('@yag_olim');
 
 //import axios from 'axios';
@@ -19,38 +19,40 @@ export default class LoginScreen extends Component {
     this.state = {
       email: '',
       password: '',
-      //isAuthorized: false, 필요해지면 써요
+      socialModalVisible: false,
+      source: undefined,
     };
   }
 
-  _storeData = async (auth) => {
-    await setItem(auth);
-    //setValue(this.state.auth);
-    //this.setState({ isAuthorized: true });
-    console.log('success');
-    this.props.navigation.replace('TabNavigator');
-  };
+  // _storeData = async (auth) => {
+  //   await setItem(auth);
+  //   console.log('success');
+  //   this.props.navigation.replace('TabNavigator');
+  // };
 
-  _retrieveData = async () => {
-    const value = await getItem();
-    if (value !== null) {
-      console.log(value);
-      //this.setState({ isAuthorized: true });
-      console.log('success');
-      this.props.navigation.replace('TabNavigator');
-    }
-  };
+  // read = async () => {
+  //   try {
+  //     const value = await getItem();
+  //     if (value) {
+  //       console.log('success');
+  //       this.props.navigation.replace('TabNavigator');
+  //     }
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
 
-  componentDidMount() {
-    this._retrieveData();
-    Linking.getInitialURL().then((url) => {
-      let newURL = Linking.parse(url);
-      let auth = newURL.queryParams.authorization;
-      if (auth !== undefined) {
-        this._storeData(auth);
-      }
-    });
-  }
+  // componentDidMount() {
+  //   this.read();
+  //   this._storeData('auth');
+  // Linking.getInitialURL().then((url) => {
+  //   let newURL = Linking.parse(url);
+  //   let auth = newURL.queryParams.authorization;
+  //   if (auth !== undefined) {
+  //     this._storeData(auth);
+  //   }
+  // });
+  //}
 
   //일반 로그인을 위해 필요한 부분. 서버는 아직 구현하지 못했지만, 클라는 소셜로그인 API 진행하는 겸사 구현하겠습니다.
   onEmailChange(email) {
@@ -60,6 +62,20 @@ export default class LoginScreen extends Component {
   onPasswordChange(password) {
     this.setState({ password });
   }
+
+  //소셜 로그인
+  onPressSocial = async (social) => {
+    this.setState({
+      socialModalVisible: !this.state.socialModalVisible,
+      source: `https://gentle-anchorage-17372.herokuapp.com/oauth/${social}`,
+    });
+  };
+
+  closeSocialModal = () => {
+    this.setState({
+      socialModalVisible: !this.state.socialModalVisible,
+    });
+  };
 
   // 일반 로그인
   // onPressLogin() {
@@ -152,28 +168,37 @@ export default class LoginScreen extends Component {
               들어가기
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#FAE301',
-              width: 250,
-              borderRadius: 20,
-              height: 60,
-              padding: 10,
-              marginBottom: 50,
-              flexDirection: 'row',
-            }}
-            onPress={() => Linking.openURL('http://localhost:5000/oauth/kakao')}
-          >
-            <Image
-              style={{ width: 35, height: 40, marginRight: 30 }}
-              source={require('../../img/kakaoLogo.png')}
-            />
-            <Text style={{ color: '#391B1B', fontSize: 18, fontWeight: 'bold' }}>
-              카카오 로그인
-            </Text>
-          </TouchableOpacity>
+          <View>
+            {this.state.source !== undefined ? (
+              <SocialWebviewModal
+                visible={this.state.socialModalVisible}
+                source={this.state.source}
+                closeSocialModal={this.closeSocialModal}
+              />
+            ) : null}
+            <TouchableOpacity
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#FAE301',
+                width: 250,
+                borderRadius: 20,
+                height: 60,
+                padding: 10,
+                marginBottom: 50,
+                flexDirection: 'row',
+              }}
+              onPress={() => this.onPressSocial('kakao')}
+            >
+              <Image
+                style={{ width: 35, height: 40, marginRight: 30 }}
+                source={require('../../img/kakaoLogo.png')}
+              />
+              <Text style={{ color: '#391B1B', fontSize: 18, fontWeight: 'bold' }}>
+                카카오 로그인
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );

@@ -123,7 +123,7 @@ const TabNavigator = createBottomTabNavigator(
 );
 
 const AppStack = createStackNavigator({
-  LoadingScreen: LoadingScreen, // 3번 로딩 화면 보기를 위해 급하게 만들었습니다. 이걸 없애면 첫화면이 로그인 화면이 됩니다.
+  //LoadingScreen: LoadingScreen, // 3번 로딩 화면 보기를 위해 급하게 만들었습니다. 이걸 없애면 첫화면이 로그인 화면이 됩니다.
   LoginScreen: LoginScreen,
   TabNavigator: {
     screen: TabNavigator,
