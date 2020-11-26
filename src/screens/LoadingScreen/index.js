@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 
-//import * as SecureStore from 'expo-secure-store';
-
 import { useAsyncStorage } from '@react-native-community/async-storage';
-const { getItem } = useAsyncStorage('@yag_olim');
+const { getItem, removeItem } = useAsyncStorage('@yag_olim');
 
 export default class LoadingScreen extends Component {
   static navigationOptions = {
@@ -49,7 +47,7 @@ export default class LoadingScreen extends Component {
       if (value) {
         console.log('success');
         this.setState({ isAuthorized: true });
-        //this.props.navigation.replace('TabNavigator');
+        console.log(value);
       }
     } catch (e) {
       console.log(e);
@@ -57,12 +55,14 @@ export default class LoadingScreen extends Component {
   };
 
   async componentDidMount() {
-    await this.read();
-    if (this.state.isAuthorized === true) {
-      this.props.navigation.replace('TabNavigator');
-    } else {
-      this.props.navigation.replace('LoginScreen');
-    }
+    //await removeItem();
+    // await this.read();
+    // if (this.state.isAuthorized === true) {
+    //   this.props.navigation.replace('TabNavigator');
+    // } else {
+    //   this.props.navigation.replace('LoginScreen');
+    // }
+    this.props.navigation.replace('LoginScreen');
   }
 
   render() {
