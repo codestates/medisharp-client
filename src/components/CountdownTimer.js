@@ -27,7 +27,7 @@ class CountdownTimer extends React.Component {
     this.minutes = moment.duration(this.then.diff(this.now)).minutes();
     this.seconds = moment.duration(this.then.diff(this.now)).seconds();
     this.state = {
-      hours: this.hour,
+      hours: this.hours,
       minutes: this.minutes,
       seconds: this.seconds,
     };
@@ -36,7 +36,6 @@ class CountdownTimer extends React.Component {
   componentDidMount() {
     this.interval = setInterval(() => {
       const timeTillDate = getRecentAlarm(this.props.upcomingAlarm);
-      console.log('timeTillDate: ', timeTillDate);
       const then = moment(timeTillDate, this.timeFormat);
       const now = moment();
       const hours = moment.duration(then.diff(now)).hours();
