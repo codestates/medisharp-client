@@ -165,7 +165,7 @@ export default class LoginScreen extends Component {
           >
             <Text
               style={{ color: '#649A8D', fontSize: 18, fontWeight: 'bold' }}
-              onPress={this.doLogin}
+              onPress={this.doLogin.bind(this)}
             >
               들어가기
             </Text>

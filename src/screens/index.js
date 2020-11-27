@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
@@ -10,11 +10,7 @@ import AlarmScreen from './AlarmScreen';
 import MedicineBoxScreen from './MedicineBoxScreen';
 import LoginScreen from './LoginScreen';
 import MypageScreen from './MypageScreen';
-import HomeIcon from '../img/Home.png';
-import calendarIcon from '../img/calendar.png';
-import alarmIcon from '../img/alarm.png';
-import medicineBoxIcon from '../img/medicineBox.png';
-import myPageIcon from '../img/myPage.png';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 // import { useAsyncStorage } from '@react-native-community/async-storage';
 // const { getItem } = useAsyncStorage('@yag_olim');
@@ -47,8 +43,6 @@ const HomeStack = createStackNavigator(
   {
     HomeScreen,
   },
-  // if you need.
-  // recommend custom header
   {
     defaultNavigationOptions: ({ navigation }) => ({
       title: 'Home',
@@ -114,10 +108,66 @@ const TabNavigator = createBottomTabNavigator(
     Mypage: MypageStack,
   },
   {
+    defaultNavigationOptions: ({ navigation }) => ({
+      tabBarIcon: ({ focused }) => {
+        const { routeName } = navigation.state;
+
+        if (routeName === 'Home') {
+          return (
+            <View>
+              <Icon name="home" size={25} color={(focused && '#6a9c90') || '#888'} />
+            </View>
+          );
+        }
+        if (routeName === 'Calendar') {
+          return (
+            <View style={{ paddingRight: 10 }}>
+              <Icon name="calendar-alt" size={25} color={(focused && '#6a9c90') || '#888'} />
+            </View>
+          );
+        }
+        if (routeName === 'Alarm') {
+          return (
+            <View
+              style={{
+                backgroundColor: '#6a9c90',
+                width: 50,
+                height: 30,
+                borderRadius: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {/* <Icon name="clock" size={25} color={(focused && '#6a9c90') || '#888'} /> */}
+              <Text style={{ color: 'white', fontSize: 30, fontWeight: 800, marginBottom: 5 }}>
+                +
+              </Text>
+            </View>
+          );
+        }
+        if (routeName === 'MedicineBox') {
+          return (
+            <View style={{ paddingLeft: 10 }}>
+              <Icon name="pills" size={25} color={(focused && '#6a9c90') || '#888'} />
+            </View>
+          );
+        }
+        if (routeName === 'Mypage') {
+          return (
+            <View>
+              <Icon name="user-alt" size={25} color={(focused && '#6a9c90') || '#888'} />
+            </View>
+          );
+        }
+
+        // can use react-native-vector-icons
+        // <Icon name={iconName} size={iconSize} color={iconColor} />
+      },
+    }),
     lazy: false,
     tabBarOptions: {
-      activeTintColor: '#6a9c90',
-      inactiveTintColor: '#888',
+      style: { borderTopColor: 'transparent' },
+      showLabel: false,
     },
   },
 );
