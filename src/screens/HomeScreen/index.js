@@ -23,9 +23,12 @@ const fakeGetAlarmList = {
   1: [false, '13:00:00', { 1: '비염약', 2: '0', 3: '환절기만 되면 이러네 에라이...' }],
   2: [false, '18:30:00', { 1: '밀키천식약', 2: '2', 3: '밀키약 너무 비싸다..ㅠ' }],
 };
+//지금시간 : 12:43
 const fakeAlarmListArry = [
-  [false, '13:00:00', { 1: '비염약', 2: '0', 3: '환절기만 되면 이러네 에라이...' }],
-  [false, '18:30:00', { 1: '밀키천식약', 2: '2', 3: '밀키약 너무 비싸다..ㅠ' }],
+  [false, '12:44:00', { 1: '비염약', 2: '0', 3: '환절기만 되면 이러네 에라이...' }],
+  //이게 마지막 알람이에요!
+  [false, '12:45:00', { 1: '밀키천식약', 2: '2', 3: '밀키약 너무 비싸다..ㅠ' }],
+  // [false, '12:23:00', {0 1: '눈건강약', 2: '2', 3: '꼭 먹기!!!' }],
 ];
 
 const window = Dimensions.get('window');
@@ -91,7 +94,8 @@ const HomeScreen = () => {
             textAlign: 'center',
           }}
         >
-          <CountdownTimer upcomingAlarm={fakeGetAlarmList[1]} />
+          {/* <CountdownTimer upcomingAlarm={fakeGetAlarmList[1]} /> */}
+          <CountdownTimer upcomingAlarm={fakeAlarmListArry} />
         </View>
         <View>
           <Text style={{ fontSize: 18, fontWeight: 300, marginBottom: 10, marginTop: 10 }}>
