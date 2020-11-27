@@ -12,11 +12,7 @@ const SocialWebviewModal = (props) => {
       visible={props.visible}
       style={styles.container}
     >
-      <SocialWebview
-        source={{ uri: props.source }}
-        closeSocialModal={props.closeSocialModal}
-        readToken={props.readToken}
-      />
+      <SocialWebview source={{ uri: props.source }} closeSocialModal={props.closeSocialModal} />
     </Modal>
   );
 };
