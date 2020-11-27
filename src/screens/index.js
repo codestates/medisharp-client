@@ -12,19 +12,6 @@ import LoginScreen from './LoginScreen';
 import MypageScreen from './MypageScreen';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-// import { useAsyncStorage } from '@react-native-community/async-storage';
-// const { getItem } = useAsyncStorage('@yag_olim');
-
-// const _retrieveData = async () => {
-//   const value = await getItem();
-//   if (value !== null) {
-//     console.log(value);
-//     //this.setState({ isAuthorized: true });
-//     console.log('success');
-//     return value;
-//   }
-// };
-
 const LoginStack = createStackNavigator(
   {
     LoginScreen,
