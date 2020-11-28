@@ -4,16 +4,11 @@ import { View, Text, StyleSheet } from 'react-native';
 const Alarm = ({ alarm }) => {
   console.log('alarm:', alarm);
   return (
-    // <View style={(styles.HomeAlarm, alarm.key === 0 && { backgroundColor: '#6a9c90', color: 'white' })}>
     <View style={styles.HomeAlarm}>
-      <Text style={{ fontSize: 20, fontWeight: 500 }}>{alarm[2][1]}</Text>
-      <Text style={{ marginTop: 10, marginBottom: 10, fontWeight: 300 }}>{alarm[2][3]}</Text>
-      <Text style={{ position: 'absolute', bottom: 20, fontWeight: 300 }}>
-        {alarm[2][2]}일 마다
-      </Text>
-      <Text style={{ position: 'absolute', bottom: 20, right: 10, fontWeight: 300 }}>
-        {alarm[1]}
-      </Text>
+      <Text style={{ fontSize: 20, fontWeight: '500' }}>{alarm[2][1]}</Text>
+      <Text style={{ marginTop: 10, marginBottom: 10 }}>{alarm[2][3]}</Text>
+      <Text style={{ position: 'absolute', bottom: 20 }}>{alarm[2][2]}일 마다</Text>
+      <Text style={{ position: 'absolute', bottom: 20, right: 10 }}>{alarm[1]}</Text>
     </View>
   );
 };
