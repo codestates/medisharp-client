@@ -135,7 +135,7 @@ export default class LoginScreen extends Component {
           <TextInput
             autoCompleteType={'password'}
             placeholder={'password'}
-            keyboardType={'password'}
+            keyboardType={'visible-password'}
             secureTextEntry={true}
             onChangeText={this.onPasswordChange}
             underlineColorAndroid="transparent"

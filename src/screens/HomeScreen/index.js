@@ -22,13 +22,14 @@ const checkCount = checkCounting();
 const fakeGetAlarmList = {
   1: [false, '13:00:00', { 1: '비염약', 2: '0', 3: '환절기만 되면 이러네 에라이...' }],
   2: [false, '18:30:00', { 1: '밀키천식약', 2: '2', 3: '밀키약 너무 비싸다..ㅠ' }],
+  3: [false, '18:30:00', { 1: '밀키천식약', 2: '2', 3: '밀키약 너무 비싸다..ㅠ' }],
 };
 //지금시간 : 12:43
 const fakeAlarmListArry = [
   [false, '12:44:00', { 1: '비염약', 2: '0', 3: '환절기만 되면 이러네 에라이...' }],
   //이게 마지막 알람이에요!
   [false, '12:45:00', { 1: '밀키천식약', 2: '2', 3: '밀키약 너무 비싸다..ㅠ' }],
-  // [false, '12:23:00', {0 1: '눈건강약', 2: '2', 3: '꼭 먹기!!!' }],
+  [false, '12:23:00', { 1: '눈건강약', 2: '2', 3: '꼭 먹기!!!' }],
 ];
 
 const window = Dimensions.get('window');
@@ -50,25 +51,31 @@ const HomeScreen = () => {
           style={{
             marginTop: 40,
             fontSize: 24,
-            fontWeight: 300,
+            fontWeight: '300',
           }}
         >
           약올림
         </Text>
-        <Text
+        <View
           style={{
-            width: 220,
-            marginTop: 5,
-            fontSize: 20,
-            fontWeight: 500,
-            paddingBottom: 5,
             borderBottomStyle: 'solid',
             borderBottomWidth: 5,
             borderBottomColor: '#6a9c90',
+            alignSelf: 'flex-start',
           }}
         >
-          오늘도 잘 챙겨먹고 있나요?
-        </Text>
+          <Text
+            style={{
+              alignSelf: 'center',
+              marginTop: 5,
+              fontSize: 20,
+              fontWeight: 'bold',
+              paddingBottom: 5,
+            }}
+          >
+            오늘도 잘 챙겨먹고 있나요?
+          </Text>
+        </View>
         <Text
           style={{
             width: window.width * 0.85,
@@ -98,7 +105,7 @@ const HomeScreen = () => {
           <CountdownTimer upcomingAlarm={fakeAlarmListArry} />
         </View>
         <View>
-          <Text style={{ fontSize: 18, fontWeight: 300, marginBottom: 10, marginTop: 10 }}>
+          <Text style={{ fontSize: 18, fontWeight: '300', marginBottom: 10, marginTop: 10 }}>
             오늘의 알람
           </Text>
           {/* <FlatList
@@ -109,29 +116,32 @@ const HomeScreen = () => {
             ListHeaderComponentStyle={true}
             renderItem={({ item }) => <Alarm alarm={item} />}
           ></FlatList> */}
-          <ScrollView horizontal={true} style={styles.HomeAlarmList}>
-            {fakeAlarmListArry.map((item, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.HomeAlarm,
-                  index === 0 && { color: 'white', backgroundColor: '#6a9c90' },
-                ]}
-              >
-                <Text style={[styles.firstItemInAlarm, index === 0 && { color: 'white' }]}>
-                  {item[2][1]}
-                </Text>
-                <Text style={[styles.secondItemInAlarm, index === 0 && { color: 'white' }]}>
-                  {item[2][3]}
-                </Text>
-                <Text style={[styles.thirdItemInAlarm, index === 0 && { color: 'white' }]}>
-                  {item[2][2]}일 마다
-                </Text>
-                <Text style={[styles.fourthItemInAlarm, index === 0 && { color: 'white' }]}>
-                  {item[1]}
-                </Text>
-              </View>
-            ))}
+
+          <ScrollView horizontal={true}>
+            <View style={styles.HomeAlarmList}>
+              {fakeAlarmListArry.map((item, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.HomeAlarm,
+                    index === 0 && { color: 'white', backgroundColor: '#6a9c90' },
+                  ]}
+                >
+                  <Text style={[styles.firstItemInAlarm, index === 0 && { color: 'white' }]}>
+                    {item[2][1]}
+                  </Text>
+                  <Text style={[styles.secondItemInAlarm, index === 0 && { color: 'white' }]}>
+                    {item[2][3]}
+                  </Text>
+                  <Text style={[styles.thirdItemInAlarm, index === 0 && { color: 'white' }]}>
+                    {item[2][2]}일 마다
+                  </Text>
+                  <Text style={[styles.fourthItemInAlarm, index === 0 && { color: 'white' }]}>
+                    {item[1]}
+                  </Text>
+                </View>
+              ))}
+            </View>
           </ScrollView>
         </View>
       </View>
@@ -167,14 +177,20 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 10,
   },
-  firstItemInAlarm: { fontSize: 20, fontWeight: 600, color: '#313131' },
-  secondItemInAlarm: { marginTop: 10, marginBottom: 10, fontWeight: 400, color: '#313131' },
-  thirdItemInAlarm: { position: 'absolute', bottom: 20, fontWeight: 400, color: '#313131' },
+  firstItemInAlarm: { fontSize: 20, fontWeight: '600', color: '#313131' },
+  secondItemInAlarm: { marginTop: 10, marginBottom: 10, fontWeight: '400', color: '#313131' },
+  thirdItemInAlarm: {
+    position: 'absolute',
+    left: 15,
+    bottom: 20,
+    fontWeight: '400',
+    color: '#313131',
+  },
   fourthItemInAlarm: {
     position: 'absolute',
     bottom: 20,
     right: 10,
-    fontWeight: 400,
+    fontWeight: '400',
     color: '#313131',
   },
 });

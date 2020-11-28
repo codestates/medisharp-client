@@ -56,46 +56,46 @@ class CountdownTimer extends React.Component {
 
     if (hours === 0 && minutes === 0 && seconds === 0) {
       return (
-        <div>
+        <View>
           <Text>약 복용하실 시간입니다~</Text>
-        </div>
+        </View>
       );
     } else if (!hours && !minutes && hours !== 0 && minutes !== 0) {
       return (
-        <div>
+        <View>
           <Text>오늘은 복용할 약이 없습니다. 내일도 오늘 같기를!</Text>
-        </div>
+        </View>
       );
     } else {
       return (
-        <div>
+        <View>
           <Text>
             <h3>다음 알람까지</h3>
           </Text>
-          <div className="countdown-wrapper">
+          <View className="countdown-wrapper">
             {
-              <div className="countdown-item">
+              <Text className="countdown-item">
                 {hours}
                 <span> 시간</span>
-              </div>
+              </Text>
             }
             {
-              <div className="countdown-item">
+              <Text className="countdown-item">
                 {minutes}
                 <span> 분</span>
-              </div>
+              </Text>
             }
             {
-              <div className="countdown-item">
+              <Text className="countdown-item">
                 {seconds}
                 <span> 초</span>
-              </div>
+              </Text>
             }
-          </div>
+          </View>
           <Text>
             <h3>남았습니다.</h3>
           </Text>
-        </div>
+        </View>
       );
     }
   }

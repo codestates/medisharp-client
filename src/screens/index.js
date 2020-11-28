@@ -126,7 +126,7 @@ const TabNavigator = createBottomTabNavigator(
               }}
             >
               {/* <Icon name="clock" size={25} color={(focused && '#6a9c90') || '#888'} /> */}
-              <Text style={{ color: 'white', fontSize: 30, fontWeight: 800, marginBottom: 5 }}>
+              <Text style={{ color: 'white', fontSize: 30, fontWeight: '800', marginBottom: 5 }}>
                 +
               </Text>
             </View>
@@ -146,7 +146,6 @@ const TabNavigator = createBottomTabNavigator(
             </View>
           );
         }
-
         // can use react-native-vector-icons
         // <Icon name={iconName} size={iconSize} color={iconColor} />
       },
