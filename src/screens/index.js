@@ -4,12 +4,27 @@ import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import HomeScreen from './HomeScreen';
+import LoadingScreen from './LoadingScreen';
 import CalendarScreen from './CalendarScreen';
 import AlarmScreen from './AlarmScreen';
 import MedicineBoxScreen from './MedicineBoxScreen';
 import LoginScreen from './LoginScreen';
 import MypageScreen from './MypageScreen';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+
+const LoginStack = createStackNavigator(
+  {
+    LoginScreen,
+  },
+  {
+    TabNavigator: {
+      screen: TabNavigator,
+      navigationOptions: ({ navigation }) => ({
+        headerShown: false,
+      }),
+    },
+  },
+);
 
 const HomeStack = createStackNavigator(
   {
@@ -145,6 +160,7 @@ const TabNavigator = createBottomTabNavigator(
 );
 
 const AppStack = createStackNavigator({
+  LoadingScreen: LoadingScreen, // 3번 로딩 화면 보기를 위해 급하게 만들었습니다. 이걸 없애면 첫화면이 로그인 화면이 됩니다.
   LoginScreen: LoginScreen,
   TabNavigator: {
     screen: TabNavigator,
