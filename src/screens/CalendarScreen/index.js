@@ -261,7 +261,6 @@ const window = Dimensions.get('window');
 const styles = StyleSheet.create({
   CalendarAlarmList: {
     borderStyle: 'solid',
-    borderColor: 'lightgreen',
     borderWidth: 1,
     height: window.height * 0.3,
     paddingBottom: 30,
