@@ -4,33 +4,33 @@ import moment from 'moment';
 import { View, Text, Dimensions, FlatList, StyleSheet, ScrollView } from 'react-native';
 import CountdownTimer from '../../components/CountdownTimer';
 // import AlarmList from '../../components/AlarmList';
+import axios from 'axios';
+import moment from 'moment';
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
+
 import Alarm from '../../components/Alarm';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { setItem, getItem, removeItem } = useAsyncStorage('@yag_olim');
 
-const fakeAlarmListArry = [
-  [false, '12:44:00', { 1: '비염약', 2: '0', 3: '환절기만 되면 이러네 에라이...' }],
-  [false, '12:45:00', { 1: '밀키천식약', 2: '2', 3: '밀키약 너무 비싸다..ㅠ' }],
-  [false, '12:23:00', { 1: '눈건강약', 2: '2', 3: '꼭 먹기!!!' }],
-];
 
 const window = Dimensions.get('window');
 
 const HomeScreen = () => {
   const [fakeGetTodayChecked, setfakeGetTodayChecked] = useState([]);
-
+  const [alarmList, setTodayAlarm] = useState([]);
   useEffect(() => {
     async function get_token() {
       const token = await getItem();
       return token;
     }
 
-    get_token().then((my_token) => {
+    get_token().then((token) => {
       axios({
         method: 'get',
         url: 'http://127.0.0.1:5000/schedules-dates/check/today', //'https://my-medisharp.herokuapp.com/schedules-dates/check/today', ,
         headers: {
-          Authorization: my_token,
+          Authorization: token,
         },
         params: {
           start_day: moment().subtract(8, 'd').format('YYYY-MM-DD'),
@@ -39,6 +39,25 @@ const HomeScreen = () => {
       })
         .then((datas) => {
           setfakeGetTodayChecked(datas.data.results);
+      })
+        .catch((err) => {
+          console.error(err);
+        });
+       
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm/today`,
+        headers: {
+          Authorization: token,
+        },
+        params: {
+          today: moment().format('YYYY-MM-DD'), //2020-11-22
+        },
+      })
+        .then((data) => {
+          console.log(data.data.results);
+          setTodayAlarm(data.data.results); //변경 후 상태를 axios 응답결과로 변경해줍니다.
         })
         .catch((err) => {
           console.error(err);
@@ -123,7 +142,7 @@ const HomeScreen = () => {
           }}
         >
           {/* <CountdownTimer upcomingAlarm={fakeGetAlarmList[1]} /> */}
-          <CountdownTimer upcomingAlarm={fakeAlarmListArry} />
+          <CountdownTimer upcomingAlarm={alarmList} />
         </View>
         <View>
           <Text style={{ fontSize: 18, fontWeight: '300', marginBottom: 10, marginTop: 10 }}>
@@ -140,7 +159,7 @@ const HomeScreen = () => {
 
           <ScrollView horizontal={true}>
             <View style={styles.HomeAlarmList}>
-              {fakeAlarmListArry.map((item, index) => (
+              {alarmList.map((item, index) => (
                 <View
                   key={index}
                   style={[
@@ -149,16 +168,16 @@ const HomeScreen = () => {
                   ]}
                 >
                   <Text style={[styles.firstItemInAlarm, index === 0 && { color: 'white' }]}>
-                    {item[2][1]}
+                    {item['title']}
                   </Text>
                   <Text style={[styles.secondItemInAlarm, index === 0 && { color: 'white' }]}>
-                    {item[2][3]}
+                    {item['memo']}
                   </Text>
                   <Text style={[styles.thirdItemInAlarm, index === 0 && { color: 'white' }]}>
-                    {item[2][2]}일 마다
+                    {item['cycle']}일 마다
                   </Text>
                   <Text style={[styles.fourthItemInAlarm, index === 0 && { color: 'white' }]}>
-                    {item[1]}
+                    {item['time']}
                   </Text>
                 </View>
               ))}
