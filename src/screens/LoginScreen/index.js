@@ -42,8 +42,8 @@ export default class LoginScreen extends Component {
   };
 
   componentDidMount = async () => {
-    //await this.read();
-    await removeItem();
+    await this.read();
+    //await removeItem();
   };
 
   //일반 로그인을 위해 필요한 부분. 서버는 아직 구현하지 못했지만, 클라는 소셜로그인 API 진행하는 겸사 구현하겠습니다.
