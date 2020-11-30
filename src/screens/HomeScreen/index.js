@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import moment from 'moment';
 import { View, Text, Dimensions, FlatList, StyleSheet, ScrollView } from 'react-native';
 import CountdownTimer from '../../components/CountdownTimer';
 // import AlarmList from '../../components/AlarmList';
@@ -7,7 +8,6 @@ import Alarm from '../../components/Alarm';
 
 const fakeAlarmListArry = [
   [false, '12:44:00', { 1: '비염약', 2: '0', 3: '환절기만 되면 이러네 에라이...' }],
-  //이게 마지막 알람이에요!
   [false, '12:45:00', { 1: '밀키천식약', 2: '2', 3: '밀키약 너무 비싸다..ㅠ' }],
   [false, '12:23:00', { 1: '눈건강약', 2: '2', 3: '꼭 먹기!!!' }],
 ];
@@ -25,8 +25,8 @@ const HomeScreen = () => {
           'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MX0.UgGrWBSBD2t1PHbjRRr3kSqWr3ECc65oXndQaaCrKqc',
       },
       params: {
-        start_day: '2020-11-14',
-        end_day: '2020-11-21',
+        start_day: moment().subtract(8, 'd').format('YYYY-MM-DD'), //2020-11-22
+        end_day: moment().subtract(1, 'd').format('YYYY-MM-DD'), //2020-11-29
       },
     })
       .then((datas) => {
