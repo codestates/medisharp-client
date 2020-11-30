@@ -5,41 +5,6 @@ import { LocaleConfig } from 'react-native-calendars';
 import moment from 'moment';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
-LocaleConfig.locales['fr'] = {
-  monthNames: [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ],
-  monthNamesShort: [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ],
-  dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
-  dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
-  today: moment().format().substring(0, 10),
-};
-LocaleConfig.defaultLocale = 'fr';
-
 const fakeDataGetMonthlyChecked = {
   1: [true, true, false, true, false, false, false, true, false, false],
 };
@@ -48,11 +13,14 @@ const fakeDataGetClickedAlarmsList = [
   [false, '감기약', '22:00', 0, '판피린'],
   [false, '비염약', '22:30', 0, '흰색동그란약'],
 ];
+const fakeDataMarkingDays = [['2020-11-21', '2020-11-28']];
 
 const CalendarMain = () => {
   const [todayDate, setTodayDate] = useState(moment().format().substring(0, 10));
+  const [markingDays, setMarkingDays] = useState(fakeDataMarkingDays);
+  console.log(markingDays[0]);
   const [markedDates, setMarkedDates] = useState({
-    '2020-11-21': {
+    [markingDays[0][0]]: {
       customStyles: {
         container: {
           borderStyle: 'solid',
@@ -63,7 +31,7 @@ const CalendarMain = () => {
         text: {},
       },
     },
-    '2020-11-28': {
+    [markingDays[0][1]]: {
       customStyles: {
         container: {
           borderStyle: 'solid',
@@ -74,7 +42,7 @@ const CalendarMain = () => {
         text: {},
       },
     },
-    '2020-11-30': {
+    [todayDate]: {
       customStyles: {
         container: {
           borderRadius: 10,
@@ -84,7 +52,6 @@ const CalendarMain = () => {
       },
     },
   });
-  console.log('markedDates :', markedDates);
 
   return (
     <View style={{ backgroundColor: 'white', height: '100%' }}>
@@ -182,9 +149,21 @@ const CalendarMain = () => {
           textDayFontSize: 16,
           textMonthFontSize: 26,
           textDayHeaderFontSize: 16,
+          todayTextColor: '#6a9c90',
         }}
         markingType={'custom'}
         markedDates={markedDates}
+        // markedDates={{
+        //   [todayDate]: {
+        //     customStyles: {
+        //       container: {
+        //         borderRadius: 10,
+        //         backgroundColor: '#6a9c90',
+        //       },
+        //       text: { color: 'white', fontWeight: 'bold' },
+        //     },
+        //   },
+        // }}
       />
       <View>
         <Text
@@ -216,7 +195,7 @@ const CalendarMain = () => {
                 >
                   {item[1]}
                 </Text>
-                <view
+                <View
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
@@ -246,7 +225,7 @@ const CalendarMain = () => {
                   >
                     {item[2]}
                   </Text>
-                </view>
+                </View>
               </View>
             ))}
           </ScrollView>
