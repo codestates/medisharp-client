@@ -3,7 +3,7 @@ import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'reac
 
 import SocialWebviewModal from './SocialWebviewModal';
 import { useAsyncStorage } from '@react-native-community/async-storage';
-const { getItem, removeItem } = useAsyncStorage('@yag_olim');
+const { setItem, getItem, removeItem } = useAsyncStorage('@yag_olim');
 
 //import axios from 'axios';
 
@@ -22,17 +22,11 @@ export default class LoginScreen extends Component {
     };
   }
 
-  // _storeData = async (auth) => {
-  //   await setItem(auth);
-  //   console.log('success');
-  //   this.props.navigation.replace('TabNavigator');
-  // };
-
   read = async () => {
     try {
       const value = await getItem();
       if (value) {
-        console.log('success');
+        //console.log('success');
         console.log(value);
         this.props.navigation.replace('TabNavigator');
       }
@@ -59,7 +53,7 @@ export default class LoginScreen extends Component {
   onPressSocial = async (social) => {
     this.setState({
       socialModalVisible: !this.state.socialModalVisible,
-      source: `https://gentle-anchorage-17372.herokuapp.com/oauth/${social}`,
+      source: `배포 서버 주소/oauth/${social}`,
     });
   };
 
@@ -70,8 +64,6 @@ export default class LoginScreen extends Component {
     try {
       const value = await getItem();
       if (value) {
-        console.log('success');
-        console.log(value);
         this.props.navigation.replace('TabNavigator');
       }
     } catch (e) {
