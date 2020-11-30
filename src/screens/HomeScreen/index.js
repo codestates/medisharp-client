@@ -4,15 +4,10 @@ import moment from 'moment';
 import { View, Text, Dimensions, FlatList, StyleSheet, ScrollView } from 'react-native';
 import CountdownTimer from '../../components/CountdownTimer';
 // import AlarmList from '../../components/AlarmList';
-import axios from 'axios';
-import moment from 'moment';
-import { useAsyncStorage } from '@react-native-community/async-storage';
-const { getItem } = useAsyncStorage('@yag_olim');
 
 import Alarm from '../../components/Alarm';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { setItem, getItem, removeItem } = useAsyncStorage('@yag_olim');
-
 
 const window = Dimensions.get('window');
 
@@ -28,7 +23,7 @@ const HomeScreen = () => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/schedules-dates/check/today', //'https://my-medisharp.herokuapp.com/schedules-dates/check/today', ,
+        url: 'http://127.0.0.1:5000/schedules-dates/check/today',
         headers: {
           Authorization: token,
         },
@@ -37,31 +32,31 @@ const HomeScreen = () => {
           end_day: moment().subtract(1, 'd').format('YYYY-MM-DD'),
         },
       })
-        .then((datas) => {
-          setfakeGetTodayChecked(datas.data.results);
-      })
-        .catch((err) => {
-          console.error(err);
-        });
-       
-    get_token().then((token) => {
-      axios({
-        method: 'get',
-        url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm/today`,
-        headers: {
-          Authorization: token,
-        },
-        params: {
-          today: moment().format('YYYY-MM-DD'), //2020-11-22
-        },
-      })
         .then((data) => {
-          console.log(data.data.results);
-          setTodayAlarm(data.data.results); //변경 후 상태를 axios 응답결과로 변경해줍니다.
+          setfakeGetTodayChecked(data.data.results);
         })
         .catch((err) => {
           console.error(err);
         });
+
+      get_token().then((token) => {
+        axios({
+          method: 'get',
+          url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm/today`,
+          headers: {
+            Authorization: token,
+          },
+          params: {
+            today: moment().format('YYYY-MM-DD'), //2020-11-22
+          },
+        })
+          .then((data) => {
+            setTodayAlarm(data.data.results); //변경 후 상태를 axios 응답결과로 변경해줍니다.
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      });
     });
   }, []);
 
