@@ -5,6 +5,8 @@ import { View, Text, Dimensions, FlatList, StyleSheet, ScrollView } from 'react-
 import CountdownTimer from '../../components/CountdownTimer';
 // import AlarmList from '../../components/AlarmList';
 import Alarm from '../../components/Alarm';
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { setItem, getItem, removeItem } = useAsyncStorage('@yag_olim');
 
 const fakeAlarmListArry = [
   [false, '12:44:00', { 1: '비염약', 2: '0', 3: '환절기만 되면 이러네 에라이...' }],
@@ -16,26 +18,36 @@ const window = Dimensions.get('window');
 
 const HomeScreen = () => {
   const [fakeGetTodayChecked, setfakeGetTodayChecked] = useState([]);
+
   useEffect(() => {
-    axios({
-      method: 'get',
-      url: 'http://127.0.0.1:5000/schedules-dates/check/today',
-      headers: {
-        Authorization:
-          'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MX0.UgGrWBSBD2t1PHbjRRr3kSqWr3ECc65oXndQaaCrKqc',
-      },
-      params: {
-        start_day: moment().subtract(8, 'd').format('YYYY-MM-DD'), //2020-11-22
-        end_day: moment().subtract(1, 'd').format('YYYY-MM-DD'), //2020-11-29
-      },
-    })
-      .then((datas) => {
-        console.log('today checked: ', datas);
-        setfakeGetTodayChecked(datas.data.results);
+    async function get_token() {
+      const token = await getItem();
+      console.log('token: ', token);
+      return token;
+    }
+
+    get_token().then((my_token) => {
+      console.log('my_token: ', my_token);
+
+      axios({
+        method: 'get',
+        url: 'http://127.0.0.1:5000/schedules-dates/check/today',
+        headers: {
+          Authorization: my_token,
+        },
+        params: {
+          start_day: moment().subtract(8, 'd').format('YYYY-MM-DD'), //2020-11-22
+          end_day: moment().subtract(1, 'd').format('YYYY-MM-DD'), //2020-11-29
+        },
       })
-      .catch((err) => {
-        console.error(err);
-      });
+        .then((datas) => {
+          console.log('today checked: ', datas);
+          setfakeGetTodayChecked(datas.data.results);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
   }, []);
   console.log('fakeGetTodayChecked', fakeGetTodayChecked);
 
