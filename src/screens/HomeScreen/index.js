@@ -22,26 +22,22 @@ const HomeScreen = () => {
   useEffect(() => {
     async function get_token() {
       const token = await getItem();
-      console.log('token: ', token);
       return token;
     }
 
     get_token().then((my_token) => {
-      console.log('my_token: ', my_token);
-
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/schedules-dates/check/today',
+        url: 'http://127.0.0.1:5000/schedules-dates/check/today', //'https://my-medisharp.herokuapp.com/schedules-dates/check/today', ,
         headers: {
           Authorization: my_token,
         },
         params: {
-          start_day: moment().subtract(8, 'd').format('YYYY-MM-DD'), //2020-11-22
-          end_day: moment().subtract(1, 'd').format('YYYY-MM-DD'), //2020-11-29
+          start_day: moment().subtract(8, 'd').format('YYYY-MM-DD'),
+          end_day: moment().subtract(1, 'd').format('YYYY-MM-DD'),
         },
       })
         .then((datas) => {
-          console.log('today checked: ', datas);
           setfakeGetTodayChecked(datas.data.results);
         })
         .catch((err) => {
@@ -49,19 +45,16 @@ const HomeScreen = () => {
         });
     });
   }, []);
-  console.log('fakeGetTodayChecked', fakeGetTodayChecked);
 
   const totalCount = fakeGetTodayChecked.length;
   const checkCounting = function () {
     let cnt = 0;
     fakeGetTodayChecked.forEach(function (el) {
-      console.log(el, cnt);
       cnt += el.check ? 1 : 0;
     });
     return cnt;
   };
   const checkCount = checkCounting();
-  console.log('checkCount: ', checkCount);
 
   return (
     <View
