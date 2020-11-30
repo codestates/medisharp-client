@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import moment from 'moment';
 import { View, Text, Dimensions, FlatList, StyleSheet, ScrollView } from 'react-native';
 import CountdownTimer from '../../components/CountdownTimer';
 // import AlarmList from '../../components/AlarmList';
@@ -8,24 +10,14 @@ import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
 
 import Alarm from '../../components/Alarm';
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { setItem, getItem, removeItem } = useAsyncStorage('@yag_olim');
 
-//Get Today Checked _주간 복용 현황
-const fakeGetTodayChecked = { 1: [true, true, true, true, false, true, false] };
-const totalCount = fakeGetTodayChecked[1].length;
-const checkCounting = function () {
-  let result = 0;
-  for (let m = 0; fakeGetTodayChecked[1][m] < totalCount; m++) {
-    if (fakeGetTodayChecked[1][m] === true) {
-      result++;
-    }
-  }
-  return result;
-};
-const checkCount = checkCounting();
 
 const window = Dimensions.get('window');
 
 const HomeScreen = () => {
+  const [fakeGetTodayChecked, setfakeGetTodayChecked] = useState([]);
   const [alarmList, setTodayAlarm] = useState([]);
   useEffect(() => {
     async function get_token() {
@@ -33,6 +25,25 @@ const HomeScreen = () => {
       return token;
     }
 
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: 'http://127.0.0.1:5000/schedules-dates/check/today', //'https://my-medisharp.herokuapp.com/schedules-dates/check/today', ,
+        headers: {
+          Authorization: token,
+        },
+        params: {
+          start_day: moment().subtract(8, 'd').format('YYYY-MM-DD'),
+          end_day: moment().subtract(1, 'd').format('YYYY-MM-DD'),
+        },
+      })
+        .then((datas) => {
+          setfakeGetTodayChecked(datas.data.results);
+      })
+        .catch((err) => {
+          console.error(err);
+        });
+       
     get_token().then((token) => {
       axios({
         method: 'get',
@@ -53,6 +64,17 @@ const HomeScreen = () => {
         });
     });
   }, []);
+
+  const totalCount = fakeGetTodayChecked.length;
+  const checkCounting = function () {
+    let cnt = 0;
+    fakeGetTodayChecked.forEach(function (el) {
+      cnt += el.check ? 1 : 0;
+    });
+    return cnt;
+  };
+  const checkCount = checkCounting();
+
   return (
     <View
       style={{
