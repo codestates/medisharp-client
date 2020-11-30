@@ -195,7 +195,7 @@ const CalendarMain = () => {
                 >
                   {item[1]}
                 </Text>
-                <view
+                <View
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
@@ -225,7 +225,7 @@ const CalendarMain = () => {
                   >
                     {item[2]}
                   </Text>
-                </view>
+                </View>
               </View>
             ))}
           </ScrollView>
