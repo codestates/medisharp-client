@@ -4,12 +4,12 @@ import moment from 'moment';
 
 function getRecentAlarm(AlarmListArry) {
   //time이 정렬되어있는 fakeAlarmListArray가 인자로 넘어와서 AlarmListArry가 됨
-  for (let time of AlarmListArry) {
+  for (let list of AlarmListArry) {
     let now = moment();
-    let then = moment(time[1], 'hh:mm:ss');
+    let then = moment(list['time'], 'hh:mm:ss');
     let term = moment.duration(then.diff(now));
     if (term.hours() >= 0 && term.minutes() >= 0 && term.seconds() >= 0) {
-      return time[1];
+      return list['time'];
     }
   }
 }
@@ -18,7 +18,6 @@ class CountdownTimer extends React.Component {
   constructor(props) {
     super(props);
     this.props = props;
-
     this.timeTillDate = getRecentAlarm(this.props.upcomingAlarm);
     this.timeFormat = 'hh:mm:ss';
     this.then = moment(this.timeTillDate, this.timeFormat);
