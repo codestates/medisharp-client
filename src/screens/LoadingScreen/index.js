@@ -16,31 +16,6 @@ export default class LoadingScreen extends Component {
     };
   }
 
-  // async componentDidMount() {
-  //   const value = await getItem();
-  //   if (value !== null) {
-  //     console.log(value);
-  //     //this.setState({ isAuthorized: true });
-  //     console.log('success');
-  //     this.props.navigation.replace('TabNavigator');
-  //   } else {
-  //     console.log('failed');
-  //     this.props.navigation.replace('LoginScreen');
-  //   }
-  // }
-
-  // read = async () => {
-  //   try {
-  //     const credentials = await SecureStore.getItemAsync('yag_olim');
-  //     if (credentials) {
-  //       console.log('success');
-  //       this.setState({ isAuthorized: true });
-  //     }
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // };
-
   read = async () => {
     try {
       const value = await getItem();
