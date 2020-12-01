@@ -2,23 +2,33 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { LocaleConfig } from 'react-native-calendars';
+import axios from 'axios';
 import moment from 'moment';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
 
-const fakeDataGetMonthlyChecked = {
-  1: [true, true, false, true, false, false, false, true, false, false],
-};
-const fakeDataGetClickedAlarmsList = [
-  [true, '밀키약', '19:00', 0, '밀키천식약'],
-  [false, '감기약', '22:00', 0, '판피린'],
-  [false, '비염약', '22:30', 0, '흰색동그란약'],
-];
 const fakeDataMarkingDays = [['2020-11-21', '2020-11-28']];
 
 const CalendarMain = () => {
+  const [monthList, setMonthList] = useState([]); //캘린더 띄워져 있는 월의 모든 데이터
+  console.log('monthList:', monthList);
+
+  const [monthCheck, setMonthCheck] = useState([]); // 해당 월의 모든 체크 값들
+  console.log('monthCheck:', monthCheck);
+
   const [todayDate, setTodayDate] = useState(moment().format().substring(0, 10));
+
+  const [selectedMonth, setSelectedMonth] = useState(moment().format('YYYY-MM'));
+  console.log('selectedMonth:', selectedMonth);
+
+  const [clickedDate, setClickedDate] = useState(todayDate);
+  console.log('clickedDate:', clickedDate);
+  const [clickedList, setClickedList] = useState([]);
+  console.log('clickedList:', clickedList);
+
   const [markingDays, setMarkingDays] = useState(fakeDataMarkingDays);
-  console.log(markingDays[0]);
+  console.log('markingDays[0]:', markingDays[0]);
   const [markedDates, setMarkedDates] = useState({
     [markingDays[0][0]]: {
       customStyles: {
@@ -52,6 +62,60 @@ const CalendarMain = () => {
       },
     },
   });
+
+  useEffect(() => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: 'http://127.0.0.1:5000/schedules-dates/check/month',
+        headers: {
+          Authorization: token,
+        },
+        params: {
+          today: selectedMonth,
+          //해당 부분을 디폴트로 이번달로 하되, 날짜가 변경될때마다도 반응해서 monthly checked list를 불러오도록 했습니다. 따라서 param 키값을 today 말고 다른것으로 바꿔줘야 하지 않을까요?
+        },
+      })
+        .then((data) => {
+          setMonthList(data.data.results);
+          let monthCheckArr = [];
+          data.data.results.map((ele) => monthCheckArr.push(ele['check']));
+          setMonthCheck(monthCheckArr);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
+  }, [selectedMonth]);
+
+  useEffect(() => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm/today`,
+        headers: {
+          Authorization: token,
+        },
+        params: {
+          date: clickedDate,
+        },
+      })
+        .then((data) => {
+          setClickedList(data.data.results);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
+  }, [clickedDate]);
 
   return (
     <View style={{ backgroundColor: 'white', height: '100%' }}>
@@ -91,25 +155,24 @@ const CalendarMain = () => {
         </View>
       </View>
       <Calendar
-        // Initially visible month. Default = Date()
         current={Date()}
-        // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
         minDate={'2020-01-01'}
-        // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
         maxDate={'2030-12-31'}
-        // Handler which gets executed on day press. Default = undefined
         onDayPress={(day) => {
           console.log('selected day', day);
+          setClickedDate(day['dateString']);
         }}
         // Handler which gets executed on day long press. Default = undefined
-        onDayLongPress={(day) => {
-          console.log('selected day', day);
-        }}
+        // onDayLongPress={(day) => {
+        //   console.log('selected day', day);
+        // }} -> 상현님 무지한 저는 이 코드를 이해할 수 없어서 우선 비활성화했습니다 ㅠ
         // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
+
         monthFormat={'yyyy MM'}
-        // Handler which gets executed when visible month changes in calendar. Default = undefined
         onMonthChange={(month) => {
           console.log('month changed', month);
+          setSelectedMonth(`${month['year']}-${month['month']}`);
+          setClickedDate(todayDate);
         }}
         // Hide month navigation arrows. Default = false
         hideArrows={false}
@@ -179,21 +242,21 @@ const CalendarMain = () => {
         </Text>
         <View style={{ flex: 1, alignItems: 'center' }}>
           <ScrollView style={styles.CalendarAlarmList}>
-            {fakeDataGetClickedAlarmsList.map((item, index) => (
+            {clickedList.map((item, index) => (
               <View
                 key={index}
                 style={[
                   styles.CalendarAlarmCheckTrue,
-                  item[0] === false && styles.CalendarAlarmCheckFalse,
+                  item['check'] === false && styles.CalendarAlarmCheckFalse,
                 ]}
               >
                 <Text
                   style={[
                     styles.firstItemCheckTrue,
-                    item[0] === false && styles.firstItemCheckFalse,
+                    item['check'] === false && styles.firstItemCheckFalse,
                   ]}
                 >
-                  {item[1]}
+                  {item['title']}
                 </Text>
                 <View
                   style={{
@@ -204,26 +267,26 @@ const CalendarMain = () => {
                   <Text
                     style={[
                       styles.secondItemCheckTrue,
-                      item[0] === false && styles.secondItemCheckFalse,
+                      item['check'] === false && styles.secondItemCheckFalse,
                     ]}
                   >
-                    {item[4]}
+                    {item['memo']}
                   </Text>
                   <Text
                     style={[
                       styles.thirdItemCheckTrue,
-                      item[0] === false && styles.thirdItemCheckFalse,
+                      item['check'] === false && styles.thirdItemCheckFalse,
                     ]}
                   >
-                    {item[3]}일 마다
+                    {item['cycle']}일 마다
                   </Text>
                   <Text
                     style={[
                       styles.fourthItemCheckTrue,
-                      item[0] === false && styles.fourthItemCheckFalse,
+                      item['check'] === false && styles.fourthItemCheckFalse,
                     ]}
                   >
-                    {item[2]}
+                    {item['time']}
                   </Text>
                 </View>
               </View>
