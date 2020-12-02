@@ -11,10 +11,11 @@ const { getItem } = useAsyncStorage('@yag_olim');
 const fakeDataMarkingDays = [['2020-11-21', '2020-11-28']];
 
 const CalendarMain = () => {
+  //여기는 제가 짠 코드입니다.
   const [monthList, setMonthList] = useState([]); //캘린더 띄워져 있는 월의 모든 데이터
   console.log('monthList:', monthList);
 
-  const [monthCheck, setMonthCheck] = useState([]); // 해당 월의 모든 체크 값들
+  const [monthCheck, setMonthCheck] = useState({}); // 해당 월의 모든 체크 값들
   console.log('monthCheck:', monthCheck);
 
   const [todayDate, setTodayDate] = useState(moment().format().substring(0, 10));
@@ -26,6 +27,7 @@ const CalendarMain = () => {
   console.log('clickedDate:', clickedDate);
   const [clickedList, setClickedList] = useState([]);
   console.log('clickedList:', clickedList);
+  //여기까지 제가 짠 코드입니다.
 
   const [markingDays, setMarkingDays] = useState(fakeDataMarkingDays);
   console.log('markingDays[0]:', markingDays[0]);
@@ -63,6 +65,7 @@ const CalendarMain = () => {
     },
   });
 
+  //여기부터 API 입니다.
   useEffect(() => {
     async function get_token() {
       const token = await getItem();
@@ -76,15 +79,20 @@ const CalendarMain = () => {
           Authorization: token,
         },
         params: {
-          today: selectedMonth,
-          //해당 부분을 디폴트로 이번달로 하되, 날짜가 변경될때마다도 반응해서 monthly checked list를 불러오도록 했습니다. 따라서 param 키값을 today 말고 다른것으로 바꿔줘야 하지 않을까요?
+          month: selectedMonth,
         },
       })
         .then((data) => {
           setMonthList(data.data.results);
-          let monthCheckArr = [];
-          data.data.results.map((ele) => monthCheckArr.push(ele['check']));
-          setMonthCheck(monthCheckArr);
+          let monthCheckObj = {};
+          data.data.results.map((ele) => {
+            if (monthCheckObj.hasOwnProperty([ele['date']]) === false) {
+              monthCheckObj[ele['date']] = [ele['check']];
+            } else {
+              monthCheckObj[ele['date']].push(ele['check']);
+            }
+          });
+          setMonthCheck(monthCheckObj);
         })
         .catch((err) => {
           console.error(err);
