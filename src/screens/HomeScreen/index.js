@@ -7,7 +7,7 @@ import CountdownTimer from '../../components/CountdownTimer';
 
 import Alarm from '../../components/Alarm';
 import { useAsyncStorage } from '@react-native-community/async-storage';
-const { setItem, getItem, removeItem } = useAsyncStorage('@yag_olim');
+const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
@@ -47,7 +47,7 @@ const HomeScreen = () => {
             Authorization: token,
           },
           params: {
-            today: moment().format('YYYY-MM-DD'), //2020-11-22
+            date: moment().format('YYYY-MM-DD'), //2020-11-22
           },
         })
           .then((data) => {
