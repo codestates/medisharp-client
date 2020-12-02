@@ -8,8 +8,6 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
 
-const fakeDataMarkingDays = [['2020-11-21', '2020-11-28']];
-
 const CalendarMain = () => {
   //여기는 제가 짠 코드입니다.
   const [monthList, setMonthList] = useState([]); //캘린더 띄워져 있는 월의 모든 데이터
@@ -29,41 +27,8 @@ const CalendarMain = () => {
   console.log('clickedList:', clickedList);
   //여기까지 제가 짠 코드입니다.
 
-  const [markingDays, setMarkingDays] = useState(fakeDataMarkingDays);
-  console.log('markingDays[0]:', markingDays[0]);
-  const [markedDates, setMarkedDates] = useState({
-    [markingDays[0][0]]: {
-      customStyles: {
-        container: {
-          borderStyle: 'solid',
-          borderBottomColor: '#6a9c90',
-          borderBottomWidth: 5,
-          borderRadius: 0,
-        },
-        text: {},
-      },
-    },
-    [markingDays[0][1]]: {
-      customStyles: {
-        container: {
-          borderStyle: 'solid',
-          borderBottomColor: '#6a9c90',
-          borderBottomWidth: 5,
-          borderRadius: 0,
-        },
-        text: {},
-      },
-    },
-    [todayDate]: {
-      customStyles: {
-        container: {
-          borderRadius: 10,
-          backgroundColor: '#6a9c90',
-        },
-        text: { color: 'white', fontWeight: 'bold' },
-      },
-    },
-  });
+  const [markingDays, setMarkingDays] = useState([]);
+  const [markedDates, setMarkedDates] = useState({});
 
   //여기부터 API 입니다.
   useEffect(() => {
@@ -86,13 +51,83 @@ const CalendarMain = () => {
           setMonthList(data.data.results);
           let monthCheckObj = {};
           data.data.results.map((ele) => {
-            if (monthCheckObj.hasOwnProperty([ele['date']]) === false) {
-              monthCheckObj[ele['date']] = [ele['check']];
+            if (ele['date'] > 10) {
+              if (monthCheckObj.hasOwnProperty(selectedMonth + '-' + [ele['date']]) === false) {
+                monthCheckObj[selectedMonth + '-' + ele['date']] = [ele['check']];
+              } else {
+                monthCheckObj[selectedMonth + '-' + ele['date']].push(ele['check']);
+              }
             } else {
-              monthCheckObj[ele['date']].push(ele['check']);
+              if (
+                monthCheckObj.hasOwnProperty(selectedMonth + '-' + '0' + [ele['date']]) === false
+              ) {
+                monthCheckObj[selectedMonth + '-' + '0' + ele['date']] = [ele['check']];
+              } else {
+                monthCheckObj[selectedMonth + '-' + '0' + ele['date']].push(ele['check']);
+              }
             }
           });
           setMonthCheck(monthCheckObj);
+
+          let markedDateResult = {};
+          for (let property in monthCheckObj) {
+            // 날짜가 오늘이라면 아무것도 안함
+            if (property.toString() === moment().format().substring(0, 10)) {
+            }
+            // false를 포함하는 경우
+            if (monthCheckObj[property].includes(false) === true) {
+              // true도 섞여있으면
+              if (monthCheckObj[property].includes(true) === true) {
+                markedDateResult[property] = {
+                  customStyles: {
+                    container: {
+                      borderStyle: 'solid',
+                      borderBottomColor: '#D3CF5F', //노란색
+                      borderBottomWidth: 5,
+                      borderRadius: 0,
+                    },
+                  },
+                };
+              }
+              // true가 없으면
+              if (monthCheckObj[property].includes(true) === false) {
+                markedDateResult[property] = {
+                  customStyles: {
+                    container: {
+                      borderStyle: 'solid',
+                      borderBottomColor: '#9A6464', //빨간색
+                      borderBottomWidth: 5,
+                      borderRadius: 0,
+                    },
+                  },
+                };
+              }
+              // false를 포함하지 않는 경우
+            } else {
+              markedDateResult[property] = {
+                customStyles: {
+                  container: {
+                    borderStyle: 'solid',
+                    borderBottomColor: '#649A8D', //초록색
+                    borderBottomWidth: 5,
+                    borderRadius: 0,
+                  },
+                },
+              };
+            }
+          }
+          //오늘 날짜는 그냥 마지막에 덮어쓰는걸루..
+          (markedDateResult[todayDate] = {
+            customStyles: {
+              container: {
+                borderRadius: 10,
+                backgroundColor: '#6a9c90',
+              },
+              text: { color: 'white', fontWeight: 'bold' },
+            },
+          }),
+            console.log('markedDateResult =>', markedDateResult);
+          setMarkedDates(markedDateResult);
         })
         .catch((err) => {
           console.error(err);
@@ -162,80 +197,76 @@ const CalendarMain = () => {
           </Text>
         </View>
       </View>
-      <Calendar
-        current={Date()}
-        minDate={'2020-01-01'}
-        maxDate={'2030-12-31'}
-        onDayPress={(day) => {
-          console.log('selected day', day);
-          setClickedDate(day['dateString']);
+      <ScrollView
+        style={{
+          maxHeight: 350,
         }}
-        // Handler which gets executed on day long press. Default = undefined
-        // onDayLongPress={(day) => {
-        //   console.log('selected day', day);
-        // }} -> 상현님 무지한 저는 이 코드를 이해할 수 없어서 우선 비활성화했습니다 ㅠ
-        // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
+      >
+        <Calendar
+          style={{}}
+          current={Date()}
+          minDate={'2020-01-01'}
+          maxDate={'2030-12-31'}
+          onDayPress={(day) => {
+            console.log('selected day', day);
+            setClickedDate(day['dateString']);
+          }}
+          // Handler which gets executed on day long press. Default = undefined
+          // onDayLongPress={(day) => {
+          //   console.log('selected day', day);
+          // }} -> 상현님 무지한 저는 이 코드를 이해할 수 없어서 우선 비활성화했습니다 ㅠ
+          // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
 
-        monthFormat={'yyyy MM'}
-        onMonthChange={(month) => {
-          console.log('month changed', month);
-          setSelectedMonth(`${month['year']}-${month['month']}`);
-          setClickedDate(todayDate);
-        }}
-        // Hide month navigation arrows. Default = false
-        hideArrows={false}
-        // Replace default arrows with custom ones (direction can be 'left' or 'right')
-        renderArrow={(direction) =>
-          direction === 'left' ? (
-            <AntDesign name="left" size={20} color="#6a9c90" />
-          ) : (
-            <AntDesign name="right" size={20} color="#6a9c90" />
-          )
-        }
-        // Do not show days of other months in month page. Default = false
-        hideExtraDays={true}
-        // If hideArrows=false and hideExtraDays=false do not switch month when tapping on greyed out
-        // day from another month that is visible in calendar page. Default = false
-        disableMonthChange={true}
-        // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday.
-        firstDay={1}
-        // Hide day names. Default = false
-        hideDayNames={false}
-        // Show week numbers to the left. Default = false
-        showWeekNumbers={false}
-        // Handler which gets executed when press arrow icon left. It receive a callback can go back month
-        onPressArrowLeft={(substractMonth) => substractMonth()}
-        // Handler which gets executed when press arrow icon right. It receive a callback can go next month
-        onPressArrowRight={(addMonth) => addMonth()}
-        // Disable left arrow. Default = false
-        disableArrowLeft={false}
-        // Disable right arrow. Default = false
-        disableArrowRight={false}
-        // Disable all touch events for disabled days. can be override with disableTouchEvent in markedDates
-        disableAllTouchEventsForDisabledDays={true}
-        /** Replace default month and year title with custom one. the function receive a date as parameter. */
-        //renderHeader={(date) => {/*Return JSX*/}}
-        theme={{
-          textMonthFontWeight: 'bold',
-          textDayFontSize: 16,
-          textMonthFontSize: 26,
-          textDayHeaderFontSize: 16,
-          todayTextColor: '#6a9c90',
-        }}
-        markingType={'custom'}
-        markedDates={markedDates}
-        // markedDates={{
-        //   [todayDate]: {
-        //     customStyles: {
-        //       container: {
-        //         borderRadius: 10,
-        //         backgroundColor: '#6a9c90',
-        //       },
-        //       text: { color: 'white', fontWeight: 'bold' },
-        //     },
-        //   },
-        // }}
-      />
+          monthFormat={'yyyy MM'}
+          onMonthChange={(month) => {
+            console.log('month changed', month);
+            setSelectedMonth(`${month['year']}-${month['month']}`);
+            setClickedDate(todayDate);
+          }}
+          // Hide month navigation arrows. Default = false
+          hideArrows={false}
+          // Replace default arrows with custom ones (direction can be 'left' or 'right')
+          renderArrow={(direction) =>
+            direction === 'left' ? (
+              <AntDesign name="left" size={20} color="#6a9c90" />
+            ) : (
+              <AntDesign name="right" size={20} color="#6a9c90" />
+            )
+          }
+          // Do not show days of other months in month page. Default = false
+          hideExtraDays={true}
+          // If hideArrows=false and hideExtraDays=false do not switch month when tapping on greyed out
+          // day from another month that is visible in calendar page. Default = false
+          disableMonthChange={true}
+          // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday.
+          firstDay={1}
+          // Hide day names. Default = false
+          hideDayNames={false}
+          // Show week numbers to the left. Default = false
+          showWeekNumbers={false}
+          // Handler which gets executed when press arrow icon left. It receive a callback can go back month
+          onPressArrowLeft={(substractMonth) => substractMonth()}
+          // Handler which gets executed when press arrow icon right. It receive a callback can go next month
+          onPressArrowRight={(addMonth) => addMonth()}
+          // Disable left arrow. Default = false
+          disableArrowLeft={false}
+          // Disable right arrow. Default = false
+          disableArrowRight={false}
+          // Disable all touch events for disabled days. can be override with disableTouchEvent in markedDates
+          disableAllTouchEventsForDisabledDays={true}
+          /** Replace default month and year title with custom one. the function receive a date as parameter. */
+          //renderHeader={(date) => {/*Return JSX*/}}
+          theme={{
+            textMonthFontWeight: 'bold',
+            textDayFontSize: 16,
+            textMonthFontSize: 26,
+            textDayHeaderFontSize: 16,
+            todayTextColor: '#6a9c90',
+          }}
+          markingType={'custom'}
+          markedDates={markedDates}
+        />
+      </ScrollView>
       <View>
         <Text
           style={{
@@ -246,9 +277,12 @@ const CalendarMain = () => {
             marginTop: 10,
           }}
         >
-          오늘의 알람
+          {clickedDate.substring(8, 10) < 10
+            ? clickedDate.substring(9, 10)
+            : clickedDate.substring(8, 10)}
+          일의 알람
         </Text>
-        <View style={{ flex: 1, alignItems: 'center' }}>
+        <View style={{ alignItems: 'center' }}>
           <ScrollView style={styles.CalendarAlarmList}>
             {clickedList.map((item, index) => (
               <View
@@ -311,7 +345,6 @@ const window = Dimensions.get('window');
 const styles = StyleSheet.create({
   CalendarAlarmList: {
     height: window.height * 0.3,
-    paddingBottom: 30,
   },
   CalendarAlarmCheckTrue: {
     width: window.width - 40,

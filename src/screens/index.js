@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, Dimensions } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
@@ -11,6 +11,8 @@ import MedicineBoxScreen from './MedicineBoxScreen';
 import LoginScreen from './LoginScreen';
 import MypageScreen from './MypageScreen';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+
+const window = Dimensions.get('window');
 
 const LoginStack = createStackNavigator(
   {
@@ -152,7 +154,7 @@ const TabNavigator = createBottomTabNavigator(
     }),
     lazy: false,
     tabBarOptions: {
-      style: { borderTopColor: 'transparent' },
+      style: { borderTopColor: 'transparent', height: window.height * 0.1 },
       showLabel: false,
     },
   },

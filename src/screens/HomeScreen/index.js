@@ -125,12 +125,13 @@ const HomeScreen = () => {
             borderColor: '#6a9c90',
             borderStyle: 'solid',
             borderWidth: 15,
-            width: 200,
-            height: 200,
-            marginLeft: (window.width - 200) / 2 - 20,
+            width: window.height * 0.3,
+            height: window.height * 0.3,
+            marginLeft: -20,
             marginTop: 10,
             marginBottom: 10,
-            borderRadius: 100,
+            borderRadius: window.height * 0.3,
+            alignSelf: 'center',
             justifyContent: 'center',
             alignItems: 'center',
             textAlign: 'center',
@@ -151,33 +152,42 @@ const HomeScreen = () => {
             ListHeaderComponentStyle={true}
             renderItem={({ item }) => <Alarm alarm={item} />}
           ></FlatList> */}
-
-          <ScrollView horizontal={true}>
-            <View style={styles.HomeAlarmList}>
-              {alarmList.map((item, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.HomeAlarm,
-                    index === 0 && { color: 'white', backgroundColor: '#6a9c90' },
-                  ]}
-                >
-                  <Text style={[styles.firstItemInAlarm, index === 0 && { color: 'white' }]}>
-                    {item['title']}
-                  </Text>
-                  <Text style={[styles.secondItemInAlarm, index === 0 && { color: 'white' }]}>
-                    {item['memo']}
-                  </Text>
-                  <Text style={[styles.thirdItemInAlarm, index === 0 && { color: 'white' }]}>
-                    {item['cycle']}일 마다
-                  </Text>
-                  <Text style={[styles.fourthItemInAlarm, index === 0 && { color: 'white' }]}>
-                    {item['time']}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          </ScrollView>
+          <View
+            style={{
+              backgroundColor: '#D7E4E1',
+              borderTopLeftRadius: 30,
+              borderBottomLeftRadius: 30,
+              height: window.height * 0.25,
+              paddingLeft: 15,
+            }}
+          >
+            <ScrollView horizontal={true}>
+              <View style={styles.HomeAlarmList}>
+                {alarmList.map((item, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.HomeAlarm,
+                      index === 0 && { color: 'white', backgroundColor: '#6a9c90' },
+                    ]}
+                  >
+                    <Text style={[styles.firstItemInAlarm, index === 0 && { color: 'white' }]}>
+                      {item['title']}
+                    </Text>
+                    <Text style={[styles.secondItemInAlarm, index === 0 && { color: 'white' }]}>
+                      {item['memo']}
+                    </Text>
+                    <Text style={[styles.thirdItemInAlarm, index === 0 && { color: 'white' }]}>
+                      {item['cycle']}일 마다
+                    </Text>
+                    <Text style={[styles.fourthItemInAlarm, index === 0 && { color: 'white' }]}>
+                      {item['time']}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
         </View>
       </View>
     </View>
@@ -188,17 +198,12 @@ const styles = StyleSheet.create({
   HomeAlarmList: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#D7E4E1',
-    borderTopLeftRadius: 30,
-    borderBottomLeftRadius: 30,
-    height: 175,
-    paddingLeft: 15,
   },
   HomeAlarm: {
     padding: 10,
     paddingTop: 20,
-    width: 145,
-    height: 145,
+    width: window.height * 0.2,
+    height: window.height * 0.2,
     borderRadius: 30,
     backgroundColor: '#e9efee',
     margin: 15,
