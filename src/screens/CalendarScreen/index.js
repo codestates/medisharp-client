@@ -211,15 +211,14 @@ const CalendarMain = () => {
             console.log('selected day', day);
             setClickedDate(day['dateString']);
           }}
-          // Handler which gets executed on day long press. Default = undefined
-          // onDayLongPress={(day) => {
-          //   console.log('selected day', day);
-          // }} -> 상현님 무지한 저는 이 코드를 이해할 수 없어서 우선 비활성화했습니다 ㅠ
-          // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
-
           monthFormat={'yyyy MM'}
           onMonthChange={(month) => {
             console.log('month changed', month);
+            if (month['month'] < 10) {
+              //해당 분기 추가
+              let before = month['month'];
+              month['month'] = `0${before}`;
+            }
             setSelectedMonth(`${month['year']}-${month['month']}`);
             setClickedDate(todayDate);
           }}
