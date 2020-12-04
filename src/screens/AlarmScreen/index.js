@@ -13,25 +13,73 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { onChange } from 'react-native-reanimated';
 
 const window = Dimensions.get('window');
 
 const Alarm = () => {
+  const weekName = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
   const [alarmTitle, setAlarmTitle] = useState('');
   const [alarmDate, setAlarmDate] = useState(moment().format().substring(0, 10));
-  const [thisYear, setThisYear] = useState(moment().format().substring(0, 4));
-  const [selectedMonth, setSelectedMonth] = useState(moment().format().substring(5, 7));
-  const [selectedDate, setSelectedDate] = useState(moment().format().substring(8, 10));
-  const [selectedDay, setSelectedDay] = useState(moment().format('dddd'));
-  const [selectedTime, setSelectedTime] = useState([
+  const [startYear, setStartYear] = useState(moment().format().substring(0, 4));
+  const [startMonth, setStartMonth] = useState(moment().format().substring(5, 7));
+  const [startDate, setStartDate] = useState(moment().format().substring(8, 10));
+  const [startDay, setStartDay] = useState(moment().format('dddd'));
+  const [endYear, setEndYear] = useState(moment().format().substring(0, 4));
+  const [endMonth, setEndMonth] = useState(moment().format().substring(5, 7));
+  const [endDate, setEndDate] = useState(moment().format().substring(8, 10));
+  const [endDay, setEndDay] = useState(moment().format('dddd'));
+  const [showTime, setShowTime] = useState([
     moment().format('a') + ' ' + moment().format('hh') + '시' + ' ' + moment().format('mm') + '분',
     '오후 03시 30분',
   ]);
   const [alarmMemo, setAlarmMemo] = useState('');
   const [alarmMedicine, setAlarmMedicine] = useState(['fake1', 'fake2', 'fake3']);
+  const [startDateTimePickerShow, setStartDateTimePickerShow] = useState(false);
+  const [endDateTimePickerShow, setEndDateTimePickerShow] = useState(false);
 
-  const onPressDate = () => {
-    console.log('Date clicked!');
+  const koreanStandardTime = Date.UTC(startYear, startMonth - 1, startDate);
+  const [date, setDate] = useState(new Date(koreanStandardTime));
+  const [mode, setMode] = useState('date');
+
+  const onPressStartDate = () => {
+    setStartDateTimePickerShow(!startDateTimePickerShow);
+  };
+  const onPressEndDate = () => {
+    setEndDateTimePickerShow(!endDateTimePickerShow);
+  };
+
+  const onChangeStartDate = (event, selectedDate) => {
+    setStartDateTimePickerShow(!startDateTimePickerShow);
+    const startDate = selectedDate || date;
+    setDate(startDate);
+
+    const startDateToShowYear = startDate.getFullYear();
+    const startDateToShowMonth = startDate.getMonth();
+    const startDateToShowDate = startDate.getDate();
+    const startDateToShowDay = weekName[startDate.getDay()];
+
+    setStartYear(startDateToShowYear);
+    setStartMonth(startDateToShowMonth + 1);
+    setStartDate(startDateToShowDate);
+    setStartDay(startDateToShowDay);
+  };
+
+  const onChangeEndDate = (event, selectedDate) => {
+    setEndDateTimePickerShow(!endDateTimePickerShow);
+    const endDate = selectedDate || date;
+    setDate(endDate);
+
+    const endDateToShowYear = endDate.getFullYear();
+    const endDateToShowMonth = endDate.getMonth();
+    const endDateToShowDate = endDate.getDate();
+    const endDateToShowDay = weekName[endDate.getDay()];
+
+    setEndYear(endDateToShowYear);
+    setEndMonth(endDateToShowMonth + 1);
+    setEndDate(endDateToShowDate);
+    setEndDay(endDateToShowDay);
   };
 
   const onPressTime = () => {
@@ -44,7 +92,7 @@ const Alarm = () => {
   };
 
   const onPressTimeDelete = () => {
-    //여기는 selectedTime 배열에서 해당 시간값 빼기
+    //여기는 showTime 배열에서 해당 시간값 빼기
     console.log('Time deleted!');
   };
 
@@ -105,9 +153,18 @@ const Alarm = () => {
               <Icon name="calendar-alt" size={25} color={'#D6E4E1'} />
               <Text style={styles.seclectText}>시작 날짜</Text>
             </View>
-            <TouchableOpacity onPress={onPressDate}>
+            {startDateTimePickerShow && (
+              <DateTimePicker
+                value={date}
+                mode={mode}
+                is24Hour={true}
+                display="default"
+                onChange={onChangeStartDate}
+              />
+            )}
+            <TouchableOpacity onPress={onPressStartDate}>
               <Text style={styles.seclectText}>
-                {selectedMonth}월 {selectedDate}일 {selectedDay}
+                {startMonth}월 {startDate}일 {startDay}
               </Text>
             </TouchableOpacity>
           </View>
@@ -116,9 +173,18 @@ const Alarm = () => {
               <Icon name="calendar-alt" size={25} color={'transparent'} />
               <Text style={styles.seclectText}>종료 날짜</Text>
             </View>
-            <TouchableOpacity onPress={onPressDate}>
+            {endDateTimePickerShow && (
+              <DateTimePicker
+                value={date}
+                mode={mode}
+                is24Hour={true}
+                display="default"
+                onChange={onChangeEndDate}
+              />
+            )}
+            <TouchableOpacity onPress={onPressEndDate}>
               <Text style={styles.seclectText}>
-                {selectedMonth}월 {selectedDate}일 {selectedDay}
+                {endMonth}월 {endDate}일 {endDay}
               </Text>
             </TouchableOpacity>
           </View>
@@ -138,7 +204,7 @@ const Alarm = () => {
           </View>
           <View style={{ alignItems: 'flex-end' }}>
             <FlatList
-              data={selectedTime}
+              data={showTime}
               renderItem={({ item }) => (
                 <View style={{ marginBottom: 10 }}>
                   <TouchableOpacity onPress={onPressTimeChange}>
