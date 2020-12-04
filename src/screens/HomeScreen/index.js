@@ -79,7 +79,8 @@ const HomeScreen = () => {
       <View
         style={{
           paddingLeft: 20,
-          height: window.height - 70,
+          height: window.height * 0.92 - 1,
+          backgroundColor: 'white',
         }}
       >
         <Text
@@ -124,7 +125,7 @@ const HomeScreen = () => {
           style={{
             borderColor: '#6a9c90',
             borderStyle: 'solid',
-            borderWidth: 15,
+            borderWidth: 10,
             width: window.height * 0.3,
             height: window.height * 0.3,
             marginLeft: -20,
