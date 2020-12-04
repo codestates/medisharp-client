@@ -154,7 +154,12 @@ const TabNavigator = createBottomTabNavigator(
     }),
     lazy: false,
     tabBarOptions: {
-      style: { borderTopColor: 'transparent', height: window.height * 0.1 },
+      style: {
+        borderTopColor: '#6a9c90',
+        borderTopWidth: 1,
+        borderStyle: 'solid',
+        height: window.height * 0.08,
+      },
       showLabel: false,
     },
   },

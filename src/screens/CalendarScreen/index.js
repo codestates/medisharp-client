@@ -8,6 +8,8 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
 
+const window = Dimensions.get('window');
+
 const CalendarMain = () => {
   //여기는 제가 짠 코드입니다.
   const [monthList, setMonthList] = useState([]); //캘린더 띄워져 있는 월의 모든 데이터
@@ -161,7 +163,7 @@ const CalendarMain = () => {
   }, [clickedDate]);
 
   return (
-    <View style={{ backgroundColor: 'white', height: '100%' }}>
+    <View style={{ backgroundColor: 'white', height: window.height * 0.92 - 1 }}>
       <View
         style={{
           paddingLeft: 20,
@@ -199,7 +201,7 @@ const CalendarMain = () => {
       </View>
       <ScrollView
         style={{
-          maxHeight: 350,
+          maxHeight: window.height * 0.5,
         }}
       >
         <Calendar
@@ -339,8 +341,6 @@ const CalendarMain = () => {
   );
 };
 
-const window = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   CalendarAlarmList: {
     height: window.height * 0.3,
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   CalendarAlarmCheckTrue: {
     width: window.width - 40,
     backgroundColor: '#6a9c90',
-    borderRadius: 20,
+    borderRadius: 25,
     padding: 15,
     marginBottom: 10,
     height: 70,
