@@ -15,11 +15,15 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { onChange } from 'react-native-reanimated';
+import CameraScreen from '../CameraScreen';
+import { createStackNavigator } from 'react-navigation-stack';
 
 const window = Dimensions.get('window');
 
-const Alarm = () => {
+const Alarm = ({ navigation, route }) => {
   const weekName = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+  const [nowHour, setNowHour] = useState(moment().format().substring(11, 13) + 12);
+  const [nowMinute, setNowMinute] = useState(moment().format().substring(14, 16));
   const [alarmTitle, setAlarmTitle] = useState('');
   const [alarmDate, setAlarmDate] = useState(moment().format().substring(0, 10));
   const [startYear, setStartYear] = useState(moment().format().substring(0, 4));
@@ -30,28 +34,27 @@ const Alarm = () => {
   const [endMonth, setEndMonth] = useState(moment().format().substring(5, 7));
   const [endDate, setEndDate] = useState(moment().format().substring(8, 10));
   const [endDay, setEndDay] = useState(moment().format('dddd'));
-  const [showTime, setShowTime] = useState([
-    moment().format('a') + ' ' + moment().format('hh') + '시' + ' ' + moment().format('mm') + '분',
-    '오후 03시 30분',
-  ]);
+  const [showTime, setShowTime] = useState([]);
   const [alarmMemo, setAlarmMemo] = useState('');
   const [alarmMedicine, setAlarmMedicine] = useState(['fake1', 'fake2', 'fake3']);
-  const [startDateTimePickerShow, setStartDateTimePickerShow] = useState(false);
-  const [endDateTimePickerShow, setEndDateTimePickerShow] = useState(false);
+  const [startDatePickerShow, setStartDatePickerShow] = useState(false);
+  const [endDatePickerShow, setEndDatePickerShow] = useState(false);
+  const [timePickerShow, setTimePickerShow] = useState(false);
+  const [selectedHour, setSelectedHour] = useState('');
+  const [selectedMinute, setSelectedMinute] = useState('');
 
-  const koreanStandardTime = Date.UTC(startYear, startMonth - 1, startDate);
+  const koreanStandardTime = Date.UTC(startYear, startMonth - 1, startDate, nowHour, nowMinute, 0);
   const [date, setDate] = useState(new Date(koreanStandardTime));
-  const [mode, setMode] = useState('date');
 
   const onPressStartDate = () => {
-    setStartDateTimePickerShow(!startDateTimePickerShow);
+    setStartDatePickerShow(!startDatePickerShow);
   };
   const onPressEndDate = () => {
-    setEndDateTimePickerShow(!endDateTimePickerShow);
+    setEndDatePickerShow(!endDatePickerShow);
   };
 
   const onChangeStartDate = (event, selectedDate) => {
-    setStartDateTimePickerShow(!startDateTimePickerShow);
+    setStartDatePickerShow(!startDatePickerShow);
     const startDate = selectedDate || date;
     setDate(startDate);
 
@@ -67,7 +70,7 @@ const Alarm = () => {
   };
 
   const onChangeEndDate = (event, selectedDate) => {
-    setEndDateTimePickerShow(!endDateTimePickerShow);
+    setEndDatePickerShow(!endDatePickerShow);
     const endDate = selectedDate || date;
     setDate(endDate);
 
@@ -83,12 +86,19 @@ const Alarm = () => {
   };
 
   const onPressTime = () => {
-    //여기는 setSelectedTime 으로 배열에 값 추가해준다음에 뿌려질 수 있게 해줘야할듯
-    console.log('Time clicked!');
+    setTimePickerShow(!timePickerShow);
   };
 
-  const onPressTimeChange = () => {
-    console.log('Time clicked!');
+  const onChangeTime = (event, selectedTime) => {
+    setTimePickerShow(!timePickerShow);
+
+    const selectedHourInPicker = selectedTime.toString().substring(16, 18);
+    const selectedMinuteInPicker = selectedTime.toString().substring(19, 21);
+
+    setSelectedHour(selectedHourInPicker);
+    setSelectedMinute(selectedMinuteInPicker);
+
+    setShowTime(showTime.concat(selectedHourInPicker + '시' + ' ' + selectedMinuteInPicker + '분'));
   };
 
   const onPressTimeDelete = () => {
@@ -96,16 +106,12 @@ const Alarm = () => {
     console.log('Time deleted!');
   };
 
-  const onPressAlarmMedicine = () => {
-    //여기는 setAlarmMedicine 으로 배열에 값 추가해준다음에 뿌려질 수 있게 해줘야할듯
-    console.log('AlarmMedicine clicked!');
-  };
-
   const onPressAlarmMedicinDelete = () => {
     //여기는 alarmMedicine 배열에서 해당 시간값 빼기
     console.log('AlarmMedicine deleted!');
   };
 
+  // console.log('date : ', date);
   return (
     <View
       style={{
@@ -153,7 +159,7 @@ const Alarm = () => {
               <Icon name="calendar-alt" size={25} color={'#D6E4E1'} />
               <Text style={styles.seclectText}>시작 날짜</Text>
             </View>
-            {startDateTimePickerShow && (
+            {startDatePickerShow && (
               <DateTimePicker
                 value={date}
                 mode={mode}
@@ -173,10 +179,10 @@ const Alarm = () => {
               <Icon name="calendar-alt" size={25} color={'transparent'} />
               <Text style={styles.seclectText}>종료 날짜</Text>
             </View>
-            {endDateTimePickerShow && (
+            {endDatePickerShow && (
               <DateTimePicker
                 value={date}
-                mode={mode}
+                mode="date"
                 is24Hour={true}
                 display="default"
                 onChange={onChangeEndDate}
@@ -197,7 +203,9 @@ const Alarm = () => {
               <Icon name="clock" size={24} color={'#D6E4E1'} />
               <Text style={styles.seclectText}>시간 설정</Text>
             </View>
-
+            {timePickerShow && (
+              <DateTimePicker value={date} mode="time" display="spinner" onChange={onChangeTime} />
+            )}
             <TouchableOpacity onPress={onPressTime}>
               <Text style={styles.seclectText}>시간 추가</Text>
             </TouchableOpacity>
@@ -207,7 +215,7 @@ const Alarm = () => {
               data={showTime}
               renderItem={({ item }) => (
                 <View style={{ marginBottom: 10 }}>
-                  <TouchableOpacity onPress={onPressTimeChange}>
+                  <TouchableOpacity onPress={onChangeTime}>
                     <View style={{ alignItems: 'flex-end' }}>
                       <Text style={{ fontSize: 18, textAlign: 'right', marginRight: 5 }}>
                         {item}
@@ -265,8 +273,7 @@ const Alarm = () => {
               <Icon name="pills" size={22} color={'#D6E4E1'} />
               <Text style={styles.seclectText}>약 올리기</Text>
             </View>
-
-            <TouchableOpacity onPress={onPressAlarmMedicine}>
+            <TouchableOpacity onPress={() => navigation.navigate('CameraScreen')}>
               <Icon name="plus-square" size={20} color={'#6A9C90'} style={{ paddingBottom: 3 }} />
             </TouchableOpacity>
           </View>
