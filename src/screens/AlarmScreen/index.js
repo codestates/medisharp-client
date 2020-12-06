@@ -98,12 +98,7 @@ const Alarm = ({ navigation, route }) => {
     setSelectedHour(selectedHourInPicker);
     setSelectedMinute(selectedMinuteInPicker);
 
-    setShowTime(showTime.concat(selectedHourInPicker + '시' + ' ' + selectedMinuteInPicker + '분'));
-  };
-
-  const onPressTimeDelete = () => {
-    //여기는 showTime 배열에서 해당 시간값 빼기
-    console.log('Time deleted!');
+    setShowTime([...showTime, selectedHourInPicker + '시' + ' ' + selectedMinuteInPicker + '분']);
   };
 
   const onPressAlarmMedicinDelete = () => {
@@ -111,7 +106,7 @@ const Alarm = ({ navigation, route }) => {
     console.log('AlarmMedicine deleted!');
   };
 
-  // console.log('date : ', date);
+  console.log('showTime => ', showTime);
   return (
     <View
       style={{
@@ -129,6 +124,7 @@ const Alarm = ({ navigation, route }) => {
         <View
           style={{
             marginTop: 40,
+            marginBottom: window.height * 0.01,
             borderBottomWidth: 2,
             borderBottomColor: '#6A9C90',
             borderStyle: 'solid',
@@ -162,7 +158,7 @@ const Alarm = ({ navigation, route }) => {
             {startDatePickerShow && (
               <DateTimePicker
                 value={date}
-                mode={mode}
+                mode="date"
                 is24Hour={true}
                 display="default"
                 onChange={onChangeStartDate}
@@ -207,28 +203,51 @@ const Alarm = ({ navigation, route }) => {
               <DateTimePicker value={date} mode="time" display="spinner" onChange={onChangeTime} />
             )}
             <TouchableOpacity onPress={onPressTime}>
-              <Text style={styles.seclectText}>시간 추가</Text>
+              <Text style={{ fontSize: 16 }}>
+                시간 추가{'  '}
+                <Icon name="plus-square" size={20} color={'#6A9C90'} style={{ paddingBottom: 3 }} />
+              </Text>
             </TouchableOpacity>
           </View>
-          <View style={{ alignItems: 'flex-end' }}>
+          <View>
             <FlatList
+              horizontal={true}
               data={showTime}
+              keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <View style={{ marginBottom: 10 }}>
-                  <TouchableOpacity onPress={onChangeTime}>
-                    <View style={{ alignItems: 'flex-end' }}>
-                      <Text style={{ fontSize: 18, textAlign: 'right', marginRight: 5 }}>
-                        {item}
-                        <Icon
-                          onPress={onPressTimeDelete}
-                          name="times-circle"
-                          size={20}
-                          color={'#9a6464'}
-                          style={{ marginLeft: 5 }}
-                        />
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
+                  <View
+                    style={{
+                      margin: 5,
+                      alignSelf: 'flex-start',
+                      borderWidth: 1,
+                      borderColor: '#939393',
+                      borderStyle: 'solid',
+                      borderRadius: 5,
+                      padding: 5,
+                    }}
+                  >
+                    <Text style={{ fontSize: 18, textAlign: 'right', marginRight: 5 }}>
+                      {item}
+                      {'  '}
+                      <Icon
+                        onPress={() => {
+                          const filteredItems = [];
+                          for (let i = 0; i < showTime.length; i++) {
+                            if (item !== showTime[i]) {
+                              filteredItems.push(showTime[i]);
+                            } else {
+                            }
+                          }
+
+                          setShowTime(filteredItems);
+                        }}
+                        name="times-circle"
+                        size={20}
+                        color={'#9a6464'}
+                      />
+                    </Text>
+                  </View>
                 </View>
               )}
             ></FlatList>
@@ -237,33 +256,26 @@ const Alarm = ({ navigation, route }) => {
 
         {/* -- 알람 메모 입력 뷰 -- */}
         <View style={styles.viewBox}>
-          <View
-            style={{
-              alignItems: 'flex-start',
-            }}
-          >
-            <View style={{ flexDirection: 'row', padding: 10 }}>
-              <Icon name="pencil-alt" size={23} color={'#D6E4E1'} />
-              <Text style={styles.seclectText}>메모 작성</Text>
-            </View>
-            <TextInput
-              style={{
-                marginTop: 10,
-                marginBottom: 10,
-                fontSize: 18,
-                width: window.width - 40,
-                padding: 5,
-                borderWidth: 1,
-                borderColor: '#D7E4E1',
-                borderStyle: 'solid',
-              }}
-              placeholder="알람에 메모를 추가하세요!"
-              placeholderTextColor={'gray'}
-              maxLength={30}
-              onChangeText={(alarmMemo) => setAlarmMemo(alarmMemo)}
-              defaultValue={alarmMemo}
-            />
+          <View style={{ flexDirection: 'row', padding: 10 }}>
+            <Icon name="pencil-alt" size={23} color={'#D6E4E1'} />
+            <Text style={styles.seclectText}>메모 작성</Text>
           </View>
+          <TextInput
+            style={{
+              marginTop: 5,
+              fontSize: 18,
+              width: window.width - 40,
+              padding: 5,
+              borderWidth: 1,
+              borderColor: '#D7E4E1',
+              borderStyle: 'solid',
+            }}
+            placeholder="알람에 메모를 추가하세요!"
+            placeholderTextColor={'gray'}
+            maxLength={30}
+            onChangeText={(alarmMemo) => setAlarmMemo(alarmMemo)}
+            defaultValue={alarmMemo}
+          />
         </View>
 
         {/* -- 약 올리기 뷰 -- */}
@@ -274,13 +286,17 @@ const Alarm = ({ navigation, route }) => {
               <Text style={styles.seclectText}>약 올리기</Text>
             </View>
             <TouchableOpacity onPress={() => navigation.navigate('CameraScreen')}>
-              <Icon name="plus-square" size={20} color={'#6A9C90'} style={{ paddingBottom: 3 }} />
+              <Text style={{ fontSize: 16 }}>
+                사진으로 추가{'  '}
+                <Icon name="plus-square" size={20} color={'#6A9C90'} style={{ paddingBottom: 3 }} />
+              </Text>
             </TouchableOpacity>
           </View>
           <View>
             <FlatList
               horizontal={true}
               data={alarmMedicine}
+              keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <View
                   style={{
@@ -317,9 +333,9 @@ const Alarm = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   viewBox: {
-    marginBottom: 10,
+    marginBottom: window.height * 0.01,
     width: window.width - 40,
-    paddingBottom: 5,
+    height: window.height * 0.15,
     borderBottomWidth: 1,
     borderBottomColor: '#6A9C90',
     borderStyle: 'solid',
