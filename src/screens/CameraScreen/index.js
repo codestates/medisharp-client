@@ -7,8 +7,11 @@ import * as Permissions from 'expo-permissions';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
+
+import * as FileSystem from 'expo-file-system';
+
 const window = Dimensions.get('window');
-export default class Alarm extends React.Component {
+export default class CameraScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -138,7 +141,7 @@ export default class Alarm extends React.Component {
                   alignItems: 'center',
                 }}
               >
-                <TouchableOpacity onPress={this.upload}>
+                <TouchableOpacity onPress={this.savePhoto}>
                   <Icon name="check-bold" size={60} color={'white'} />
                 </TouchableOpacity>
               </View>
@@ -179,34 +182,46 @@ export default class Alarm extends React.Component {
       let img = await this.camera.takePictureAsync({ quality: 0.5 });
       if (img) {
         console.log('photo uri: ', img.uri);
-        this.savePhoto(img.uri);
+        //this.savePhoto(img.uri);
         this.setState({ photo: img.uri, image: img, show: false });
-        this.handleSubmit();
+        //this.handleSubmit();
       }
     }
   };
-  savePhoto = async (uri) => {
+  savePhoto = async () => {
     try {
-      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-      if (status === 'granted') {
-        const asset = await MediaLibrary.createAssetAsync(uri);
-        let album = await MediaLibrary.getAlbumAsync(ALBUM_NAME);
-        if (album === null) {
-          album = await MediaLibrary.createAlbumAsync(ALBUM_NAME, asset);
-        } else {
-          await MediaLibrary.addAssetsToAlbumAsync([asset], album.id);
-        }
-      } else {
-        this.setState({ hasPermission: false });
-      }
+      console.log(FileSystem.cacheDirectory);
+      // const getImg = await FileSystem.getInfoAsync(this.state.photo);
+      // console.log(getImg);
+      this.props.navigation.navigate('CheckScreen', {
+        uri: this.state.photo,
+      });
     } catch (error) {
       console.log(error);
     }
   };
-  upload = async () => {
-    this.setState({ photo: img.uri, image: img, show: false });
-    this.handleSubmit();
-  };
+  // savePhoto = async () => {
+  //   try {
+  //     const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+  //     if (status === 'granted') {
+  //       const asset = await MediaLibrary.createAssetAsync(this.state.photo);
+  //       let album = await MediaLibrary.getAlbumAsync(ALBUM_NAME);
+  //       if (album === null) {
+  //         album = await MediaLibrary.createAlbumAsync(ALBUM_NAME, asset);
+  //       } else {
+  //         await MediaLibrary.addAssetsToAlbumAsync([asset], album.id);
+  //       }
+  //     } else {
+  //       this.setState({ hasPermission: false });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+  // upload = async () => {
+  //   this.setState({ photo: img.uri, image: img, show: false });
+  //   this.handleSubmit();
+  // };
   pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
