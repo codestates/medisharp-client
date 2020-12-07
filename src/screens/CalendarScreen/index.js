@@ -23,6 +23,9 @@ const CalendarMain = () => {
   const [selectedMonth, setSelectedMonth] = useState(moment().format('YYYY-MM'));
   console.log('selectedMonth:', selectedMonth);
 
+  const [nextMonth, setNextMonth] = useState(moment().add(1, 'M').format('YYYY-MM'));
+  console.log('nextMonth:', nextMonth);
+
   const [clickedDate, setClickedDate] = useState(todayDate);
   console.log('clickedDate:', clickedDate);
   const [clickedList, setClickedList] = useState([]);
@@ -46,28 +49,28 @@ const CalendarMain = () => {
           Authorization: token,
         },
         params: {
-          month: selectedMonth,
+          start_day: `${selectedMonth}-01`,
+          end_day: `${nextMonth}-01`,
         },
       })
         .then((data) => {
           setMonthList(data.data.results);
           let monthCheckObj = {};
           data.data.results.map((ele) => {
-            if (ele['date'] > 10) {
-              if (monthCheckObj.hasOwnProperty(selectedMonth + '-' + [ele['date']]) === false) {
-                monthCheckObj[selectedMonth + '-' + ele['date']] = [ele['check']];
-              } else {
-                monthCheckObj[selectedMonth + '-' + ele['date']].push(ele['check']);
-              }
+            if (monthCheckObj.hasOwnProperty(selectedMonth + '-' + [ele['alarmdate']]) === false) {
+              monthCheckObj[selectedMonth + '-' + ele['alarmdate']] = [ele['check']];
             } else {
-              if (
-                monthCheckObj.hasOwnProperty(selectedMonth + '-' + '0' + [ele['date']]) === false
-              ) {
-                monthCheckObj[selectedMonth + '-' + '0' + ele['date']] = [ele['check']];
-              } else {
-                monthCheckObj[selectedMonth + '-' + '0' + ele['date']].push(ele['check']);
-              }
+              monthCheckObj[selectedMonth + '-' + ele['alarmdate']].push(ele['check']);
             }
+            // } else {
+            //   if (
+            //     monthCheckObj.hasOwnProperty(selectedMonth + '-' + '0' + [ele['date']]) === false
+            //   ) {
+            //     monthCheckObj[selectedMonth + '-' + '0' + ele['date']] = [ele['check']];
+            //   } else {
+            //     monthCheckObj[selectedMonth + '-' + '0' + ele['date']].push(ele['check']);
+            //   }
+            // }
           });
           setMonthCheck(monthCheckObj);
 
@@ -135,7 +138,7 @@ const CalendarMain = () => {
           console.error(err);
         });
     });
-  }, [selectedMonth]);
+  }, [selectedMonth, nextMonth]);
 
   useEffect(() => {
     async function get_token() {
@@ -222,6 +225,13 @@ const CalendarMain = () => {
               month['month'] = `0${before}`;
             }
             setSelectedMonth(`${month['year']}-${month['month']}`);
+            if (month['month'] === 12) {
+              console.log(typeof month['year']);
+              setNextMonth(`${month['year'] + 1}-01`);
+            } else {
+              month['month'] = parseInt(month['month']);
+              setNextMonth(`${month['year']}-${month['month'] + 1}`);
+            }
             setClickedDate(todayDate);
           }}
           // Hide month navigation arrows. Default = false
