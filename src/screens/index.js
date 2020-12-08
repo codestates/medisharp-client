@@ -11,9 +11,24 @@ import MedicineBoxScreen from './MedicineBoxScreen';
 import LoginScreen from './LoginScreen';
 import MypageScreen from './MypageScreen';
 import CameraScreen from './CameraScreen';
+import CheckScreen from './CheckScreen';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const window = Dimensions.get('window');
+
+const CheckStack = createStackNavigator(
+  {
+    CheckScreen,
+  },
+  {
+    TabNavigator: {
+      screen: TabNavigator,
+      navigationOptions: ({ navigation }) => ({
+        headerShown: false,
+      }),
+    },
+  },
+);
 
 const CameraStack = createStackNavigator(
   {
@@ -184,6 +199,7 @@ const AppStack = createStackNavigator({
   LoadingScreen: LoadingScreen, // 3번 로딩 화면 보기를 위해 급하게 만들었습니다. 이걸 없애면 첫화면이 로그인 화면이 됩니다.
   LoginScreen: LoginScreen,
   CameraScreen: CameraScreen,
+  CheckScreen: CheckScreen,
   TabNavigator: {
     screen: TabNavigator,
     navigationOptions: ({ navigation }) => ({
