@@ -141,7 +141,7 @@ export default class CameraScreen extends React.Component {
                   alignItems: 'center',
                 }}
               >
-                <TouchableOpacity onPress={this.savePhoto}>
+                <TouchableOpacity onPress={this.handleSubmit}>
                   <Icon name="check-bold" size={60} color={'white'} />
                 </TouchableOpacity>
               </View>
@@ -182,65 +182,16 @@ export default class CameraScreen extends React.Component {
       let img = await this.camera.takePictureAsync({ quality: 0.5 });
       if (img) {
         console.log('photo uri: ', img.uri);
-        //this.savePhoto(img.uri);
         this.setState({ photo: img.uri, image: img, show: false });
-        //this.handleSubmit();
       }
     }
-  };
-  savePhoto = async () => {
-    try {
-      console.log(FileSystem.cacheDirectory);
-      // const getImg = await FileSystem.getInfoAsync(this.state.photo);
-      // console.log(getImg);
-      this.props.navigation.navigate('CheckScreen', {
-        uri: this.state.photo,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  // savePhoto = async () => {
-  //   try {
-  //     const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-  //     if (status === 'granted') {
-  //       const asset = await MediaLibrary.createAssetAsync(this.state.photo);
-  //       let album = await MediaLibrary.getAlbumAsync(ALBUM_NAME);
-  //       if (album === null) {
-  //         album = await MediaLibrary.createAlbumAsync(ALBUM_NAME, asset);
-  //       } else {
-  //         await MediaLibrary.addAssetsToAlbumAsync([asset], album.id);
-  //       }
-  //     } else {
-  //       this.setState({ hasPermission: false });
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-  // upload = async () => {
-  //   this.setState({ photo: img.uri, image: img, show: false });
-  //   this.handleSubmit();
-  // };
-  pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-    });
-    console.log('pickImage: ', result); //pickImage:  {cancelled: false, uri: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD…v7EhjkvIwl2TuZs5A9Pxro4rsS7oA3LHOW/pWUmZ2d9T/2Q==", width: 3024, height: 4032} 로 잘 찍힘
-    //uri가 data:image/jpeg;base64 형식이다. data형식의 jpeg인 image이며 base64로 인코딩되어 있다는 뜻이다.
-    //이 뒤에 붙을 이미지를 텍스트로 인코딩해야한다.
-    if (!result.cancelled) {
-      this.setState({ photo: result.uri });
-    }
-    this.handleSubmit();
   };
   //이제 서버 전송전에 formData를 만들어 이미지 및 다른 정보를 보낼 준비를 합니다.
   //여기서 Blob를 핸들링 해야합니다.
   //다시 formData를 만들어봅시다
   //https://kyounghwan01.github.io/blog/React/image-upload/#base64-%EB%B3%80%ED%99%98
   handleSubmit = () => {
-    // dataURL 값이 data:image/jpeg:base64,~~~~~~~ 이므로 ','를 기점으로 잘라서 ~~~~~인 부분만 다시 인코딩
+    // 웹에서 실행시
     const byteString = atob(this.state.photo.split(',')[1]);
     const ab = new ArrayBuffer(byteString.length);
     const ia = new Uint8Array(ab);
@@ -255,6 +206,16 @@ export default class CameraScreen extends React.Component {
     console.log('handleSubmit photo: ', file);
     form_data.append('image', blob);
     console.log('handleSubmit form_data: ', form_data.entries().next());
+
+    //모바일에서 실행시
+    // let fileName = this.state.photo.split('Camera')[1];
+    // //결국 여기 쓰일 파일 이름이 keras에서 전달받은 약 이름 혹은, 유저가 직접 설정한 이름이 되어야 합니다,
+    // let form_data = new FormData();
+    // form_data.append('image', {
+    //   name: fileName,
+    //   type: 'image/jpeg',
+    //   uri: this.state.photo,
+    // });
     let url = 'http://localhost:5000/medicines/image';
     axios
       .post(url, form_data, {
@@ -265,6 +226,25 @@ export default class CameraScreen extends React.Component {
       .then((res) => {
         console.log(res.data);
       })
+      .then((res) => {
+        this.props.navigation.navigate('CheckScreen', {
+          uri: this.state.photo,
+          //mediname: res.data.name
+        });
+      })
       .catch((err) => console.log(err));
   };
+
+  // savePhoto = async () => {
+  //   try {
+  //     console.log(FileSystem.cacheDirectory);
+  //     // const getImg = await FileSystem.getInfoAsync(this.state.photo);
+  //     // console.log(getImg);
+  //     this.props.navigation.navigate('CheckScreen', {
+  //       uri: this.state.photo,
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 }
