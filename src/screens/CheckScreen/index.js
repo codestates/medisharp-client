@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, StyleSheet, Text } from 'react-native';
+import { View, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 
 export default class CheckScreen extends Component {
@@ -12,6 +12,7 @@ export default class CheckScreen extends Component {
     this.state = {
       uri: this.props.navigation.getParam('uri'),
       getImg: '../../img/loginMain.png',
+      mediname: this.props.navigation.getParam('mediname'),
     };
   }
 
@@ -25,6 +26,17 @@ export default class CheckScreen extends Component {
     return (
       <View style={styles.loginContainer}>
         <Image style={{ width: 300, height: 300 }} source={{ uri: this.state.getImg }} />
+        <Text>{this.state.mediname}</Text>
+        <TouchableOpacity>
+          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#313131' }}>
+            이 약이 맞아요!
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#313131' }}>
+            직접 등록할래요!
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
