@@ -208,6 +208,32 @@ export default class CameraScreen extends React.Component {
     // console.log('handleSubmit photo: ', file);
     // form_data.append('image', blob);
     // console.log('handleSubmit form_data: ', form_data.entries().next());
+    // console.log('form data: ', form_data);
+
+    // async function get_token() {
+    //   const token = await getItem();
+    //   return token;
+    // }
+    // get_token()
+    //   .then((token) => {
+    //     axios
+    //       .post('http://127.0.0.1:5000/medicines/image', form_data, {
+    //         headers: {
+    //           'content-type': 'multipart/form-data',
+    //           Authorization: token,
+    //         },
+    //       })
+    //       .then((res) => {
+    //         this.props.navigation.navigate('CheckScreen', {
+    //           uri: this.state.photo,
+    //           mediname: res.data.prediction,
+    //         });
+    //       })
+    //       .catch((err) => console.log(err));
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //   });
 
     // 모바일에서 실행시
     let fileName = this.state.photo.split('Camera')[1];
