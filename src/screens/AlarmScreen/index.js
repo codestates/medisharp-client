@@ -16,6 +16,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { onChange } from 'react-native-reanimated';
 import CameraScreen from '../CameraScreen';
+import CameraNoticeScreen from '../CameraNoticeScreen';
 import { createStackNavigator } from 'react-navigation-stack';
 
 const window = Dimensions.get('window');
@@ -285,7 +286,8 @@ const Alarm = ({ navigation, route }) => {
               <Icon name="pills" size={22} color={'#D6E4E1'} />
               <Text style={styles.seclectText}>약 올리기</Text>
             </View>
-            <TouchableOpacity onPress={() => navigation.navigate('CameraScreen')}>
+            {/* <TouchableOpacity onPress={() => navigation.navigate('CameraScreen')}> */}
+            <TouchableOpacity onPress={() => navigation.navigate('CameraNoticeScreen')}>
               <Text style={{ fontSize: 16 }}>
                 사진으로 추가{'  '}
                 <Icon name="plus-square" size={20} color={'#6A9C90'} style={{ paddingBottom: 3 }} />
