@@ -9,8 +9,11 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
 import * as FileSystem from 'expo-file-system';
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
+
 export default class CameraScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -163,6 +166,7 @@ export default class CameraScreen extends React.Component {
       );
     }
   }
+
   switchCameraType = () => {
     console.log('switch');
     const { cameraType } = this.state;
@@ -176,6 +180,7 @@ export default class CameraScreen extends React.Component {
       });
     }
   };
+
   takePhoto = async () => {
     if (this.cameraRef) {
       console.log('takePhoto');
@@ -204,27 +209,8 @@ export default class CameraScreen extends React.Component {
     // form_data.append('image', blob);
     // console.log('handleSubmit form_data: ', form_data.entries().next());
 
-    // console.log('form data: ', form_data);
-    // axios
-    //   .post('http://127.0.0.1:5000/medicines/image', form_data, {
-    //     headers: {
-    //       'content-type': 'multipart/form-data',
-    //     },
-    //   })
-    //   .then((res) => {
-    //     console.log(res.data);
-    //   })
-    //   .then((res) => {
-    //     this.props.navigation.navigate('CheckScreen', {
-    //       uri: this.state.photo,
-    //       mediname: res.data.prediction,
-    //     });
-    //   })
-    //   .catch((err) => console.log(err));
-
     // 모바일에서 실행시
     let fileName = this.state.photo.split('Camera')[1];
-    //결국 여기 쓰일 파일 이름이 keras에서 전달받은 약 이름 혹은, 유저가 직접 설정한 이름이 되어야 합니다,
     let form_data = new FormData();
     form_data.append('image', {
       name: fileName,
@@ -232,21 +218,32 @@ export default class CameraScreen extends React.Component {
       uri: this.state.photo,
     });
     console.log('form data: ', form_data);
-    axios
-      .post('https://my-medisharp.herokuapp.com/medicines/image', form_data, {
-        headers: {
-          'content-type': 'multipart/form-data',
-        },
-      })
-      .then((res) => {
-        this.props.navigation.navigate('CheckScreen', {
-          uri: this.state.photo,
-          mediname: res.data.prediction,
-        });
-      })
-      .catch((err) => console.log(err));
-  };
 
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token()
+      .then((token) => {
+        axios
+          .post('https://my-medisharp.herokuapp.com/medicines/image', form_data, {
+            headers: {
+              'content-type': 'multipart/form-data',
+              Authorization: token,
+            },
+          })
+          .then((res) => {
+            this.props.navigation.navigate('CheckScreen', {
+              uri: this.state.photo,
+              mediname: res.data.prediction,
+            });
+          })
+          .catch((err) => console.log(err));
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
   // savePhoto = async () => {
   //   try {
   //     console.log(FileSystem.cacheDirectory);
