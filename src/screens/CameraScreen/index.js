@@ -245,30 +245,36 @@ export default class CameraScreen extends React.Component {
     });
     console.log('form data: ', form_data);
 
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token()
-      .then((token) => {
-        axios
-          .post('https://my-medisharp.herokuapp.com/medicines/image', form_data, {
-            headers: {
-              'content-type': 'multipart/form-data',
-              Authorization: token,
-            },
-          })
-          .then((res) => {
-            this.props.navigation.navigate('CheckScreen', {
-              uri: this.state.photo,
-              mediname: res.data.prediction,
-            });
-          })
-          .catch((err) => console.log(err));
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    this.props.navigation.navigate('CheckScreen', {
+      form_data: form_data,
+      uri: this.state.photo,
+      mediname: null,
+    });
+
+    // async function get_token() {
+    //   const token = await getItem();
+    //   return token;
+    // }
+    // get_token()
+    //   .then((token) => {
+    //     axios
+    //       .post('https://my-medisharp.herokuapp.com/medicines/image', form_data, {
+    //         headers: {
+    //           'content-type': 'multipart/form-data',
+    //           Authorization: token,
+    //         },
+    //       })
+    //       .then((res) => {
+    //         this.props.navigation.navigate('CheckScreen', {
+    //           uri: this.state.photo,
+    //           mediname: res.data.prediction,
+    //         });
+    //       })
+    //       .catch((err) => console.log(err));
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //   });
   };
   // savePhoto = async () => {
   //   try {
