@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import axios from 'axios';
 
@@ -35,10 +35,6 @@ export default class CheckScreen extends Component {
             },
           })
           .then((res) => {
-            // this.props.navigation.navigate('CheckScreen', {
-            //   uri: this.state.photo,
-            //   mediname: res.data.prediction,
-            // });
             this.setState({ mediname: res.data.prediction, isLoading: false });
           })
           .catch((err) => console.log(err));
@@ -57,8 +53,11 @@ export default class CheckScreen extends Component {
   render() {
     return this.state.isLoading ? (
       <View style={styles.loginContainer}>
-        <Image style={{ width: 300, height: 300 }} source={{ uri: this.state.getImg }} />
-        <Text>Loading...</Text>
+        <Image style={{ width: 300, height: 200 }} />
+        <View style={[styles.container, styles.horizontal]}>
+          <ActivityIndicator size={60} color="#6a9c90" />
+          <ActivityIndicator size={40} color="#9DC183" />
+        </View>
       </View>
     ) : (
       <View style={styles.loginContainer}>
@@ -84,5 +83,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: '100%',
     position: 'relative',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  horizontal: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 10,
   },
 });
