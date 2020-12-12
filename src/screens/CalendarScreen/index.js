@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { LocaleConfig } from 'react-native-calendars';
 import axios from 'axios';
@@ -166,7 +166,15 @@ const CalendarMain = () => {
   }, [clickedDate]);
 
   return (
-    <View style={{ backgroundColor: 'white', height: window.height * 0.92 - 1 }}>
+    <View
+      style={{
+        backgroundColor: 'white',
+        height: window.height * 0.92 - 1,
+
+        flex: 1,
+        flexDirection: 'column',
+      }}
+    >
       <View
         style={{
           paddingLeft: 20,
@@ -202,13 +210,8 @@ const CalendarMain = () => {
           </Text>
         </View>
       </View>
-      <ScrollView
-        style={{
-          maxHeight: window.height * 0.5,
-        }}
-      >
+      <View>
         <Calendar
-          style={{}}
           current={Date()}
           minDate={'2020-01-01'}
           maxDate={'2030-12-31'}
@@ -277,8 +280,8 @@ const CalendarMain = () => {
           markingType={'custom'}
           markedDates={markedDates}
         />
-      </ScrollView>
-      <View>
+      </View>
+      <View style={{ flex: 1 }}>
         <Text
           style={{
             fontSize: 18,
@@ -293,21 +296,23 @@ const CalendarMain = () => {
             : clickedDate.substring(8, 10)}
           일의 알람
         </Text>
-        <View style={{ alignItems: 'center' }}>
-          <ScrollView style={styles.CalendarAlarmList}>
-            {clickedList.map((item, index) => (
+        <FlatList
+          style={{}}
+          data={clickedList}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={{ alignItems: 'center' }}>
               <View
-                key={index}
-                style={[
-                  styles.CalendarAlarmCheckTrue,
-                  item['check'] === false && styles.CalendarAlarmCheckFalse,
-                ]}
+                style={
+                  item['check'] === false
+                    ? styles.CalendarAlarmCheckFalse
+                    : styles.CalendarAlarmCheckTrue
+                }
               >
                 <Text
-                  style={[
-                    styles.firstItemCheckTrue,
-                    item['check'] === false && styles.firstItemCheckFalse,
-                  ]}
+                  style={
+                    item['check'] === false ? styles.firstItemCheckFalse : styles.firstItemCheckTrue
+                  }
                 >
                   {item['title']}
                 </Text>
@@ -318,43 +323,43 @@ const CalendarMain = () => {
                   }}
                 >
                   <Text
-                    style={[
-                      styles.secondItemCheckTrue,
-                      item['check'] === false && styles.secondItemCheckFalse,
-                    ]}
+                    style={
+                      item['check'] === false
+                        ? styles.secondItemCheckFalse
+                        : styles.secondItemCheckTrue
+                    }
                   >
                     {item['memo']}
                   </Text>
                   <Text
-                    style={[
-                      styles.thirdItemCheckTrue,
-                      item['check'] === false && styles.thirdItemCheckFalse,
-                    ]}
+                    style={
+                      item['check'] === false
+                        ? styles.thirdItemCheckFalse
+                        : styles.thirdItemCheckTrue
+                    }
                   >
                     {item['cycle']}일 마다
                   </Text>
                   <Text
-                    style={[
-                      styles.fourthItemCheckTrue,
-                      item['check'] === false && styles.fourthItemCheckFalse,
-                    ]}
+                    style={
+                      item['check'] === false
+                        ? styles.fourthItemCheckFalse
+                        : styles.fourthItemCheckTrue
+                    }
                   >
                     {item['time']}
                   </Text>
                 </View>
               </View>
-            ))}
-          </ScrollView>
-        </View>
+            </View>
+          )}
+        ></FlatList>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  CalendarAlarmList: {
-    height: window.height * 0.3,
-  },
   CalendarAlarmCheckTrue: {
     width: window.width - 40,
     backgroundColor: '#6a9c90',
