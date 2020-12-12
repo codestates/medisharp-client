@@ -30,6 +30,10 @@ export default class CheckScreen extends React.Component {
       getImg: '../../img/loginMain.png',
       mediname: this.props.navigation.getParam('mediname'),
       isLoading: true,
+      token: null,
+      imgS3Uri: null,
+      camera: false,
+      //카메라 촬영여부 표시 위한 state입니다. 직접등록의 경우, 다음 화면에서 해당 부분을 false로 해서 전달하면 될거 같아요
     };
 
     async function get_token() {
@@ -39,16 +43,21 @@ export default class CheckScreen extends React.Component {
     get_token()
       .then((token) => {
         axios
-          .post('https://my-medisharp.herokuapp.com/medicines/image', this.state.form_data, {
-            headers: {
-              'content-type': 'multipart/form-data',
-              Authorization: token,
+          .post(
+            'https://gentle-anchorage-17372.herokuapp.com/medicines/image',
+            this.state.form_data,
+            {
+              headers: {
+                'content-type': 'multipart/form-data',
+                Authorization: token,
+              },
             },
-          })
+          )
           .then((res) => {
             this.setState({
               mediname: res.data.prediction,
               isLoading: false,
+              token: token,
             });
           })
           .catch((err) => console.log(err));
@@ -62,6 +71,31 @@ export default class CheckScreen extends React.Component {
     const getImg = await FileSystem.getInfoAsync(this.state.uri);
     console.log(getImg['uri']);
     this.setState({ getImg: getImg['uri'] });
+  }
+
+  uploadToS3Camera() {
+    axios
+      .post('http://localhost:5000/medicines/upload', this.state.form_data, {
+        headers: {
+          'content-type': 'multipart/form-data',
+          Authorization: this.state.token,
+        },
+      })
+      .then((res) => {
+        this.setState({
+          imgS3Uri: res.data,
+          camera: true,
+        });
+      })
+      .then(() => {
+        console.log('S3 uri:', this.state.imgS3Uri);
+        this.props.navigation.navigate('Alarm', {
+          alarmMedicine: this.state.mediname,
+          mediS3Uri: this.state.imgS3Uri,
+          mediCamera: this.state.camera,
+        });
+      })
+      .catch((err) => console.log(err));
   }
 
   // changeScreen(Alarm) {
@@ -114,10 +148,7 @@ export default class CheckScreen extends React.Component {
 
         <TouchableOpacity
           onPress={() => {
-            // this.changeScreen();
-            this.props.navigation.navigate('Alarm', {
-              alarmMedicine: this.state.mediname,
-            });
+            this.uploadToS3Camera();
           }}
         >
           <View
