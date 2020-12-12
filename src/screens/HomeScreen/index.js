@@ -85,7 +85,7 @@ const HomeScreen = () => {
       >
         <Text
           style={{
-            marginTop: 40,
+            marginTop: 30,
             fontSize: 24,
             fontWeight: '300',
           }}

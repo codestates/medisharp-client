@@ -14,330 +14,494 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
+
 import { onChange } from 'react-native-reanimated';
 import CameraScreen from '../CameraScreen';
 import CameraNoticeScreen from '../CameraNoticeScreen';
 import { createStackNavigator } from 'react-navigation-stack';
 
+import { NavigationEvents } from 'react-navigation';
+
+
 const window = Dimensions.get('window');
 
-const Alarm = ({ navigation, route }) => {
-  const weekName = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-  const [nowHour, setNowHour] = useState(moment().format().substring(11, 13) + 12);
-  const [nowMinute, setNowMinute] = useState(moment().format().substring(14, 16));
-  const [alarmTitle, setAlarmTitle] = useState('');
-  const [alarmDate, setAlarmDate] = useState(moment().format().substring(0, 10));
-  const [startYear, setStartYear] = useState(moment().format().substring(0, 4));
-  const [startMonth, setStartMonth] = useState(moment().format().substring(5, 7));
-  const [startDate, setStartDate] = useState(moment().format().substring(8, 10));
-  const [startDay, setStartDay] = useState(moment().format('dddd'));
-  const [endYear, setEndYear] = useState(moment().format().substring(0, 4));
-  const [endMonth, setEndMonth] = useState(moment().format().substring(5, 7));
-  const [endDate, setEndDate] = useState(moment().format().substring(8, 10));
-  const [endDay, setEndDay] = useState(moment().format('dddd'));
-  const [showTime, setShowTime] = useState([]);
-  const [alarmMemo, setAlarmMemo] = useState('');
-  const [alarmMedicine, setAlarmMedicine] = useState(['fake1', 'fake2', 'fake3']);
-  const [startDatePickerShow, setStartDatePickerShow] = useState(false);
-  const [endDatePickerShow, setEndDatePickerShow] = useState(false);
-  const [timePickerShow, setTimePickerShow] = useState(false);
-  const [selectedHour, setSelectedHour] = useState('');
-  const [selectedMinute, setSelectedMinute] = useState('');
+export default class AlarmScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      alarmMedicine: [],
+      weekName: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+      nowHour: moment().format().substring(11, 13) + 12,
+      nowMinute: moment().format().substring(14, 16),
+      alarmTitle: '',
+      alarmDate: moment().format().substring(0, 10),
+      startYear: moment().format().substring(0, 4),
+      startMonth: moment().format().substring(5, 7),
+      startDate: moment().format().substring(8, 10),
+      startDay: moment().format('dddd'),
+      endYear: moment().format().substring(0, 4),
+      endMonth: moment().format().substring(5, 7),
+      endDate: moment().format().substring(8, 10),
+      endDay: moment().format('dddd'),
+      alarmInterval: 0,
+      showTime: [],
+      alarmMemo: '',
+      startDatePickerShow: false,
+      endDatePickerShow: false,
+      timePickerShow: false,
+      selectedHour: '',
+      selectedMinute: '',
+      koreanStandardTime: Date.UTC(
+        this.startYear,
+        this.startMonth - 1,
+        this.startDate,
+        this.nowHour,
+        this.nowMinute,
+        0,
+      ),
+      date: new Date(this.koreanStandardTime),
+    };
+  }
 
-  const koreanStandardTime = Date.UTC(startYear, startMonth - 1, startDate, nowHour, nowMinute, 0);
-  const [date, setDate] = useState(new Date(koreanStandardTime));
+  // refresh() {
+  //   const alarmMedicineGetParam = this.props.navigation.getParam('alarmMedicine');
+  //   console.log('alarmMedicine =>', this.state.alarmMedicine);
 
-  const onPressStartDate = () => {
-    setStartDatePickerShow(!startDatePickerShow);
+  //   this.setState({ alarmMedicine: [alarmMedicineGetParam] });
+  // }
+
+  screenDidFocus() {
+    // navigation.push('Alarm') 을 통해 stack을 열게되면 기존의 param들이 모두 날아가버리기때문에
+    // 로컬에 저장해둔 약이름들을 불러오는 것으로 변경하는 것에대해 고려중임
+    const alarmMedicineGetParam = this.props.navigation.getParam('alarmMedicine');
+    console.log('alarmMedicineGetParam === undefined  =>', alarmMedicineGetParam === undefined);
+
+    alarmMedicineGetParam === undefined
+      ? this.state.alarmMedicine
+      : this.setState({ alarmMedicine: [alarmMedicineGetParam] });
+  }
+
+  onPressStartDate = () => {
+    this.setState({ startDatePickerShow: !this.state.startDatePickerShow });
   };
-  const onPressEndDate = () => {
-    setEndDatePickerShow(!endDatePickerShow);
+  onPressEndDate = () => {
+    this.setState({ endDatePickerShow: !this.state.endDatePickerShow });
   };
 
-  const onChangeStartDate = (event, selectedDate) => {
-    setStartDatePickerShow(!startDatePickerShow);
-    const startDate = selectedDate || date;
-    setDate(startDate);
+  onChangeStartDate = (event, selectedDate) => {
+    this.setState({ startDatePickerShow: !this.state.startDatePickerShow });
+    const startDate = selectedDate || this.state.date;
+
+    this.setState({ date: startDate });
 
     const startDateToShowYear = startDate.getFullYear();
     const startDateToShowMonth = startDate.getMonth();
     const startDateToShowDate = startDate.getDate();
-    const startDateToShowDay = weekName[startDate.getDay()];
+    const startDateToShowDay = this.state.weekName[startDate.getDay()];
 
-    setStartYear(startDateToShowYear);
-    setStartMonth(startDateToShowMonth + 1);
-    setStartDate(startDateToShowDate);
-    setStartDay(startDateToShowDay);
+    this.setState({ startYear: startDateToShowYear });
+    this.setState({ startMonth: startDateToShowMonth + 1 });
+    this.setState({ startDate: startDateToShowDate });
+    this.setState({ startDay: startDateToShowDay });
   };
 
-  const onChangeEndDate = (event, selectedDate) => {
-    setEndDatePickerShow(!endDatePickerShow);
-    const endDate = selectedDate || date;
-    setDate(endDate);
+  onChangeEndDate = (event, selectedDate) => {
+    this.setState({ endDatePickerShow: !this.state.endDatePickerShow });
+    const endDate = selectedDate || this.state.date;
+    this.setState({ date: endDate });
 
     const endDateToShowYear = endDate.getFullYear();
     const endDateToShowMonth = endDate.getMonth();
     const endDateToShowDate = endDate.getDate();
-    const endDateToShowDay = weekName[endDate.getDay()];
+    const endDateToShowDay = this.state.weekName[endDate.getDay()];
 
-    setEndYear(endDateToShowYear);
-    setEndMonth(endDateToShowMonth + 1);
-    setEndDate(endDateToShowDate);
-    setEndDay(endDateToShowDay);
+    this.setState({ endYear: endDateToShowYear });
+    this.setState({ endMonth: endDateToShowMonth + 1 });
+    this.setState({ endDate: endDateToShowDate });
+    this.setState({ endDay: endDateToShowDay });
   };
 
-  const onPressTime = () => {
-    setTimePickerShow(!timePickerShow);
+  onPressTime = () => {
+    this.setState({ timePickerShow: !this.state.timePickerShow });
   };
 
-  const onChangeTime = (event, selectedTime) => {
-    setTimePickerShow(!timePickerShow);
+  onChangeTime = (event, selectedTime) => {
+    this.setState({ timePickerShow: !this.state.timePickerShow });
 
     const selectedHourInPicker = selectedTime.toString().substring(16, 18);
     const selectedMinuteInPicker = selectedTime.toString().substring(19, 21);
 
-    setSelectedHour(selectedHourInPicker);
-    setSelectedMinute(selectedMinuteInPicker);
+    this.setState({ selectedHour: selectedHourInPicker });
+    this.setState({ selectedMinute: selectedMinuteInPicker });
 
-    setShowTime([...showTime, selectedHourInPicker + '시' + ' ' + selectedMinuteInPicker + '분']);
+    this.setState({
+      showTime: [selectedHourInPicker + '시' + ' ' + selectedMinuteInPicker + '분'],
+    });
   };
 
-  const onPressAlarmMedicinDelete = () => {
-    //여기는 alarmMedicine 배열에서 해당 시간값 빼기
-    console.log('AlarmMedicine deleted!');
-  };
+  render() {
+    return (
+      <View style={{ backgroundColor: 'white' }}>
+        <NavigationEvents
+          onDidFocus={(payload) => {
+            //   console.log('payload => ', payload);
+            //   console.log('alarmMedicine => ', payload['action']['params']['alarmMedicine']);
+            const resultArr = this.state.alarmMedicine;
+            const alarmMedicineGetParam = this.props.navigation.getParam('alarmMedicine');
 
-  console.log('showTime => ', showTime);
-  return (
-    <View
-      style={{
-        height: window.height,
-      }}
-    >
-      <ScrollView
-        style={{
-          backgroundColor: 'white',
-          paddingLeft: 20,
-          height: window.height * 0.92 - 1,
-        }}
-      >
-        {/* -- 알람 이름 입력 뷰 -- */}
-        <View
+            alarmMedicineGetParam === undefined
+              ? this.state.alarmMedicine
+              : resultArr.push(alarmMedicineGetParam);
+            this.setState({ alarmMedicine: resultArr });
+
+            console.log('alarmMedicine  =>', this.state.alarmMedicine);
+            console.log('resultArr  =>', resultArr);
+          }}
+        />
+        <ScrollView
           style={{
-            marginTop: 40,
-            marginBottom: window.height * 0.01,
-            borderBottomWidth: 2,
-            borderBottomColor: '#6A9C90',
-            borderStyle: 'solid',
-            width: window.width - 40,
+            marginTop: 30,
+            backgroundColor: 'white',
+            paddingLeft: 20,
+            height: window.height * 0.92 - 30,
           }}
         >
-          <TextInput
+          <Text
             style={{
-              marginTop: 10,
-              marginBottom: 5,
               fontSize: 24,
               fontWeight: '300',
-              width: window.width - 40,
-              paddingBottom: 5,
             }}
-            placeholder="알람 이름을 입력하세요 :)"
-            placeholderTextColor={'gray'}
-            maxLength={10}
-            onChangeText={(alarmTitle) => setAlarmTitle(alarmTitle)}
-            defaultValue={alarmTitle}
-          />
-        </View>
-
-        {/* -- 날짜 선택 뷰 -- */}
-        <View style={styles.viewBox}>
-          <View style={styles.seclectView}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="calendar-alt" size={25} color={'#D6E4E1'} />
-              <Text style={styles.seclectText}>시작 날짜</Text>
-            </View>
-            {startDatePickerShow && (
-              <DateTimePicker
-                value={date}
-                mode="date"
-                is24Hour={true}
-                display="default"
-                onChange={onChangeStartDate}
-              />
-            )}
-            <TouchableOpacity onPress={onPressStartDate}>
-              <Text style={styles.seclectText}>
-                {startMonth}월 {startDate}일 {startDay}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.seclectView}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="calendar-alt" size={25} color={'transparent'} />
-              <Text style={styles.seclectText}>종료 날짜</Text>
-            </View>
-            {endDatePickerShow && (
-              <DateTimePicker
-                value={date}
-                mode="date"
-                is24Hour={true}
-                display="default"
-                onChange={onChangeEndDate}
-              />
-            )}
-            <TouchableOpacity onPress={onPressEndDate}>
-              <Text style={styles.seclectText}>
-                {endMonth}월 {endDate}일 {endDay}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* -- 시간 선택 뷰 -- */}
-        <View style={styles.viewBox}>
-          <View style={styles.seclectView}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="clock" size={24} color={'#D6E4E1'} />
-              <Text style={styles.seclectText}>시간 설정</Text>
-            </View>
-            {timePickerShow && (
-              <DateTimePicker value={date} mode="time" display="spinner" onChange={onChangeTime} />
-            )}
-            <TouchableOpacity onPress={onPressTime}>
-              <Text style={{ fontSize: 16 }}>
-                시간 추가{'  '}
-                <Icon name="plus-square" size={20} color={'#6A9C90'} style={{ paddingBottom: 3 }} />
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View>
-            <FlatList
-              horizontal={true}
-              data={showTime}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View style={{ marginBottom: 10 }}>
-                  <View
-                    style={{
-                      margin: 5,
-                      alignSelf: 'flex-start',
-                      borderWidth: 1,
-                      borderColor: '#939393',
-                      borderStyle: 'solid',
-                      borderRadius: 5,
-                      padding: 5,
-                    }}
-                  >
-                    <Text style={{ fontSize: 18, textAlign: 'right', marginRight: 5 }}>
-                      {item}
-                      {'  '}
-                      <Icon
-                        onPress={() => {
-                          const filteredItems = [];
-                          for (let i = 0; i < showTime.length; i++) {
-                            if (item !== showTime[i]) {
-                              filteredItems.push(showTime[i]);
-                            } else {
-                            }
-                          }
-
-                          setShowTime(filteredItems);
-                        }}
-                        name="times-circle"
-                        size={20}
-                        color={'#9a6464'}
-                      />
-                    </Text>
-                  </View>
-                </View>
-              )}
-            ></FlatList>
-          </View>
-        </View>
-
-        {/* -- 알람 메모 입력 뷰 -- */}
-        <View style={styles.viewBox}>
-          <View style={{ flexDirection: 'row', padding: 10 }}>
-            <Icon name="pencil-alt" size={23} color={'#D6E4E1'} />
-            <Text style={styles.seclectText}>메모 작성</Text>
-          </View>
-          <TextInput
+          >
+            약 올리기
+          </Text>
+          <View
             style={{
-              marginTop: 5,
-              fontSize: 18,
-              width: window.width - 40,
-              padding: 5,
-              borderWidth: 1,
-              borderColor: '#D7E4E1',
-              borderStyle: 'solid',
+              borderBottomStyle: 'solid',
+              borderBottomWidth: 5,
+              borderBottomColor: '#6a9c90',
+              alignSelf: 'flex-start',
+              marginBottom: window.height * 0.02,
             }}
-            placeholder="알람에 메모를 추가하세요!"
-            placeholderTextColor={'gray'}
-            maxLength={30}
-            onChangeText={(alarmMemo) => setAlarmMemo(alarmMemo)}
-            defaultValue={alarmMemo}
-          />
-        </View>
-
-        {/* -- 약 올리기 뷰 -- */}
-        <View style={styles.viewBox}>
-          <View style={styles.seclectView}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="pills" size={22} color={'#D6E4E1'} />
-              <Text style={styles.seclectText}>약 올리기</Text>
-            </View>
-            {/* <TouchableOpacity onPress={() => navigation.navigate('CameraScreen')}> */}
-            <TouchableOpacity onPress={() => navigation.navigate('CameraNoticeScreen')}>
-              <Text style={{ fontSize: 16 }}>
-                사진으로 추가{'  '}
-                <Icon name="plus-square" size={20} color={'#6A9C90'} style={{ paddingBottom: 3 }} />
-              </Text>
-            </TouchableOpacity>
+          >
+            <Text
+              style={{
+                alignSelf: 'center',
+                marginTop: 5,
+                fontSize: 20,
+                fontWeight: 'bold',
+                paddingBottom: 5,
+              }}
+            >
+              복용 알람 등록하기
+            </Text>
           </View>
-          <View>
-            <FlatList
-              horizontal={true}
-              data={alarmMedicine}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View
+          {/* -- 약 올리기 뷰 -- */}
+          <View style={styles.viewBox}>
+            <View style={styles.seclectView}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Icon name="pills" size={22} color={'#D6E4E1'} />
+                <Text style={styles.seclectText}>약 올리기</Text>
+              </View>
+//               <TouchableOpacity onPress={() => this.props.navigation.navigate('CameraStack')}>
+                <TouchableOpacity onPress={() => navigation.navigate('CameraNoticeScreen')}>
+                <Text style={{ fontSize: 16 }}>
+                  사진으로 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View>
+              <FlatList
+                horizontal={true}
+                data={this.state.alarmMedicine}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <View style={{ marginBottom: 10 }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        margin: 5,
+                        alignSelf: 'flex-start',
+                        borderWidth: 1,
+                        borderColor: '#939393',
+                        borderStyle: 'solid',
+                        borderRadius: 5,
+                        padding: 5,
+                      }}
+                    >
+                      <Text style={{ fontSize: 18, marginRight: 5 }}>
+                        {item}
+                        {'  '}
+                        <Icon
+                          onPress={() => {
+                            const filteredMedicine = [];
+                            for (let i = 0; i < this.state.alarmMedicine.length; i++) {
+                              console.log(
+                                'this.state.alarmMedicine[i] =>',
+                                this.state.alarmMedicine[i],
+                              );
+                              console.log('item =>', item);
+                              if (item !== this.state.alarmMedicine[i]) {
+                                filteredMedicine.push(this.state.alarmMedicine[i]);
+                              } else {
+                              }
+                            }
+
+                            this.setState({ alarmMedicine: filteredMedicine });
+                          }}
+                          name="times-circle"
+                          size={20}
+                          color={'#9a6464'}
+                          style={{
+                            marginLeft: 5,
+                          }}
+                        />
+                      </Text>
+                    </View>
+                  </View>
+                )}
+              ></FlatList>
+            </View>
+          </View>
+
+          {/* -- 알람 이름 입력 뷰 -- */}
+          <View
+            style={{
+              marginBottom: window.height * 0.01,
+              borderBottomWidth: 1,
+              borderBottomColor: '#6A9C90',
+              borderStyle: 'solid',
+              width: window.width - 40,
+            }}
+          >
+            <View style={{ flexDirection: 'row', padding: 10 }}>
+              <Icon name="pencil-alt" size={23} color={'#D6E4E1'} />
+              <Text style={styles.seclectText}>알람 이름</Text>
+            </View>
+            <TextInput
+              style={{
+                textAlign: 'center',
+                marginTop: 10,
+                marginBottom: 5,
+                fontSize: 20,
+                width: window.width - 40,
+                paddingBottom: 5,
+              }}
+              placeholder="알람 이름을 입력하세요 :)"
+              placeholderTextColor={'gray'}
+              maxLength={10}
+              onChangeText={(alarmTitleValue) => this.setState({ alarmTitle: alarmTitleValue })}
+              defaultValue={this.state.alarmTitle}
+            />
+          </View>
+
+          {/* -- 알람 메모 입력 뷰 -- */}
+          <View style={styles.viewBox}>
+            <View style={{ flexDirection: 'row', padding: 10 }}>
+              <Icon name="pencil-alt" size={23} color={'#D6E4E1'} />
+              <Text style={styles.seclectText}>메모 작성</Text>
+            </View>
+            <TextInput
+              style={{
+                textAlign: 'left',
+                marginBottom: window.height * 0.015,
+                marginTop: 5,
+                fontSize: 18,
+                width: window.width - 40,
+                padding: 5,
+                borderWidth: 1,
+                borderColor: '#D7E4E1',
+                borderStyle: 'solid',
+              }}
+              placeholder="알람에 메모를 추가하세요!"
+              placeholderTextColor={'gray'}
+              maxLength={30}
+              onChangeText={(alarmMemoValue) => this.setState({ alarmMemo: alarmMemoValue })}
+              defaultValue={this.state.alarmMemo}
+            />
+          </View>
+
+          {/* -- 날짜 선택 뷰 -- */}
+          <View style={styles.viewBox}>
+            <View style={styles.seclectView}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Icon name="calendar-alt" size={25} color={'#D6E4E1'} />
+                <Text style={styles.seclectText}>시작 날짜</Text>
+              </View>
+              {this.state.startDatePickerShow && (
+                <DateTimePicker
+                  value={new Date()}
+                  mode="date"
+                  is24Hour={true}
+                  display="default"
+                  onChange={this.onChangeStartDate}
+                />
+              )}
+              <TouchableOpacity onPress={this.onPressStartDate}>
+                <Text
                   style={{
-                    margin: 5,
-                    alignSelf: 'flex-start',
-                    borderWidth: 1,
-                    borderColor: '#939393',
-                    borderStyle: 'solid',
-                    borderRadius: 5,
-                    padding: 5,
+                    paddingLeft: 15,
+                    fontSize: 18,
                   }}
                 >
-                  <Text style={{ fontSize: 18 }}>
-                    {item}
-                    <Icon
-                      onPress={onPressAlarmMedicinDelete}
-                      name="times-circle"
-                      size={20}
-                      color={'#9a6464'}
-                      style={{
-                        marginLeft: 5,
-                      }}
-                    />
-                  </Text>
-                </View>
+                  {this.state.startMonth}월 {this.state.startDate}일 {this.state.startDay}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.seclectView}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Icon name="calendar-alt" size={25} color={'transparent'} />
+                <Text style={styles.seclectText}>종료 날짜</Text>
+              </View>
+              {this.state.endDatePickerShow && (
+                <DateTimePicker
+                  value={new Date()}
+                  mode="date"
+                  is24Hour={true}
+                  display="default"
+                  onChange={this.onChangeEndDate}
+                />
               )}
-            ></FlatList>
+              <TouchableOpacity onPress={this.onPressEndDate}>
+                <Text
+                  style={{
+                    paddingLeft: 15,
+                    fontSize: 18,
+                  }}
+                >
+                  {this.state.endMonth}월 {this.state.endDate}일 {this.state.endDay}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </View>
-  );
-};
+
+          {/* -- 시간 선택 뷰 -- */}
+          <View style={styles.viewBox}>
+            <View style={styles.seclectView}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <View style={{ flexDirection: 'row', flex: 1 }}>
+                  <Icon name="clock" size={24} color={'#D6E4E1'} />
+                  <Text style={styles.seclectText}>시간 설정</Text>
+                </View>
+                {this.state.timePickerShow && (
+                  <DateTimePicker
+                    value={new Date()}
+                    mode="time"
+                    display="spinner"
+                    onChange={this.onChangeTime}
+                  />
+                )}
+                <TouchableOpacity onPress={this.onPressTime}>
+                  <Text style={{ fontSize: 16 }}>
+                    시간 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ color: '#6a9c90', fontWeight: 'bold', margin: 10 }}>
+                시간은 한 알람에 하나씩만 추가할 수 있어요!
+              </Text>
+            </View>
+            <View>
+              <FlatList
+                data={this.state.showTime}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <View style={{ marginBottom: 10 }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        margin: 5,
+                        alignSelf: 'center',
+                        borderWidth: 1,
+                        borderColor: '#939393',
+                        borderStyle: 'solid',
+                        borderRadius: 5,
+                        padding: 5,
+                      }}
+                    >
+                      <Text style={{ fontSize: 22, textAlign: 'right', marginRight: 5 }}>
+                        {item}
+                        {'  '}
+                        <Icon
+                          onPress={() => {
+                            this.setState({ showTime: [] });
+                          }}
+                          name="times-circle"
+                          size={20}
+                          color={'#9a6464'}
+                        />
+                      </Text>
+                    </View>
+                  </View>
+                )}
+              ></FlatList>
+              <View style={styles.seclectView}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', flex: 1 }}>
+                    <Icon name="clock" size={24} color={'white'} />
+                    <Text style={styles.seclectText}>반복 주기</Text>
+                  </View>
+                  <TextInput
+                    style={{
+                      textAlign: 'center',
+                      fontSize: 16,
+                    }}
+                    placeholder="0"
+                    placeholderTextColor={'gray'}
+                    maxLength={2}
+                    onChangeText={(alarmInterval) =>
+                      this.setState({ alarmInterval: alarmInterval })
+                    }
+                    defaultValue={this.state.alarmInterval}
+                  />
+                  <Text style={{ fontSize: 16 }}>일 간격</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* -- 확인 버튼 -- */}
+          <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
+            <TouchableOpacity onPress={() => console.log('등록하기 눌려따!')}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  marginTop: 10,
+                  alignItems: 'center',
+                  width: window.width * 0.7,
+                  height: window.height * 0.075,
+                  backgroundColor: '#6a9c90',
+                  borderRadius: 20,
+                }}
+              >
+                <Text style={{ fontSize: 20, color: 'white' }}>등록하기</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   viewBox: {
-    marginBottom: window.height * 0.01,
+    marginBottom: window.height * 0.005,
     width: window.width - 40,
-    height: window.height * 0.15,
     borderBottomWidth: 1,
     borderBottomColor: '#6A9C90',
     borderStyle: 'solid',
@@ -346,12 +510,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 10,
+    padding: 8,
   },
   seclectText: {
-    paddingLeft: 15,
+    paddingLeft: 10,
     fontSize: 18,
+    fontWeight: 'bold',
   },
 });
-
-export default Alarm;

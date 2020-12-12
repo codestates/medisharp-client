@@ -174,7 +174,7 @@ const CalendarMain = () => {
       >
         <Text
           style={{
-            marginTop: 40,
+            marginTop: 30,
             fontSize: 24,
           }}
         >
