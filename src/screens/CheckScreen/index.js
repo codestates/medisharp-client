@@ -30,7 +30,6 @@ export default class CheckScreen extends React.Component {
       getImg: '../../img/loginMain.png',
       mediname: this.props.navigation.getParam('mediname'),
       isLoading: true,
-      item_name: '에페드린정',
     };
 
     async function get_token() {
@@ -47,7 +46,10 @@ export default class CheckScreen extends React.Component {
             },
           })
           .then((res) => {
-            this.setState({ mediname: res.data.prediction, isLoading: false });
+            this.setState({
+              mediname: res.data.prediction,
+              isLoading: false,
+            });
           })
           .catch((err) => console.log(err));
       })
@@ -96,12 +98,13 @@ export default class CheckScreen extends React.Component {
           }}
           source={{ uri: this.state.getImg }}
         />
+        <Text>{this.state.mediname}</Text>
 
         <TouchableOpacity
           onPress={() => {
             // this.changeScreen();
             this.props.navigation.navigate('Alarm', {
-              alarmMedicine: this.state.item_name,
+              alarmMedicine: this.state.mediname,
             });
           }}
         >
