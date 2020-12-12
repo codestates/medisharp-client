@@ -1,6 +1,14 @@
 import React, { Component, useEffect, useState } from 'react';
 import react from 'react';
-import { View, Image, StyleSheet, Text, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  Text,
+  Dimensions,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import axios from 'axios';
 
@@ -68,10 +76,9 @@ export default class CheckScreen extends React.Component {
         <Image style={{ width: 300, height: 200 }} />
         <View style={[styles.container, styles.horizontal]}>
           <ActivityIndicator size={60} color="#6a9c90" />
-          <ActivityIndicator size={40} color="#9DC183" />
         </View>
       </View>
-    ) :(
+    ) : (
       <View
         style={{
           height: window.height * 0.9,
@@ -140,7 +147,6 @@ export default class CheckScreen extends React.Component {
     );
   }
 }
-
 
 const styles = StyleSheet.create({
   loginContainer: {

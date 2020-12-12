@@ -22,7 +22,6 @@ import { createStackNavigator } from 'react-navigation-stack';
 
 import { NavigationEvents } from 'react-navigation';
 
-
 const window = Dimensions.get('window');
 
 export default class AlarmScreen extends React.Component {
@@ -202,8 +201,10 @@ export default class AlarmScreen extends React.Component {
                 <Icon name="pills" size={22} color={'#D6E4E1'} />
                 <Text style={styles.seclectText}>약 올리기</Text>
               </View>
-//               <TouchableOpacity onPress={() => this.props.navigation.navigate('CameraStack')}>
-                <TouchableOpacity onPress={() => navigation.navigate('CameraNoticeScreen')}>
+              {/* <TouchableOpacity onPress={() => this.props.navigation.navigate('CameraStack')}> */}
+              <TouchableOpacity
+                onPress={() => this.props.navigation.navigate('CameraNoticeScreen')}
+              >
                 <Text style={{ fontSize: 16 }}>
                   사진으로 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />
                 </Text>
