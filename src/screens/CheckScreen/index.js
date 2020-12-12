@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import axios from 'axios';
-
+import medisharpLogo from '../../img/medisharpLogo.png';
 import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
 
@@ -75,8 +75,11 @@ export default class CheckScreen extends React.Component {
   render() {
     return this.state.isLoading ? (
       <View style={styles.loginContainer}>
-        <Image style={{ width: 300, height: 200 }} />
         <View style={[styles.container, styles.horizontal]}>
+          <Image
+            style={{ width: 77, height: 71, marginTop: '60%', marginBottom: '20%' }}
+            source={medisharpLogo}
+          />
           <ActivityIndicator size={60} color="#6a9c90" />
         </View>
       </View>
@@ -98,7 +101,16 @@ export default class CheckScreen extends React.Component {
           }}
           source={{ uri: this.state.getImg }}
         />
-        <Text>{this.state.mediname}</Text>
+        <Text
+          style={{
+            fontSize: 20,
+            color: '#313131',
+            fontWeight: 'bold',
+            marginTop: '5%',
+          }}
+        >
+          {this.state.mediname}
+        </Text>
 
         <TouchableOpacity
           onPress={() => {
@@ -155,15 +167,5 @@ const styles = StyleSheet.create({
   loginContainer: {
     alignItems: 'center',
     height: '100%',
-    position: 'relative',
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  horizontal: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 10,
   },
 });
