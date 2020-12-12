@@ -9,8 +9,11 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
 import * as FileSystem from 'expo-file-system';
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
+
 export default class CameraScreen extends React.Component {
   static navigationOptions = {
     headerShown: false,
@@ -195,49 +198,63 @@ export default class CameraScreen extends React.Component {
 
   handleSubmit = () => {
     // 웹에서 실행시
-    const byteString = atob(this.state.photo.split(',')[1]);
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-    const blob = new Blob([ia], {
-      type: 'image/jpeg',
-    });
-    const file = new File([blob], 'image.jpg');
-    let form_data = new FormData();
-    console.log('handleSubmit photo: ', file);
-    form_data.append('image', blob);
-    console.log('handleSubmit form_data: ', form_data.entries().next());
-
-    //모바일에서 실행시
-    // let fileName = this.state.photo.split('Camera')[1];
-    // //결국 여기 쓰일 파일 이름이 keras에서 전달받은 약 이름 혹은, 유저가 직접 설정한 이름이 되어야 합니다,
-    // let form_data = new FormData();
-    // form_data.append('image', {
-    //   name: fileName,
+    // const byteString = atob(this.state.photo.split(',')[1]);
+    // const ab = new ArrayBuffer(byteString.length);
+    // const ia = new Uint8Array(ab);
+    // for (let i = 0; i < byteString.length; i++) {
+    //   ia[i] = byteString.charCodeAt(i);
+    // }
+    // const blob = new Blob([ia], {
     //   type: 'image/jpeg',
-    //   uri: this.state.photo,
     // });
-    let url = 'http://localhost:5000/medicines/image';
-    axios
-      .post(url, form_data, {
-        headers: {
-          'content-type': 'multipart/form-data',
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-      })
-      .then((res) => {
-        this.props.navigation.navigate('CheckScreen', {
-          uri: this.state.photo,
-          //mediname: res.data.name
-        });
-      })
-      .catch((err) => console.log(err));
-  };
+    // const file = new File([blob], 'image.jpg');
+    // let form_data = new FormData();
+    // console.log('handleSubmit photo: ', file);
+    // form_data.append('image', blob);
+    // console.log('handleSubmit form_data: ', form_data.entries().next());
+    // console.log('form data: ', form_data);
 
+    // async function get_token() {
+    //   const token = await getItem();
+    //   return token;
+    // }
+    // get_token()
+    //   .then((token) => {
+    //     axios
+    //       .post('http://127.0.0.1:5000/medicines/image', form_data, {
+    //         headers: {
+    //           'content-type': 'multipart/form-data',
+    //           Authorization: token,
+    //         },
+    //       })
+    //       .then((res) => {
+    //         this.props.navigation.navigate('CheckScreen', {
+    //           uri: this.state.photo,
+    //           mediname: res.data.prediction,
+    //         });
+    //       })
+    //       .catch((err) => console.log(err));
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //   });
+
+    // 모바일에서 실행시
+    let fileName = this.state.photo.split('Camera')[1];
+    let form_data = new FormData();
+    form_data.append('image', {
+      name: fileName,
+      type: 'image/jpeg',
+      uri: this.state.photo,
+    });
+    console.log('form data: ', form_data);
+
+    this.props.navigation.navigate('CheckScreen', {
+      form_data: form_data,
+      uri: this.state.photo,
+      mediname: null,
+    });
+  };
   // savePhoto = async () => {
   //   try {
   //     console.log(FileSystem.cacheDirectory);

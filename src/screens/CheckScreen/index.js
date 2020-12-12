@@ -1,8 +1,11 @@
 import React, { Component, useEffect, useState } from 'react';
-import { View, Image, StyleSheet, Text, Dimensions, TouchableOpacity } from 'react-native';
-import * as FileSystem from 'expo-file-system';
 import react from 'react';
-// import { NavigationActions, StackActions } from 'react-navigation';
+import { View, Image, StyleSheet, Text, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
+import * as FileSystem from 'expo-file-system';
+import axios from 'axios';
+
+import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
@@ -14,10 +17,35 @@ export default class CheckScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      form_data: this.props.navigation.getParam('form_data'),
       uri: this.props.navigation.getParam('uri'),
       getImg: '../../img/loginMain.png',
+      mediname: this.props.navigation.getParam('mediname'),
+      isLoading: true,
       item_name: '에페드린정',
     };
+
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token()
+      .then((token) => {
+        axios
+          .post('https://my-medisharp.herokuapp.com/medicines/image', this.state.form_data, {
+            headers: {
+              'content-type': 'multipart/form-data',
+              Authorization: token,
+            },
+          })
+          .then((res) => {
+            this.setState({ mediname: res.data.prediction, isLoading: false });
+          })
+          .catch((err) => console.log(err));
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
   async componentDidMount() {
@@ -35,7 +63,15 @@ export default class CheckScreen extends React.Component {
   // }
 
   render() {
-    return (
+    return this.state.isLoading ? (
+      <View style={styles.loginContainer}>
+        <Image style={{ width: 300, height: 200 }} />
+        <View style={[styles.container, styles.horizontal]}>
+          <ActivityIndicator size={60} color="#6a9c90" />
+          <ActivityIndicator size={40} color="#9DC183" />
+        </View>
+      </View>
+    ) :(
       <View
         style={{
           height: window.height * 0.9,
@@ -104,3 +140,21 @@ export default class CheckScreen extends React.Component {
     );
   }
 }
+
+
+const styles = StyleSheet.create({
+  loginContainer: {
+    alignItems: 'center',
+    height: '100%',
+    position: 'relative',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  horizontal: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 10,
+  },
+});
