@@ -30,7 +30,6 @@ export default class CheckScreen extends React.Component {
     this.state = {
       uri: this.props.navigation.getParam('uri'),
       getImg: '../../img/loginMain.png',
-      mediname: this.props.navigation.getParam('mediname'),
     };
   }
 
@@ -52,7 +51,6 @@ export default class CheckScreen extends React.Component {
           }}
           source={{ uri: this.state.getImg }}
         />
-        <Text>약이름: {this.state.mediname}</Text>
       </View>
     );
   }

@@ -147,7 +147,6 @@ export default class CheckScreen extends React.Component {
           onPress={() => {
             this.props.navigation.navigate('SelfInputScreen', {
               uri: this.state.uri,
-              mediname: this.state.mediname,
             });
           }}
         >
