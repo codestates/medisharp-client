@@ -143,7 +143,14 @@ export default class CheckScreen extends React.Component {
             </Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => this.props.navigation.navigate('FuckMyLife')}>
+        <TouchableOpacity
+          onPress={() => {
+            this.props.navigation.navigate('SelfInputScreen', {
+              uri: this.state.uri,
+              mediname: this.state.mediname,
+            });
+          }}
+        >
           <View
             style={{
               justifyContent: 'center',
