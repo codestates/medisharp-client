@@ -148,7 +148,7 @@ const CalendarMain = () => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm/today`,
+        url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
         headers: {
           Authorization: token,
         },
