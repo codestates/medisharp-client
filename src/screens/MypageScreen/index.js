@@ -1,12 +1,19 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-const Mypage = () => {
-  return (
-    <View>
-      <Text>Mypage</Text>
-    </View>
-  );
-};
+export default class Mypage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      test: 'ah, ah, mic test',
+    };
+  }
 
-export default Mypage;
+  render() {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>{this.state.test}</Text>
+      </View>
+    );
+  }
+}

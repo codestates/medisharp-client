@@ -69,7 +69,7 @@ const MedicineBox = () => {
       <View style={{ backgroundColor: 'white', height: window.height * 0.92 - 1, paddingLeft: 20 }}>
         <Text
           style={{
-            marginTop: 40,
+            marginTop: 30,
             fontSize: 24,
           }}
         >
@@ -158,7 +158,7 @@ const MedicineBox = () => {
       <View style={{ backgroundColor: 'white', height: window.height * 0.92 - 1, paddingLeft: 20 }}>
         <Text
           style={{
-            marginTop: 40,
+            marginTop: 30,
             fontSize: 24,
           }}
         >
