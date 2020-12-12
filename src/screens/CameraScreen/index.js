@@ -15,6 +15,10 @@ const { getItem } = useAsyncStorage('@yag_olim');
 const window = Dimensions.get('window');
 
 export default class CameraScreen extends React.Component {
+  static navigationOptions = {
+    headerShown: false,
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -42,7 +46,7 @@ export default class CameraScreen extends React.Component {
         return (
           <View>
             <Camera
-              style={{ width: '100%', height: window.width }}
+              style={{ width: '100%', height: window.width, marginTop: 30 }}
               type={cameraType}
               ratio="1:1"
               ref={(ref) => {
@@ -100,7 +104,7 @@ export default class CameraScreen extends React.Component {
         return (
           <View>
             <Camera
-              style={{ width: '100%', height: window.width }}
+              style={{ width: '100%', height: window.width, marginTop: 30 }}
               type={cameraType}
               ref={(ref) => {
                 this.camera = ref;
@@ -166,7 +170,7 @@ export default class CameraScreen extends React.Component {
       );
     }
   }
-
+  
   switchCameraType = () => {
     console.log('switch');
     const { cameraType } = this.state;
