@@ -83,7 +83,7 @@ export default class CheckScreen extends React.Component {
       })
       .then((res) => {
         this.setState({
-          imgS3Uri: res.data,
+          imgS3Uri: res.data.results,
           camera: true,
         });
       })
