@@ -14,6 +14,7 @@ import MypageScreen from './MypageScreen';
 import CameraScreen from './CameraScreen';
 import CameraNoticeScreen from './CameraNoticeScreen';
 import CheckScreen from './CheckScreen';
+import SelfInputScreen from './SelfInputScreen';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const window = Dimensions.get('window');
@@ -99,6 +100,7 @@ const AppStack = createStackNavigator({
   CheckScreen: CheckScreen,
   Alarm: AlarmStackWithPush,
   CameraNoticeScreen: CameraNoticeScreen,
+  SelfInputScreen: SelfInputScreen,
   TabNavigator: {
     screen: TabNavigator,
     navigationOptions: ({ navigation }) => ({
