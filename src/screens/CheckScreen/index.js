@@ -94,6 +94,10 @@ export default class CheckScreen extends React.Component {
             name: this.state.mediname,
             image_dir: this.state.imgS3Uri,
             camera: this.state.camera,
+            title: null,
+            effect: null,
+            capacity: null,
+            validity: null,
           },
         });
       })
