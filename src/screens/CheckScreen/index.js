@@ -90,9 +90,11 @@ export default class CheckScreen extends React.Component {
       .then(() => {
         console.log('S3 uri:', this.state.imgS3Uri);
         this.props.navigation.navigate('Alarm', {
-          alarmMedicine: this.state.mediname,
-          mediS3Uri: this.state.imgS3Uri,
-          mediCamera: this.state.camera,
+          alarmMedicine: {
+            mediname: this.state.mediname,
+            mediS3Uri: this.state.imgS3Uri,
+            mediCamera: this.state.camera,
+          },
         });
       })
       .catch((err) => console.log(err));
