@@ -106,12 +106,12 @@ export default class AlarmScreen extends React.Component {
     const startDate = selectedDate || this.state.date;
 
     this.setState({ date: startDate });
+    console.log(startDate);
 
     const startDateToShowYear = startDate.getFullYear();
     const startDateToShowMonth = startDate.getMonth();
     const startDateToShowDate = startDate.getDate();
     const startDateToShowDay = this.state.weekName[startDate.getDay()];
-
     this.setState({ startYear: startDateToShowYear });
     this.setState({ startMonth: startDateToShowMonth + 1 });
     this.setState({ startDate: startDateToShowDate });
@@ -171,12 +171,69 @@ export default class AlarmScreen extends React.Component {
           )
           .then((res) => {
             let medi_ids = res.data.medicine_id;
+            axios
+              .post(
+                'http://127.0.0.1:5000/schedules-common',
+                {
+                  schedules_common: {
+                    title: this.state.alarmTitle,
+                    memo: this.state.alarmMemo,
+                    startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
+                    enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDay}`,
+                    cycle: this.state.alarmInterval,
+                    time: `${this.state.selectedHour}:${this.state.selectedMinute}`,
+                  },
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              )
+              .then((res) => {
+                let schedules_common_id = res.data.results['new_schedules_common_id'];
+                let time = res.data.results['time'];
+                axios
+                  .post(
+                    'http://127.0.0.1:5000/schedules-common/schedules-dates',
+                    {
+                      schedules_common: {
+                        medicine_id: medi_ids,
+                        schedules_common_id: schedules_common_id,
+                        time: time,
+                      },
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  )
+                  .then(() => {
+                    axios
+                      .post(
+                        'http://127.0.0.1:5000/medicines/schedules-medicines',
+                        {
+                          schedules_common: {
+                            medicine_id: medi_ids,
+                            schedules_common_id: schedules_common_id,
+                          },
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      )
+                      .catch((err) => console.log(err));
+                  })
+                  .catch((err) => console.log(err));
+              })
+              .catch((err) => console.log(err));
           })
-          .catch((err) => console.log(err));
+          .catch((err) => console.error(err));
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   render() {
