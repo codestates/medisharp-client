@@ -31,7 +31,18 @@ export default class AlarmScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      alarmMedicine: [],
+      alarmMedicine: [
+        {
+          name: '하이투벤',
+          image_dir:
+            'https://medisharp.s3.ap-northeast-2.amazonaws.com//43D997B1-DCC1-451F-B331-458580722917.jpg_L',
+          camera: true,
+          title: null,
+          effect: null,
+          capacity: null,
+          validity: null,
+        },
+      ],
       weekName: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
       nowHour: moment().format().substring(11, 13) + 12,
       nowMinute: moment().format().substring(14, 16),
@@ -142,16 +153,6 @@ export default class AlarmScreen extends React.Component {
   };
 
   postSchedules = () => {
-    let form_data = new FormData();
-    form_data.append('medicines', {
-      name:, 
-      title:,
-      image_dir:,
-      effect:,
-      capacity:,
-      validity:,
-      camera:
-    });
     async function get_token() {
       const token = await getItem();
       return token;
@@ -159,22 +160,24 @@ export default class AlarmScreen extends React.Component {
     get_token()
       .then((token) => {
         axios
-          .post('http://127.0.0.1:5000/medicines', {
-            
-          }, {
-            headers: {
-              Authorization: token,
+          .post(
+            'http://127.0.0.1:5000/medicines',
+            { medicine: this.state.alarmMedicine },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
-          })
+          )
           .then((res) => {
-            console.log(res)
+            let medi_ids = res.data.medicine_id;
           })
           .catch((err) => console.log(err));
       })
       .catch((err) => {
         console.error(err);
       });
-  }
+  };
 
   render() {
     return (
@@ -268,7 +271,7 @@ export default class AlarmScreen extends React.Component {
                       }}
                     >
                       <Text style={{ fontSize: 18, marginRight: 5 }}>
-                        {item}
+                        {item.name}
                         {'  '}
                         <Icon
                           onPress={() => {
@@ -515,7 +518,7 @@ export default class AlarmScreen extends React.Component {
 
           {/* -- 확인 버튼 -- */}
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity onPress={() => console.log('등록하기 눌려따!')}>
+            <TouchableOpacity onPress={this.postSchedules}>
               <View
                 style={{
                   justifyContent: 'center',
