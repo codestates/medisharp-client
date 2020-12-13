@@ -22,6 +22,9 @@ import { createStackNavigator } from 'react-navigation-stack';
 
 import { NavigationEvents } from 'react-navigation';
 
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
+
 const window = Dimensions.get('window');
 
 export default class AlarmScreen extends React.Component {
@@ -137,6 +140,41 @@ export default class AlarmScreen extends React.Component {
       showTime: [selectedHourInPicker + '시' + ' ' + selectedMinuteInPicker + '분'],
     });
   };
+
+  postSchedules = () => {
+    let form_data = new FormData();
+    form_data.append('medicines', {
+      name:, 
+      title:,
+      image_dir:,
+      effect:,
+      capacity:,
+      validity:,
+      camera:
+    });
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token()
+      .then((token) => {
+        axios
+          .post('http://127.0.0.1:5000/medicines', {
+            
+          }, {
+            headers: {
+              Authorization: token,
+            },
+          })
+          .then((res) => {
+            console.log(res)
+          })
+          .catch((err) => console.log(err));
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
 
   render() {
     return (
