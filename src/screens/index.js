@@ -7,7 +7,6 @@ import HomeScreen from './HomeScreen';
 import LoadingScreen from './LoadingScreen';
 import CalendarScreen from './CalendarScreen';
 import AlarmScreen from './AlarmScreen';
-import AlarmStackWithPush from './AlarmScreen';
 import MedicineBoxScreen from './MedicineBoxScreen';
 import LoginScreen from './LoginScreen';
 import MypageScreen from './MypageScreen';
@@ -15,15 +14,22 @@ import CameraScreen from './CameraScreen';
 import CameraNoticeScreen from './CameraNoticeScreen';
 import CheckScreen from './CheckScreen';
 import SelfInputScreen from './SelfInputScreen';
+import AlarmUpdateScreen from './AlarmUpdateScreen';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const window = Dimensions.get('window');
+
+const AlarmStack = createStackNavigator({
+  Alarm: AlarmScreen,
+  SelfInputScreen: SelfInputScreen,
+  AlarmUpdateScreen: AlarmUpdateScreen,
+});
 
 const TabNavigator = createBottomTabNavigator(
   {
     Home: { screen: HomeScreen },
     Calendar: { screen: CalendarScreen },
-    Alarm: { screen: AlarmScreen },
+    Alarm: { screen: AlarmStack },
     MedicineBox: { screen: MedicineBoxScreen },
     Mypage: { screen: MypageScreen },
   },
@@ -98,9 +104,7 @@ const AppStack = createStackNavigator({
   LoginScreen: LoginScreen,
   CameraStack: CameraScreen,
   CheckScreen: CheckScreen,
-  Alarm: AlarmStackWithPush,
   CameraNoticeScreen: CameraNoticeScreen,
-  SelfInputScreen: SelfInputScreen,
   TabNavigator: {
     screen: TabNavigator,
     navigationOptions: ({ navigation }) => ({
