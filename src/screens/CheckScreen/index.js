@@ -35,36 +35,6 @@ export default class CheckScreen extends React.Component {
       camera: false,
       //카메라 촬영여부 표시 위한 state입니다. 직접등록의 경우, 다음 화면에서 해당 부분을 false로 해서 전달하면 될거 같아요
     };
-
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token()
-      .then((token) => {
-        axios
-          .post(
-            'https://gentle-anchorage-17372.herokuapp.com/medicines/image',
-            this.state.form_data,
-            {
-              headers: {
-                'content-type': 'multipart/form-data',
-                Authorization: token,
-              },
-            },
-          )
-          .then((res) => {
-            this.setState({
-              mediname: res.data.prediction,
-              isLoading: false,
-              token: token,
-            });
-          })
-          .catch((err) => console.log(err));
-      })
-      .catch((err) => {
-        console.error(err);
-      });
   }
 
   async componentDidMount() {
@@ -113,17 +83,7 @@ export default class CheckScreen extends React.Component {
   // }
 
   render() {
-    return this.state.isLoading ? (
-      <View style={styles.loginContainer}>
-        <View style={[styles.container, styles.horizontal]}>
-          <Image
-            style={{ width: 77, height: 71, marginTop: '60%', marginBottom: '20%' }}
-            source={medisharpLogo}
-          />
-          <ActivityIndicator size={60} color="#6a9c90" />
-        </View>
-      </View>
-    ) : (
+    return (
       <View
         style={{
           height: window.height * 0.9,
@@ -205,10 +165,3 @@ export default class CheckScreen extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  loginContainer: {
-    alignItems: 'center',
-    height: '100%',
-  },
-});
