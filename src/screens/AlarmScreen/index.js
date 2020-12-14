@@ -22,6 +22,9 @@ import { createStackNavigator } from 'react-navigation-stack';
 
 import { NavigationEvents } from 'react-navigation';
 
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
+
 const window = Dimensions.get('window');
 
 export default class AlarmScreen extends React.Component {
@@ -32,7 +35,18 @@ export default class AlarmScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      alarmMedicine: [],
+      alarmMedicine: [
+        {
+          name: '하이투벤',
+          image_dir:
+            'https://medisharp.s3.ap-northeast-2.amazonaws.com//43D997B1-DCC1-451F-B331-458580722917.jpg_L',
+          camera: true,
+          title: null,
+          effect: null,
+          capacity: null,
+          validity: null,
+        },
+      ],
       weekName: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
       nowHour: moment().format().substring(11, 13) + 12,
       nowMinute: moment().format().substring(14, 16),
@@ -89,12 +103,12 @@ export default class AlarmScreen extends React.Component {
     const startDate = selectedDate || this.state.date;
 
     this.setState({ date: startDate });
+    console.log(startDate);
 
     const startDateToShowYear = startDate.getFullYear();
     const startDateToShowMonth = startDate.getMonth();
     const startDateToShowDate = startDate.getDate();
     const startDateToShowDay = this.state.weekName[startDate.getDay()];
-
     this.setState({ startYear: startDateToShowYear });
     this.setState({ startMonth: startDateToShowMonth + 1 });
     this.setState({ startDate: startDateToShowDate });
@@ -133,6 +147,114 @@ export default class AlarmScreen extends React.Component {
     this.setState({
       showTime: [selectedHourInPicker + '시' + ' ' + selectedMinuteInPicker + '분'],
     });
+  };
+
+  postSchedules = () => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token()
+      .then((token) => {
+        axios
+          .post(
+            'http://127.0.0.1:5000/medicines',
+            { medicine: this.state.alarmMedicine },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          )
+          .then((res) => {
+            let medi_ids = res.data.medicine_id;
+            console.log('medicines API');
+            axios
+              .post(
+                'http://127.0.0.1:5000/schedules-commons',
+                {
+                  schedules_common: {
+                    title: this.state.alarmTitle,
+                    memo: this.state.alarmMemo,
+                    startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
+                    enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
+                    cycle: this.state.alarmInterval,
+                    time: `${this.state.selectedHour}:${this.state.selectedMinute}`,
+                  },
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              )
+              .then((res) => {
+                let schedules_common_id = res.data.results['new_schedules_common_id'];
+                let time = res.data.results['time'];
+                console.log('schedules common API');
+                axios
+                  .post(
+                    'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+                    {
+                      schedules_common: {
+                        medicines_id: medi_ids,
+                        schedules_common_id: schedules_common_id,
+                        time: time,
+                      },
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  )
+                  .then(() => {
+                    console.log('schedules common, schedules date API');
+                    axios
+                      .post(
+                        'http://127.0.0.1:5000/medicines/schedules-medicines',
+                        {
+                          schedules_common_medicines: {
+                            medicines_id: medi_ids,
+                            schedules_common_id: schedules_common_id,
+                          },
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      )
+                      .then(() => {
+                        console.log('schedules medicines, medicines API');
+                        axios
+                          .post(
+                            'http://127.0.0.1:5000/medicines/users-medicines',
+                            {
+                              medicines: {
+                                medicines_id: medi_ids,
+                              },
+                            },
+                            {
+                              headers: {
+                                Authorization: token,
+                              },
+                            },
+                          )
+                          .then(() => {
+                            console.log('medicines, user medicines API');
+                          })
+                          .catch((err) => console.log(err));
+                      })
+                      .catch((err) => console.log(err));
+                  })
+                  .catch((err) => console.log(err));
+              })
+              .catch((err) => console.log(err));
+          })
+          .catch((err) => console.error(err));
+      })
+      .catch((err) => console.error(err));
   };
 
   render() {
@@ -224,7 +346,7 @@ export default class AlarmScreen extends React.Component {
                       }}
                     >
                       <Text style={{ fontSize: 18, marginRight: 5 }}>
-                        {item}
+                        {item.name}
                         {'  '}
                         <Icon
                           onPress={() => {
@@ -473,7 +595,7 @@ export default class AlarmScreen extends React.Component {
 
           {/* -- 확인 버튼 -- */}
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity onPress={() => console.log('등록하기 눌려따!')}>
+            <TouchableOpacity onPress={this.postSchedules}>
               <View
                 style={{
                   justifyContent: 'center',
