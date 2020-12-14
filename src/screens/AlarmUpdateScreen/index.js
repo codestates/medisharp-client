@@ -52,7 +52,7 @@ export default class AlarmUpdateScreen extends React.Component {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://my-medisharp.herokuapp.com/schedules-commons',
+        url: 'http://127.0.0.1:5000/schedules-commons',
         headers: {
           Authorization: token,
         },
@@ -61,7 +61,7 @@ export default class AlarmUpdateScreen extends React.Component {
         .then((data) => {
           axios({
             method: 'get',
-            url: 'https://my-medisharp.herokuapp.com/medicines',
+            url: 'http://127.0.0.1:5000/medicines',
             headers: {
               Authorization: token,
             },
