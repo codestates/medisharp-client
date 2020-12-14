@@ -14,17 +14,11 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
-import { onChange } from 'react-native-reanimated';
-import CameraScreen from '../CameraScreen';
-import CameraNoticeScreen from '../CameraNoticeScreen';
-import { createStackNavigator } from 'react-navigation-stack';
-
 import { NavigationEvents } from 'react-navigation';
 
 const window = Dimensions.get('window');
 
-export default class AlarmScreen extends React.Component {
+export default class AlarmUpdateScreen extends React.Component {
   static navigationOptions = {
     headerShown: false,
   };
@@ -32,50 +26,43 @@ export default class AlarmScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      alarmMedicine: [],
-      weekName: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
-      nowHour: moment().format().substring(11, 13) + 12,
-      nowMinute: moment().format().substring(14, 16),
-      alarmTitle: '',
-      alarmDate: moment().format().substring(0, 10),
-      startYear: moment().format().substring(0, 4),
-      startMonth: moment().format().substring(5, 7),
-      startDate: moment().format().substring(8, 10),
-      startDay: moment().format('dddd'),
-      endYear: moment().format().substring(0, 4),
-      endMonth: moment().format().substring(5, 7),
-      endDate: moment().format().substring(8, 10),
-      endDay: moment().format('dddd'),
-      alarmInterval: 0,
-      showTime: [],
-      alarmMemo: '',
+      item: [this.props.navigation.getParam('item')],
+      medicineName: ['어려운약이름뭐시기', '종근당뭐시기'],
+      alarmMemo: [],
       startDatePickerShow: false,
       endDatePickerShow: false,
       timePickerShow: false,
-      selectedHour: '',
-      selectedMinute: '',
-      koreanStandardTime: Date.UTC(
-        this.startYear,
-        this.startMonth - 1,
-        this.startDate,
-        this.nowHour,
-        this.nowMinute,
-        0,
-      ),
+      resData: {
+        schedules_common: {
+          schedules_common_id: 1,
+          title: '처방받은 관절약',
+          memo: '자기 전에 꼭 먹어',
+          startdate: '2020-12-01',
+          enddate: '2020-12-15',
+          cycle: 2,
+          time: '23:30:00',
+        },
+      },
+      weekName: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+      startMonth: '12',
+      startDate: '01',
+      startDay: '',
+      endMonth: '12',
+      endDate: '15',
+      endDay: '',
       date: new Date(this.koreanStandardTime),
+      showTime: [],
+      check: false,
     };
   }
 
-  screenDidFocus() {
-    // navigation.push('Alarm') 을 통해 stack을 열게되면 기존의 param들이 모두 날아가버리기때문에
-    // 로컬에 저장해둔 약이름들을 불러오는 것으로 변경하는 것에대해 고려중임 => 네비게이션 구조를 변경하여 해결
-    const alarmMedicineGetParam = this.props.navigation.getParam('alarmMedicine');
-    console.log('alarmMedicineGetParam === undefined  =>', alarmMedicineGetParam === undefined);
+  checkChangeTrue = () => {
+    this.setState({ check: true });
+  };
 
-    alarmMedicineGetParam === undefined
-      ? this.state.alarmMedicine
-      : this.setState({ alarmMedicine: [alarmMedicineGetParam] });
-  }
+  checkChangeFalse = () => {
+    this.setState({ check: false });
+  };
 
   onPressStartDate = () => {
     this.setState({ startDatePickerShow: !this.state.startDatePickerShow });
@@ -140,16 +127,10 @@ export default class AlarmScreen extends React.Component {
       <View style={{ backgroundColor: 'white' }}>
         <NavigationEvents
           onDidFocus={(payload) => {
-            const resultArr = this.state.alarmMedicine;
-            const alarmMedicineGetParam = this.props.navigation.getParam('alarmMedicine');
-
-            alarmMedicineGetParam === undefined
-              ? this.state.alarmMedicine
-              : resultArr.push(alarmMedicineGetParam);
-            this.setState({ alarmMedicine: resultArr });
-
-            console.log('alarmMedicine  =>', this.state.alarmMedicine);
-            console.log('resultArr  =>', resultArr);
+            const startDayValue = new Date('2020-12-01').getDay();
+            const endDayValue = new Date('2020-12-15').getDay();
+            this.setState({ startDay: this.state.weekName[startDayValue] });
+            this.setState({ endDay: this.state.weekName[endDayValue] });
           }}
         />
         <ScrollView
@@ -166,7 +147,7 @@ export default class AlarmScreen extends React.Component {
               fontWeight: '300',
             }}
           >
-            약 올리기
+            알람 수정
           </Text>
           <View
             style={{
@@ -186,9 +167,73 @@ export default class AlarmScreen extends React.Component {
                 paddingBottom: 5,
               }}
             >
-              복용 알람 등록하기
+              복용 알람 수정하기
             </Text>
           </View>
+
+          {/* -- 상단 복용 여부 버튼 -- */}
+          <View
+            style={{
+              width: window.width - 40,
+            }}
+          >
+            <View
+              style={{
+                alignItems: 'center',
+                marginTop: 10,
+                marginBottom: 20,
+                flex: 1,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
+              <TouchableOpacity
+                onPress={this.checkChangeTrue}
+                style={this.state.check ? styles.TrueBoxCheckTrue : styles.TrueBoxCheckFalse}
+              >
+                <Text
+                  style={
+                    this.state.check
+                      ? { fontSize: 20, fontWeight: 'bold', color: 'white', textAlign: 'center' }
+                      : {
+                          fontSize: 20,
+                          fontWeight: 'bold',
+                          color: '#6a9c90',
+                          textAlign: 'center',
+                        }
+                  }
+                >
+                  먹었어요!
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={this.checkChangeFalse}
+                style={this.state.check ? styles.FalseBoxCheckFalse : styles.FalseBoxCheckTrue}
+              >
+                <Text
+                  style={
+                    this.state.check
+                      ? {
+                          fontSize: 20,
+                          fontWeight: 'bold',
+                          color: '#9a6464',
+                          textAlign: 'center',
+                        }
+                      : {
+                          fontSize: 20,
+                          fontWeight: 'bold',
+                          color: 'white',
+                          textAlign: 'center',
+                        }
+                  }
+                >
+                  아직이요!
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
           {/* -- 약 올리기 뷰 -- */}
           <View style={styles.viewBox}>
             <View style={styles.seclectView}>
@@ -196,18 +241,11 @@ export default class AlarmScreen extends React.Component {
                 <Icon name="pills" size={22} color={'#D6E4E1'} />
                 <Text style={styles.seclectText}>약 올리기</Text>
               </View>
-              <TouchableOpacity
-                onPress={() => this.props.navigation.navigate('CameraNoticeScreen')}
-              >
-                <Text style={{ fontSize: 16 }}>
-                  사진으로 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />
-                </Text>
-              </TouchableOpacity>
             </View>
             <View>
               <FlatList
                 horizontal={true}
-                data={this.state.alarmMedicine}
+                data={this.state.medicineName}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <View style={{ marginBottom: 10 }}>
@@ -216,40 +254,21 @@ export default class AlarmScreen extends React.Component {
                         flexDirection: 'row',
                         margin: 5,
                         alignSelf: 'flex-start',
-                        borderWidth: 1,
-                        borderColor: '#939393',
+                        borderWidth: 2,
+                        borderColor: '#6a9c90',
                         borderStyle: 'solid',
                         borderRadius: 5,
                         padding: 5,
                       }}
                     >
-                      <Text style={{ fontSize: 18, marginRight: 5 }}>
+                      <Text
+                        style={{
+                          fontSize: 18,
+                          fontWeight: 'bold',
+                          color: '#6a9c90',
+                        }}
+                      >
                         {item}
-                        {'  '}
-                        <Icon
-                          onPress={() => {
-                            const filteredMedicine = [];
-                            for (let i = 0; i < this.state.alarmMedicine.length; i++) {
-                              console.log(
-                                'this.state.alarmMedicine[i] =>',
-                                this.state.alarmMedicine[i],
-                              );
-                              console.log('item =>', item);
-                              if (item !== this.state.alarmMedicine[i]) {
-                                filteredMedicine.push(this.state.alarmMedicine[i]);
-                              } else {
-                              }
-                            }
-
-                            this.setState({ alarmMedicine: filteredMedicine });
-                          }}
-                          name="times-circle"
-                          size={20}
-                          color={'#9a6464'}
-                          style={{
-                            marginLeft: 5,
-                          }}
-                        />
                       </Text>
                     </View>
                   </View>
@@ -272,21 +291,20 @@ export default class AlarmScreen extends React.Component {
               <Icon name="pencil-alt" size={23} color={'#D6E4E1'} />
               <Text style={styles.seclectText}>알람 이름</Text>
             </View>
-            <TextInput
+
+            <Text
               style={{
                 textAlign: 'center',
-                marginTop: 10,
+                marginTop: -10,
                 marginBottom: 5,
                 fontSize: 20,
                 width: window.width - 40,
                 paddingBottom: 5,
+                color: '#6a9c90',
               }}
-              placeholder="알람 이름을 입력하세요 :)"
-              placeholderTextColor={'gray'}
-              maxLength={10}
-              onChangeText={(alarmTitleValue) => this.setState({ alarmTitle: alarmTitleValue })}
-              defaultValue={this.state.alarmTitle}
-            />
+            >
+              {this.state.item[0]['title']}
+            </Text>
           </View>
 
           {/* -- 알람 메모 입력 뷰 -- */}
@@ -307,7 +325,7 @@ export default class AlarmScreen extends React.Component {
                 borderColor: '#D7E4E1',
                 borderStyle: 'solid',
               }}
-              placeholder="알람에 메모를 추가하세요!"
+              placeholder={this.state.item[0]['memo']}
               placeholderTextColor={'gray'}
               maxLength={30}
               onChangeText={(alarmMemoValue) => this.setState({ alarmMemo: alarmMemoValue })}
@@ -471,9 +489,9 @@ export default class AlarmScreen extends React.Component {
             </View>
           </View>
 
-          {/* -- 확인 버튼 -- */}
+          {/* -- 하단 버튼 -- */}
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity onPress={() => console.log('등록하기 눌려따!')}>
+            <TouchableOpacity onPress={() => console.log('수정하기 눌려따!')}>
               <View
                 style={{
                   justifyContent: 'center',
@@ -485,7 +503,22 @@ export default class AlarmScreen extends React.Component {
                   borderRadius: 20,
                 }}
               >
-                <Text style={{ fontSize: 20, color: 'white' }}>등록하기</Text>
+                <Text style={{ fontSize: 20, color: 'white' }}>수정하기</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => console.log('삭제하기 눌려따!')}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  marginTop: 10,
+                  alignItems: 'center',
+                  width: window.width * 0.7,
+                  height: window.height * 0.075,
+                  backgroundColor: '#9a6464',
+                  borderRadius: 20,
+                }}
+              >
+                <Text style={{ fontSize: 20, color: 'white' }}>삭제하기</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -496,6 +529,46 @@ export default class AlarmScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  TrueBoxCheckTrue: {
+    marginTop: 10,
+    width: window.width * 0.42,
+    height: window.width * 0.42,
+    backgroundColor: '#6a9c90',
+    borderRadius: 30,
+    alignContent: 'center',
+    justifyContent: 'center',
+  },
+  TrueBoxCheckFalse: {
+    marginTop: 10,
+    width: window.width * 0.42,
+    height: window.width * 0.42,
+    borderColor: '#6a9c90',
+    borderStyle: 'solid',
+    borderWidth: 2,
+    borderRadius: 30,
+    alignContent: 'center',
+    justifyContent: 'center',
+  },
+  FalseBoxCheckTrue: {
+    marginTop: 10,
+    width: window.width * 0.42,
+    height: window.width * 0.42,
+    backgroundColor: '#9a6464',
+    borderRadius: 30,
+    alignContent: 'center',
+    justifyContent: 'center',
+  },
+  FalseBoxCheckFalse: {
+    marginTop: 10,
+    width: window.width * 0.42,
+    height: window.width * 0.42,
+    borderColor: '#9a6464',
+    borderStyle: 'solid',
+    borderWidth: 2,
+    borderRadius: 30,
+    alignContent: 'center',
+    justifyContent: 'center',
+  },
   viewBox: {
     marginBottom: window.height * 0.005,
     width: window.width - 40,

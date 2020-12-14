@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions, TouchableOpacity } from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { LocaleConfig } from 'react-native-calendars';
 import axios from 'axios';
@@ -10,7 +10,7 @@ const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
-const CalendarMain = () => {
+const CalendarMain = ({ navigation }) => {
   //여기는 제가 짠 코드입니다.
   const [monthList, setMonthList] = useState([]); //캘린더 띄워져 있는 월의 모든 데이터
   console.log('monthList:', monthList);
@@ -302,55 +302,64 @@ const CalendarMain = () => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={{ alignItems: 'center' }}>
-              <View
-                style={
-                  item['check'] === false
-                    ? styles.CalendarAlarmCheckFalse
-                    : styles.CalendarAlarmCheckTrue
-                }
+              <TouchableOpacity
+                onPress={() => {
+                  console.log(item);
+                  navigation.navigate('AlarmUpdateScreen', { item: item });
+                }}
               >
-                <Text
+                <View
                   style={
-                    item['check'] === false ? styles.firstItemCheckFalse : styles.firstItemCheckTrue
+                    item['check'] === false
+                      ? styles.CalendarAlarmCheckFalse
+                      : styles.CalendarAlarmCheckTrue
                   }
                 >
-                  {item['title']}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}
-                >
                   <Text
                     style={
                       item['check'] === false
-                        ? styles.secondItemCheckFalse
-                        : styles.secondItemCheckTrue
+                        ? styles.firstItemCheckFalse
+                        : styles.firstItemCheckTrue
                     }
                   >
-                    {item['memo']}
+                    {item['title']}
                   </Text>
-                  <Text
-                    style={
-                      item['check'] === false
-                        ? styles.thirdItemCheckFalse
-                        : styles.thirdItemCheckTrue
-                    }
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}
                   >
-                    {item['cycle']}일 마다
-                  </Text>
-                  <Text
-                    style={
-                      item['check'] === false
-                        ? styles.fourthItemCheckFalse
-                        : styles.fourthItemCheckTrue
-                    }
-                  >
-                    {item['time']}
-                  </Text>
+                    <Text
+                      style={
+                        item['check'] === false
+                          ? styles.secondItemCheckFalse
+                          : styles.secondItemCheckTrue
+                      }
+                    >
+                      {item['memo']}
+                    </Text>
+                    <Text
+                      style={
+                        item['check'] === false
+                          ? styles.thirdItemCheckFalse
+                          : styles.thirdItemCheckTrue
+                      }
+                    >
+                      {item['cycle']}일 마다
+                    </Text>
+                    <Text
+                      style={
+                        item['check'] === false
+                          ? styles.fourthItemCheckFalse
+                          : styles.fourthItemCheckTrue
+                      }
+                    >
+                      {item['time']}
+                    </Text>
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             </View>
           )}
         ></FlatList>
