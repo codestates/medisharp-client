@@ -243,6 +243,7 @@ export default class AlarmScreen extends React.Component {
                           )
                           .then(() => {
                             console.log('medicines, user medicines API');
+                            this.props.navigation.navigate('CalendarScreen');
                           })
                           .catch((err) => console.log(err));
                       })

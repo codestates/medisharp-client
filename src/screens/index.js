@@ -104,6 +104,7 @@ const AppStack = createStackNavigator({
   LoginScreen: LoginScreen,
   CameraStack: CameraScreen,
   CheckScreen: CheckScreen,
+  CalendarScreen: CalendarScreen,
   CameraNoticeScreen: CameraNoticeScreen,
   TabNavigator: {
     screen: TabNavigator,
