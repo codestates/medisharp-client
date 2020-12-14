@@ -171,15 +171,16 @@ export default class AlarmScreen extends React.Component {
           )
           .then((res) => {
             let medi_ids = res.data.medicine_id;
+            console.log('medicines API');
             axios
               .post(
-                'http://127.0.0.1:5000/schedules-common',
+                'http://127.0.0.1:5000/schedules-commons',
                 {
                   schedules_common: {
                     title: this.state.alarmTitle,
                     memo: this.state.alarmMemo,
                     startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
-                    enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDay}`,
+                    enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
                     cycle: this.state.alarmInterval,
                     time: `${this.state.selectedHour}:${this.state.selectedMinute}`,
                   },
@@ -193,12 +194,13 @@ export default class AlarmScreen extends React.Component {
               .then((res) => {
                 let schedules_common_id = res.data.results['new_schedules_common_id'];
                 let time = res.data.results['time'];
+                console.log('schedules common API');
                 axios
                   .post(
-                    'http://127.0.0.1:5000/schedules-common/schedules-dates',
+                    'http://127.0.0.1:5000/schedules-commons/schedules-dates',
                     {
                       schedules_common: {
-                        medicine_id: medi_ids,
+                        medicines_id: medi_ids,
                         schedules_common_id: schedules_common_id,
                         time: time,
                       },
@@ -210,12 +212,13 @@ export default class AlarmScreen extends React.Component {
                     },
                   )
                   .then(() => {
+                    console.log('schedules common, schedules date API');
                     axios
                       .post(
                         'http://127.0.0.1:5000/medicines/schedules-medicines',
                         {
-                          schedules_common: {
-                            medicine_id: medi_ids,
+                          schedules_common_medicines: {
+                            medicines_id: medi_ids,
                             schedules_common_id: schedules_common_id,
                           },
                         },
@@ -225,6 +228,27 @@ export default class AlarmScreen extends React.Component {
                           },
                         },
                       )
+                      .then(() => {
+                        console.log('schedules medicines, medicines API');
+                        axios
+                          .post(
+                            'http://127.0.0.1:5000/medicines/users-medicines',
+                            {
+                              medicines: {
+                                medicines_id: medi_ids,
+                              },
+                            },
+                            {
+                              headers: {
+                                Authorization: token,
+                              },
+                            },
+                          )
+                          .then(() => {
+                            console.log('medicines, user medicines API');
+                          })
+                          .catch((err) => console.log(err));
+                      })
                       .catch((err) => console.log(err));
                   })
                   .catch((err) => console.log(err));
