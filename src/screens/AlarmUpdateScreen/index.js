@@ -15,6 +15,8 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { NavigationEvents } from 'react-navigation';
+import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
@@ -27,22 +29,11 @@ export default class AlarmUpdateScreen extends React.Component {
     super(props);
     this.state = {
       item: [this.props.navigation.getParam('item')],
-      medicineName: ['어려운약이름뭐시기', '종근당뭐시기'],
+      medicineName: [],
       alarmMemo: [],
       startDatePickerShow: false,
       endDatePickerShow: false,
       timePickerShow: false,
-      resData: {
-        schedules_common: {
-          schedules_common_id: 1,
-          title: '처방받은 관절약',
-          memo: '자기 전에 꼭 먹어',
-          startdate: '2020-12-01',
-          enddate: '2020-12-15',
-          cycle: 2,
-          time: '23:30:00',
-        },
-      },
       weekName: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
       startMonth: '12',
       startDate: '01',
@@ -54,6 +45,42 @@ export default class AlarmUpdateScreen extends React.Component {
       showTime: [],
       check: false,
     };
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: 'https://my-medisharp.herokuapp.com/schedules-commons',
+        headers: {
+          Authorization: token,
+        },
+        params: this.state.item[0],
+      })
+        .then((data) => {
+          axios({
+            method: 'get',
+            url: 'https://my-medisharp.herokuapp.com/medicines',
+            headers: {
+              Authorization: token,
+            },
+            params: {
+              schedules_common_id: data.data.results[0]['schedules_common_id'],
+            },
+          })
+            .then((data) => {
+              let medicineList = data.data.results.map((el) => el.name);
+              this.setState({ medicineName: medicineList });
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
   }
 
   checkChangeTrue = () => {
