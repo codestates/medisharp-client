@@ -22,13 +22,17 @@ const window = Dimensions.get('window');
 const AlarmStack = createStackNavigator({
   Alarm: AlarmScreen,
   SelfInputScreen: SelfInputScreen,
+});
+
+const CalendarStack = createStackNavigator({
+  Calendar: CalendarScreen,
   AlarmUpdateScreen: AlarmUpdateScreen,
 });
 
 const TabNavigator = createBottomTabNavigator(
   {
     Home: { screen: HomeScreen },
-    Calendar: { screen: CalendarScreen },
+    Calendar: { screen: CalendarStack },
     Alarm: { screen: AlarmStack },
     MedicineBox: { screen: MedicineBoxScreen },
     Mypage: { screen: MypageScreen },
@@ -104,7 +108,6 @@ const AppStack = createStackNavigator({
   LoginScreen: LoginScreen,
   CameraStack: CameraScreen,
   CheckScreen: CheckScreen,
-  CalendarScreen: CalendarScreen,
   CameraNoticeScreen: CameraNoticeScreen,
   TabNavigator: {
     screen: TabNavigator,
