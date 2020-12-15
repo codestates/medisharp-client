@@ -48,26 +48,20 @@ export default class AlarmUpdateScreen extends React.Component {
       check: false,
       alarmInterval: 0,
     };
-    console.log('{{{{{{{{{{this.state.item: }}}}}}}}}}}}}', this.state.item);
     async function get_token() {
       const token = await getItem();
       return token;
     }
     get_token().then((token) => {
-      console.log('++++++++++++++AlarmUpdateScreen item: +++++++++++++++', this.state.item[0]);
       axios({
         method: 'get',
-        url: 'https://my-medisharp.herokuapp.com/schedules-commons',
+        url: 'http://127.0.0.1:5000/schedules-commons',
         headers: {
           Authorization: token,
         },
         params: this.state.item[0],
       })
         .then((data) => {
-          console.log(
-            '________________AlarmUpdateScreen data: _____________',
-            data.data.results[0],
-          );
           let startdate = data.data.results[0]['startdate'].split('-');
           let enddate = data.data.results[0]['enddate'].split('-');
           this.setState({
@@ -83,7 +77,7 @@ export default class AlarmUpdateScreen extends React.Component {
 
           axios({
             method: 'get',
-            url: 'https://my-medisharp.herokuapp.com/medicines',
+            url: 'http://127.0.0.1:5000/medicines',
             headers: {
               Authorization: token,
             },
