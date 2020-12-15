@@ -45,14 +45,6 @@ export default class CheckScreen extends React.Component {
   }
 
   redirectToAlarmScreen() {
-    console.log(
-      '눌려따!!!',
-      this.state.medicineName,
-      this.state.imgS3Uri,
-      this.state.effect,
-      this.state.capacity,
-      this.state.validity,
-    );
     async function get_token() {
       const token = await getItem();
       return token;
@@ -60,7 +52,7 @@ export default class CheckScreen extends React.Component {
     get_token()
       .then((token) => {
         axios
-          .post('https://my-medisharp.herokuapp.com/medicines/upload', this.state.form_data, {
+          .post('http://127.0.0.1:5000/medicines/upload', this.state.form_data, {
             headers: {
               'content-type': 'multipart/form-data',
               Authorization: token,
@@ -72,12 +64,10 @@ export default class CheckScreen extends React.Component {
             });
           })
           .then(() => {
-            console.log('직접입력 창에서 S3업로드!: ', this.state.imgS3Uri);
             this.props.navigation.navigate('Alarm', {
               alarmMedicine: {
                 name: this.state.medicineName,
                 image_dir: this.state.imgS3Uri,
-                // image_dir:'https://medisharp.s3.ap-northeast-2.amazonaws.com//43D997B1-DCC1-451F-B331-458580722917.jpg_L',
                 camera: false,
                 title: null,
                 effect: this.state.effect,
@@ -202,20 +192,7 @@ export default class CheckScreen extends React.Component {
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
             <TouchableOpacity
               onPress={() => {
-                // this.redirectToAlarmScreen();
-                this.props.navigation.navigate('Alarm', {
-                  alarmMedicine: {
-                    name: this.state.medicineName,
-                    // image_dir: this.state.imgS3Uri,
-                    image_dir:
-                      'https://medisharp.s3.ap-northeast-2.amazonaws.com//43D997B1-DCC1-451F-B331-458580722917.jpg_L',
-                    camera: false,
-                    title: null,
-                    effect: this.state.effect,
-                    capacity: this.state.capacity,
-                    validity: this.state.validity,
-                  },
-                });
+                this.redirectToAlarmScreen();
               }}
             >
               <View
