@@ -52,30 +52,17 @@ export default class AlarmUpdateScreen extends React.Component {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/schedules-commons',
+        url: 'http://127.0.0.1:5000/medicines',
         headers: {
           Authorization: token,
         },
-        params: this.state.item[0],
+        params: {
+          schedules_common_id: this.state.item[0]['schedules_common_id'],
+        },
       })
         .then((data) => {
-          axios({
-            method: 'get',
-            url: 'http://127.0.0.1:5000/medicines',
-            headers: {
-              Authorization: token,
-            },
-            params: {
-              schedules_common_id: data.data.results[0]['schedules_common_id'],
-            },
-          })
-            .then((data) => {
-              let medicineList = data.data.results.map((el) => el.name);
-              this.setState({ medicineName: medicineList });
-            })
-            .catch((err) => {
-              console.error(err);
-            });
+          let medicineList = data.data.results.map((el) => el.name);
+          this.setState({ medicineName: medicineList });
         })
         .catch((err) => {
           console.error(err);
