@@ -43,16 +43,12 @@ export default class CheckScreen extends React.Component {
     get_token()
       .then((token) => {
         axios
-          .post(
-            'https://gentle-anchorage-17372.herokuapp.com/medicines/image',
-            this.state.form_data,
-            {
-              headers: {
-                'content-type': 'multipart/form-data',
-                Authorization: token,
-              },
+          .post('https://my-medisharp.herokuapp.com/medicines/image', this.state.form_data, {
+            headers: {
+              'content-type': 'multipart/form-data',
+              Authorization: token,
             },
-          )
+          })
           .then((res) => {
             this.setState({
               mediname: res.data.prediction,
@@ -75,7 +71,7 @@ export default class CheckScreen extends React.Component {
 
   uploadToS3Camera() {
     axios
-      .post('http://localhost:5000/medicines/upload', this.state.form_data, {
+      .post('https://my-medisharp.herokuapp.com/medicines/upload', this.state.form_data, {
         headers: {
           'content-type': 'multipart/form-data',
           Authorization: this.state.token,
@@ -184,6 +180,7 @@ export default class CheckScreen extends React.Component {
           onPress={() => {
             this.props.navigation.navigate('SelfInputScreen', {
               uri: this.state.uri,
+              form_data: this.state.form_data,
             });
           }}
         >
