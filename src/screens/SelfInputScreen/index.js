@@ -45,7 +45,7 @@ export default class CheckScreen extends React.Component {
     return (
       <View
         style={{
-          height: window.height * 0.9,
+          height: window.height * 0.92 - 1,
           width: window.width - 40,
           marginLeft: 20,
           alignItems: 'center',
