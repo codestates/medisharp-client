@@ -62,7 +62,7 @@ class CountdownTimer extends React.Component {
     } else if (!hours && !minutes && hours !== 0 && minutes !== 0) {
       return (
         <View>
-          <Text>오늘은 복용할 약이 없습니다. 내일도 오늘 같기를!</Text>
+          <Text>오늘은 더이상 복용할 약이 없습니다. 내일도 오늘 같기를!</Text>
         </View>
       );
     } else {
