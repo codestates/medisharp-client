@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Camera } from 'expo-camera';
@@ -7,6 +7,8 @@ import * as Permissions from 'expo-permissions';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
+
+import medisharpLogo from '../../img/medisharpLogo.png';
 
 import * as FileSystem from 'expo-file-system';
 import { useAsyncStorage } from '@react-native-community/async-storage';
@@ -27,6 +29,7 @@ export default class CameraScreen extends React.Component {
       photo: null,
       image: require('../../img/medicineBox.png'), //디폴트 이미지
       show: true,
+      isLoading: false,
     };
     this.cameraRef = React.createRef();
   }
@@ -40,137 +43,154 @@ export default class CameraScreen extends React.Component {
     }
   };
   render() {
-    const { hasPermission, cameraType } = this.state;
-    if (hasPermission === true) {
-      if (this.state.show) {
-        return (
-          <View>
-            <Camera
-              style={{ width: '100%', height: window.width, marginTop: 30 }}
-              type={cameraType}
-              ratio="1:1"
-              ref={(ref) => {
-                this.camera = ref;
-              }}
-            >
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: 'transparent',
-                  flexDirection: 'row',
+    const { hasPermission, cameraType, isLoading } = this.state;
+    if (isLoading === true) {
+      return (
+        <View style={styles.loginContainer}>
+          <View style={[styles.container, styles.horizontal]}>
+            <Image
+              style={{ width: 77, height: 71, marginTop: '60%', marginBottom: '20%' }}
+              source={medisharpLogo}
+            />
+            <ActivityIndicator size={60} color="#6a9c90" />
+          </View>
+        </View>
+      );
+    } else {
+      if (hasPermission === true) {
+        if (this.state.show) {
+          return (
+            <View>
+              <Camera
+                style={{ width: '100%', height: window.width, marginTop: 30 }}
+                type={cameraType}
+                ratio="1:1"
+                ref={(ref) => {
+                  this.camera = ref;
                 }}
               >
-                {/* // FLIP : 전면/후면 카메라 변경 버튼, */}
                 <View
                   style={{
-                    position: 'absolute',
-                    top: 10,
-                    right: 10,
-                    backgroundColor: 'white',
-                    width: 50,
-                    height: 50,
-                    borderRadius: 30,
+                    flex: 1,
+                    backgroundColor: 'transparent',
+                    flexDirection: 'row',
+                  }}
+                >
+                  {/* // FLIP : 전면/후면 카메라 변경 버튼, */}
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 10,
+                      backgroundColor: 'white',
+                      width: 50,
+                      height: 50,
+                      borderRadius: 30,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <TouchableOpacity onPress={this.switchCameraType}>
+                      <Icon name="camera-party-mode" size={35} color={'#649A8D'} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Camera>
+              {/* // SNAP : 사진 촬영 버튼 */}
+              <View
+                style={{
+                  position: 'absolute',
+                  bottom: -(window.height - window.width) * 0.5,
+                  backgroundColor: '#649A8D',
+                  width: 100,
+                  height: 100,
+                  left: window.width * 0.5 - 50,
+                  borderRadius: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <TouchableOpacity onPress={this.takePhoto}>
+                  <Icon name="camera" size={60} color={'white'} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          );
+        } else {
+          return (
+            <View>
+              <Camera
+                style={{ width: '100%', height: window.width, marginTop: 30 }}
+                type={cameraType}
+                ref={(ref) => {
+                  this.camera = ref;
+                }}
+              >
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                  }}
+                >
+                  <Image
+                    source={this.state.image}
+                    style={{ width: '100%', height: window.width }}
+                  />
+                  {/* // Retake Photo : 사진 재촬영 버튼 */}
+                </View>
+              </Camera>
+              <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                <View
+                  style={{
+                    backgroundColor: '#649A8D',
+                    margin: window.width * 0.15,
+                    width: 100,
+                    height: 100,
+                    borderRadius: 50,
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}
                 >
-                  <TouchableOpacity onPress={this.switchCameraType}>
-                    <Icon name="camera-party-mode" size={35} color={'#649A8D'} />
+                  <TouchableOpacity onPress={() => this.setState({ show: true })}>
+                    <Icon name="camera-retake" size={60} color={'white'} />
+                  </TouchableOpacity>
+                </View>
+                {/* // Upload Photo : 사진 업로드 버튼 */}
+                <View
+                  style={{
+                    backgroundColor: '#649A8D',
+                    margin: window.width * 0.15,
+                    width: 100,
+                    height: 100,
+                    borderRadius: 50,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <TouchableOpacity onPress={this.handleSubmit}>
+                    <Icon name="check-bold" size={60} color={'white'} />
                   </TouchableOpacity>
                 </View>
               </View>
-            </Camera>
-            {/* // SNAP : 사진 촬영 버튼 */}
-            <View
-              style={{
-                position: 'absolute',
-                bottom: -(window.height - window.width) * 0.5,
-                backgroundColor: '#649A8D',
-                width: 100,
-                height: 100,
-                left: window.width * 0.5 - 50,
-                borderRadius: 50,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <TouchableOpacity onPress={this.takePhoto}>
-                <Icon name="camera" size={60} color={'white'} />
-              </TouchableOpacity>
             </View>
+          );
+        }
+      } else if (hasPermission === false) {
+        return (
+          <View>
+            <Text>Don't have Permission for this App.</Text>
           </View>
         );
       } else {
         return (
           <View>
-            <Camera
-              style={{ width: '100%', height: window.width, marginTop: 30 }}
-              type={cameraType}
-              ref={(ref) => {
-                this.camera = ref;
-              }}
-            >
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                }}
-              >
-                <Image source={this.state.image} style={{ width: '100%', height: window.width }} />
-                {/* // Retake Photo : 사진 재촬영 버튼 */}
-              </View>
-            </Camera>
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <View
-                style={{
-                  backgroundColor: '#649A8D',
-                  margin: window.width * 0.15,
-                  width: 100,
-                  height: 100,
-                  borderRadius: 50,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <TouchableOpacity onPress={() => this.setState({ show: true })}>
-                  <Icon name="camera-retake" size={60} color={'white'} />
-                </TouchableOpacity>
-              </View>
-              {/* // Upload Photo : 사진 업로드 버튼 */}
-              <View
-                style={{
-                  backgroundColor: '#649A8D',
-                  margin: window.width * 0.15,
-                  width: 100,
-                  height: 100,
-                  borderRadius: 50,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <TouchableOpacity onPress={this.handleSubmit}>
-                  <Icon name="check-bold" size={60} color={'white'} />
-                </TouchableOpacity>
-              </View>
-            </View>
+            <ActivityIndicator color="white" size={1} />
           </View>
         );
       }
-    } else if (hasPermission === false) {
-      return (
-        <View>
-          <Text>Don't have Permission for this App.</Text>
-        </View>
-      );
-    } else {
-      return (
-        <View>
-          <ActivityIndicator color="white" size={1} />
-        </View>
-      );
     }
   }
-  
+
   switchCameraType = () => {
     console.log('switch');
     const { cameraType } = this.state;
@@ -196,7 +216,7 @@ export default class CameraScreen extends React.Component {
     }
   };
 
-  handleSubmit = () => {
+  handleSubmit = async () => {
     // 웹에서 실행시
     // const byteString = atob(this.state.photo.split(',')[1]);
     // const ab = new ArrayBuffer(byteString.length);
@@ -240,6 +260,7 @@ export default class CameraScreen extends React.Component {
     //   });
 
     // 모바일에서 실행시
+    await this.setState({ isLoading: true });
     let fileName = this.state.photo.split('Camera')[1];
     let form_data = new FormData();
     form_data.append('image', {
@@ -248,13 +269,39 @@ export default class CameraScreen extends React.Component {
       uri: this.state.photo,
     });
     console.log('form data: ', form_data);
-
-    this.props.navigation.navigate('CheckScreen', {
-      form_data: form_data,
-      uri: this.state.photo,
-      mediname: null,
-    });
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token()
+      .then((token) => {
+        axios
+          .post('https://gentle-anchorage-17372.herokuapp.com/medicines/image', form_data, {
+            headers: {
+              'content-type': 'multipart/form-data',
+              Authorization: token,
+            },
+          })
+          .then((res) => {
+            this.props.navigation.navigate('CheckScreen', {
+              form_data: form_data,
+              uri: this.state.photo,
+              mediname: res.data.prediction,
+            });
+          })
+          .catch((err) => console.log(err));
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
+
+  //   this.props.navigation.navigate('CheckScreen', {
+  //     form_data: form_data,
+  //     uri: this.state.photo,
+  //     mediname: null,
+  //   });
+  // };
   // savePhoto = async () => {
   //   try {
   //     console.log(FileSystem.cacheDirectory);
@@ -268,3 +315,10 @@ export default class CameraScreen extends React.Component {
   //   }
   // };
 }
+
+const styles = StyleSheet.create({
+  loginContainer: {
+    alignItems: 'center',
+    height: '100%',
+  },
+});
