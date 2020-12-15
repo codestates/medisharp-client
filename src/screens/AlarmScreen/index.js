@@ -244,6 +244,23 @@ export default class AlarmScreen extends React.Component {
                           .then(() => {
                             console.log('medicines, user medicines API');
                             this.props.navigation.navigate({ routeName: 'Calendar' });
+                            this.setState({
+                              alarmTitle: '',
+                              alarmMemo: '',
+                              startYear: moment().format().substring(0, 4),
+                              startMonth: moment().format().substring(5, 7),
+                              startDate: moment().format().substring(8, 10),
+                              startDay: moment().format('dddd'),
+                              endYear: moment().format().substring(0, 4),
+                              endMonth: moment().format().substring(5, 7),
+                              endDate: moment().format().substring(8, 10),
+                              endDay: moment().format('dddd'),
+                              showTime: [],
+                              alarmInterval: 0,
+                              selectedHour: '',
+                              selectedMinute: '',
+                              alarmMedicine: [],
+                            });
                           })
                           .catch((err) => console.log(err));
                       })
