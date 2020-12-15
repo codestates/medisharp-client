@@ -35,34 +35,69 @@ export default class AlarmUpdateScreen extends React.Component {
       endDatePickerShow: false,
       timePickerShow: false,
       weekName: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
-      startMonth: '12',
-      startDate: '01',
+      totalStartDate: '',
+      totalEndDate: '',
+      startMonth: '',
+      startDate: '',
       startDay: '',
-      endMonth: '12',
-      endDate: '15',
+      endMonth: '',
+      endDate: '',
       endDay: '',
       date: new Date(this.koreanStandardTime),
       showTime: [],
       check: false,
+      alarmInterval: 0,
     };
+    console.log('{{{{{{{{{{this.state.item: }}}}}}}}}}}}}', this.state.item);
     async function get_token() {
       const token = await getItem();
       return token;
     }
     get_token().then((token) => {
+      console.log('++++++++++++++AlarmUpdateScreen item: +++++++++++++++', this.state.item[0]);
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/medicines',
+        url: 'https://my-medisharp.herokuapp.com/schedules-commons',
         headers: {
           Authorization: token,
         },
-        params: {
-          schedules_common_id: this.state.item[0]['schedules_common_id'],
-        },
+        params: this.state.item[0],
       })
         .then((data) => {
-          let medicineList = data.data.results.map((el) => el.name);
-          this.setState({ medicineName: medicineList });
+          console.log(
+            '________________AlarmUpdateScreen data: _____________',
+            data.data.results[0],
+          );
+          let startdate = data.data.results[0]['startdate'].split('-');
+          let enddate = data.data.results[0]['enddate'].split('-');
+          this.setState({
+            totalStartDate: data.data.results[0]['startdate'],
+            totalEndDate: data.data.results[0]['enddate'],
+            startMonth: startdate[1],
+            startDate: startdate[2],
+            endMonth: enddate[1],
+            endDate: enddate[2],
+            check: data.data.results[0]['check'],
+            alarmInterval: data.data.results[0]['cycle'],
+          });
+
+          axios({
+            method: 'get',
+            url: 'https://my-medisharp.herokuapp.com/medicines',
+            headers: {
+              Authorization: token,
+            },
+            params: {
+              schedules_common_id: data.data.results[0]['schedules_common_id'],
+            },
+          })
+            .then((data) => {
+              let medicineList = data.data.results.map((el) => el.name);
+              this.setState({ medicineName: medicineList });
+            })
+            .catch((err) => {
+              console.error(err);
+            });
         })
         .catch((err) => {
           console.error(err);
@@ -141,8 +176,8 @@ export default class AlarmUpdateScreen extends React.Component {
       <View style={{ backgroundColor: 'white' }}>
         <NavigationEvents
           onDidFocus={(payload) => {
-            const startDayValue = new Date('2020-12-01').getDay();
-            const endDayValue = new Date('2020-12-15').getDay();
+            const startDayValue = new Date(this.state.totalStartDate).getDay();
+            const endDayValue = new Date(this.state.totalEndDate).getDay();
             this.setState({ startDay: this.state.weekName[startDayValue] });
             this.setState({ endDay: this.state.weekName[endDayValue] });
           }}
