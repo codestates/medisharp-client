@@ -35,18 +35,7 @@ export default class AlarmScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      alarmMedicine: [
-        {
-          name: '하이투벤',
-          image_dir:
-            'https://medisharp.s3.ap-northeast-2.amazonaws.com//43D997B1-DCC1-451F-B331-458580722917.jpg_L',
-          camera: true,
-          title: null,
-          effect: null,
-          capacity: null,
-          validity: null,
-        },
-      ],
+      alarmMedicine: [],
       weekName: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
       nowHour: moment().format().substring(11, 13) + 12,
       nowMinute: moment().format().substring(14, 16),
@@ -159,7 +148,7 @@ export default class AlarmScreen extends React.Component {
         console.log('medicines API token, ', token);
         axios
           .post(
-            'https://hj-medisharp.herokuapp.com/medicines',
+            'http://127.0.0.1:5000/medicines',
             { medicine: this.state.alarmMedicine },
             {
               headers: {
@@ -173,7 +162,7 @@ export default class AlarmScreen extends React.Component {
             console.log('schedules-commons API token, ', token);
             axios
               .post(
-                'https://hj-medisharp.herokuapp.com/schedules-commons',
+                'http://127.0.0.1:5000/schedules-commons',
                 {
                   schedules_common: {
                     title: this.state.alarmTitle,
@@ -199,7 +188,7 @@ export default class AlarmScreen extends React.Component {
                 console.log('schedules date API', schedules_common_id, time, medi_ids);
                 axios
                   .post(
-                    'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
+                    'http://127.0.0.1:5000/schedules-commons/schedules-dates',
                     {
                       schedules_common: {
                         medicines_id: medi_ids,
@@ -220,7 +209,7 @@ export default class AlarmScreen extends React.Component {
                     console.log('schedules common, schedules date API', token);
                     axios
                       .post(
-                        'https://hj-medisharp.herokuapp.com/medicines/schedules-medicines',
+                        'http://127.0.0.1:5000/medicines/schedules-medicines',
                         {
                           schedules_common_medicines: {
                             medicines_id: medi_ids,
@@ -237,7 +226,7 @@ export default class AlarmScreen extends React.Component {
                         console.log('schedules medicines, medicines API');
                         axios
                           .post(
-                            'https://hj-medisharp.herokuapp.com/medicines/users-medicines',
+                            'http://127.0.0.1:5000/medicines/users-medicines',
                             {
                               medicines: {
                                 medicines_id: medi_ids,
