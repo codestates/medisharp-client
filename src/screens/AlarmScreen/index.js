@@ -146,9 +146,10 @@ export default class AlarmScreen extends React.Component {
     }
     get_token()
       .then((token) => {
+        console.log('medicines API token, ', token);
         axios
           .post(
-            'https://gentle-anchorage-17372.herokuapp.com/medicines',
+            'http://127.0.0.1:5000/medicines',
             { medicine: this.state.alarmMedicine },
             {
               headers: {
@@ -159,9 +160,10 @@ export default class AlarmScreen extends React.Component {
           .then((res) => {
             let medi_ids = res.data.medicine_id;
             console.log('medicines API', medi_ids);
+            console.log('schedules-commons API token, ', token);
             axios
               .post(
-                'https://gentle-anchorage-17372.herokuapp.com/schedules-commons',
+                'http://127.0.0.1:5000/schedules-commons',
                 {
                   schedules_common: {
                     title: this.state.alarmTitle,
@@ -184,10 +186,10 @@ export default class AlarmScreen extends React.Component {
                 let startdate = res.data.results['startdate'];
                 let endtdate = res.data.results['enddate'];
                 let cycle = res.data.results['cycle'];
-                console.log('schedules common API', schedules_common_id, time, medi_ids);
+                console.log('schedules date API', schedules_common_id, time, medi_ids);
                 axios
                   .post(
-                    'https://gentle-anchorage-17372.herokuapp.com/schedules-commons/schedules-dates',
+                    'http://127.0.0.1:5000/schedules-commons/schedules-dates',
                     {
                       schedules_common: {
                         medicines_id: medi_ids,
@@ -205,10 +207,10 @@ export default class AlarmScreen extends React.Component {
                     },
                   )
                   .then(() => {
-                    console.log('schedules common, schedules date API');
+                    console.log('schedules common, schedules date API', token);
                     axios
                       .post(
-                        'https://gentle-anchorage-17372.herokuapp.com/medicines/schedules-medicines',
+                        'http://127.0.0.1:5000/medicines/schedules-medicines',
                         {
                           schedules_common_medicines: {
                             medicines_id: medi_ids,
@@ -225,7 +227,7 @@ export default class AlarmScreen extends React.Component {
                         console.log('schedules medicines, medicines API');
                         axios
                           .post(
-                            'https://gentle-anchorage-17372.herokuapp.com/medicines/users-medicines',
+                            'http://127.0.0.1:5000/medicines/users-medicines',
                             {
                               medicines: {
                                 medicines_id: medi_ids,

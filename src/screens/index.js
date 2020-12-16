@@ -19,10 +19,16 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const window = Dimensions.get('window');
 
-const AlarmStack = createStackNavigator({
-  Alarm: AlarmScreen,
-  SelfInputScreen: SelfInputScreen,
-});
+const AlarmStack = createStackNavigator(
+  {
+    Calendar: CalendarScreen,
+    Alarm: AlarmScreen,
+    SelfInputScreen: SelfInputScreen,
+  },
+  {
+    initialRouteName: 'Alarm',
+  },
+);
 
 const CalendarStack = createStackNavigator(
   {
@@ -34,6 +40,11 @@ const CalendarStack = createStackNavigator(
     headerShown: false,
   },
 );
+
+// const SetAlarmStack = createStackNavigator({
+//   Alarm: AlarmScreen,
+//   Calendar: CalendarScreen,
+// });
 
 const TabNavigator = createBottomTabNavigator(
   {
