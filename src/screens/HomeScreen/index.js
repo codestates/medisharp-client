@@ -11,7 +11,7 @@ const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   const [fakeGetTodayChecked, setfakeGetTodayChecked] = useState([]);
   const [alarmList, setTodayAlarm] = useState([]);
   useEffect(() => {
@@ -23,7 +23,8 @@ const HomeScreen = () => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/schedules-dates/check/today',
+        url: 'https://gentle-anchorage-17372.herokuapp.com/schedules-dates/check/today',
+        //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,
         },
@@ -42,7 +43,8 @@ const HomeScreen = () => {
       get_token().then((token) => {
         axios({
           method: 'get',
-          url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
+          url: `https://gentle-anchorage-17372.herokuapp.com/schedules-dates/schedules-commons/alarm`,
+          //https://yag-ollim.herokuapp.com/ -> 배포용 주소
           headers: {
             Authorization: token,
           },
@@ -58,7 +60,7 @@ const HomeScreen = () => {
           });
       });
     });
-  }, []);
+  }, [navigation]);
 
   const totalCount = fakeGetTodayChecked.length;
   const checkCounting = function () {
