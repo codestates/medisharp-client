@@ -158,7 +158,7 @@ export default class AlarmScreen extends React.Component {
       .then((token) => {
         axios
           .post(
-            'http://127.0.0.1:5000/medicines',
+            'https://hj-medisharp.herokuapp.com/medicines',
             { medicine: this.state.alarmMedicine },
             {
               headers: {
@@ -171,7 +171,7 @@ export default class AlarmScreen extends React.Component {
             console.log('medicines API');
             axios
               .post(
-                'http://127.0.0.1:5000/schedules-commons',
+                'https://hj-medisharp.herokuapp.com/schedules-commons',
                 {
                   schedules_common: {
                     title: this.state.alarmTitle,
@@ -192,9 +192,10 @@ export default class AlarmScreen extends React.Component {
                 let schedules_common_id = res.data.results['new_schedules_common_id'];
                 let time = res.data.results['time'];
                 console.log('schedules common API');
+                console.log('여기서부터 안되네: ', medi_ids, schedules_common_id, time, token);
                 axios
                   .post(
-                    'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+                    'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
                     {
                       schedules_common: {
                         medicines_id: medi_ids,
@@ -212,7 +213,7 @@ export default class AlarmScreen extends React.Component {
                     console.log('schedules common, schedules date API');
                     axios
                       .post(
-                        'http://127.0.0.1:5000/medicines/schedules-medicines',
+                        'https://hj-medisharp.herokuapp.com/medicines/schedules-medicines',
                         {
                           schedules_common_medicines: {
                             medicines_id: medi_ids,
@@ -229,7 +230,7 @@ export default class AlarmScreen extends React.Component {
                         console.log('schedules medicines, medicines API');
                         axios
                           .post(
-                            'http://127.0.0.1:5000/medicines/users-medicines',
+                            'https://hj-medisharp.herokuapp.com/medicines/users-medicines',
                             {
                               medicines: {
                                 medicines_id: medi_ids,

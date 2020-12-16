@@ -276,7 +276,7 @@ export default class CameraScreen extends React.Component {
     get_token()
       .then((token) => {
         axios
-          .post('https://gentle-anchorage-17372.herokuapp.com/medicines/image', form_data, {
+          .post('https://hj-medisharp.herokuapp.com/medicines/image', form_data, {
             headers: {
               'content-type': 'multipart/form-data',
               Authorization: token,

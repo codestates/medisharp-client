@@ -52,7 +52,7 @@ export default class CheckScreen extends React.Component {
     get_token()
       .then((token) => {
         axios
-          .post('http://127.0.0.1:5000/medicines/upload', this.state.form_data, {
+          .post('https://hj-medisharp.herokuapp.com/medicines/upload', this.state.form_data, {
             headers: {
               'content-type': 'multipart/form-data',
               Authorization: token,
@@ -192,7 +192,18 @@ export default class CheckScreen extends React.Component {
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
             <TouchableOpacity
               onPress={() => {
-                this.redirectToAlarmScreen();
+                // this.redirectToAlarmScreen();
+                this.props.navigation.navigate('Alarm', {
+                  alarmMedicine: {
+                    name: this.state.medicineName,
+                    image_dir: this.state.imgS3Uri,
+                    camera: false,
+                    title: null,
+                    effect: this.state.effect,
+                    capacity: this.state.capacity,
+                    validity: this.state.validity,
+                  },
+                });
               }}
             >
               <View
