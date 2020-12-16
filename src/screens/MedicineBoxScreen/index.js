@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Image,
 } from 'react-native';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
 
 const window = Dimensions.get('window');
 
@@ -66,7 +67,14 @@ const MedicineBox = () => {
 
   if (cameraTabSelected) {
     return (
-      <View style={{ backgroundColor: 'white', height: window.height * 0.92 - 1, paddingLeft: 20 }}>
+      <View
+        style={{
+          backgroundColor: 'white',
+          height: window.height * 0.92 - 1,
+          paddingLeft: 20,
+          paddingTop: getStatusBarHeight(),
+        }}
+      >
         <Text
           style={{
             marginTop: 30,

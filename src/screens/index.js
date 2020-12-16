@@ -24,10 +24,16 @@ const AlarmStack = createStackNavigator({
   SelfInputScreen: SelfInputScreen,
 });
 
-const CalendarStack = createStackNavigator({
-  Calendar: CalendarScreen,
-  AlarmUpdateScreen: AlarmUpdateScreen,
-});
+const CalendarStack = createStackNavigator(
+  {
+    Calendar: CalendarScreen,
+    AlarmUpdateScreen: AlarmUpdateScreen,
+  },
+  {
+    headerMode: 'none',
+    headerShown: false,
+  },
+);
 
 const TabNavigator = createBottomTabNavigator(
   {

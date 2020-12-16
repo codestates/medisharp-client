@@ -3,7 +3,7 @@ import axios from 'axios';
 import moment from 'moment';
 import { View, Text, Dimensions, FlatList, StyleSheet, ScrollView } from 'react-native';
 import CountdownTimer from '../../components/CountdownTimer';
-// import AlarmList from '../../components/AlarmList';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
 
 import Alarm from '../../components/Alarm';
 import { useAsyncStorage } from '@react-native-community/async-storage';
@@ -76,6 +76,8 @@ const HomeScreen = ({ navigation }) => {
     <View
       style={{
         height: window.height,
+        backgroundColor: 'white',
+        paddingTop: getStatusBarHeight(),
       }}
     >
       <View
