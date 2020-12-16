@@ -11,7 +11,7 @@ const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   const [fakeGetTodayChecked, setfakeGetTodayChecked] = useState([]);
   const [alarmList, setTodayAlarm] = useState([]);
   useEffect(() => {
@@ -24,6 +24,7 @@ const HomeScreen = () => {
       axios({
         method: 'get',
         url: 'https://hj-medisharp.herokuapp.com/schedules-dates/check/today',
+        //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,
         },
@@ -43,6 +44,7 @@ const HomeScreen = () => {
         axios({
           method: 'get',
           url: `https://hj-medisharp.herokuapp.com/schedules-dates/schedules-commons/alarm`,
+          //https://yag-ollim.herokuapp.com/ -> 배포용 주소
           headers: {
             Authorization: token,
           },
@@ -58,7 +60,7 @@ const HomeScreen = () => {
           });
       });
     });
-  }, []);
+  }, [navigation]);
 
   const totalCount = fakeGetTodayChecked.length;
   const checkCounting = function () {

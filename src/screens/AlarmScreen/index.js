@@ -66,8 +66,8 @@ export default class AlarmScreen extends React.Component {
       startDatePickerShow: false,
       endDatePickerShow: false,
       timePickerShow: false,
-      selectedHour: '',
-      selectedMinute: '',
+      selectedHour: '13',
+      selectedMinute: '00',
       koreanStandardTime: Date.UTC(
         this.startYear,
         this.startMonth - 1,
@@ -156,6 +156,7 @@ export default class AlarmScreen extends React.Component {
     }
     get_token()
       .then((token) => {
+        console.log('medicines API token, ', token);
         axios
           .post(
             'https://hj-medisharp.herokuapp.com/medicines',
@@ -168,7 +169,8 @@ export default class AlarmScreen extends React.Component {
           )
           .then((res) => {
             let medi_ids = res.data.medicine_id;
-            console.log('medicines API');
+            console.log('medicines API', medi_ids);
+            console.log('schedules-commons API token, ', token);
             axios
               .post(
                 'https://hj-medisharp.herokuapp.com/schedules-commons',
@@ -191,8 +193,10 @@ export default class AlarmScreen extends React.Component {
               .then((res) => {
                 let schedules_common_id = res.data.results['new_schedules_common_id'];
                 let time = res.data.results['time'];
-                console.log('schedules common API');
-                console.log('여기서부터 안되네: ', medi_ids, schedules_common_id, time, token);
+                let startdate = res.data.results['startdate'];
+                let endtdate = res.data.results['enddate'];
+                let cycle = res.data.results['cycle'];
+                console.log('schedules date API', schedules_common_id, time, medi_ids);
                 axios
                   .post(
                     'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
@@ -201,6 +205,9 @@ export default class AlarmScreen extends React.Component {
                         medicines_id: medi_ids,
                         schedules_common_id: schedules_common_id,
                         time: time,
+                        startdate: startdate,
+                        enddate: endtdate,
+                        cycle: cycle,
                       },
                     },
                     {
@@ -210,7 +217,7 @@ export default class AlarmScreen extends React.Component {
                     },
                   )
                   .then(() => {
-                    console.log('schedules common, schedules date API');
+                    console.log('schedules common, schedules date API', token);
                     axios
                       .post(
                         'https://hj-medisharp.herokuapp.com/medicines/schedules-medicines',
@@ -244,7 +251,25 @@ export default class AlarmScreen extends React.Component {
                           )
                           .then(() => {
                             console.log('medicines, user medicines API');
-                            this.props.navigation.navigate('CalendarScreen');
+                            this.setState({
+                              alarmTitle: '',
+                              alarmMemo: '',
+                              startYear: moment().format().substring(0, 4),
+                              startMonth: moment().format().substring(5, 7),
+                              startDate: moment().format().substring(8, 10),
+                              startDay: moment().format('dddd'),
+                              endYear: moment().format().substring(0, 4),
+                              endMonth: moment().format().substring(5, 7),
+                              endDate: moment().format().substring(8, 10),
+                              endDay: moment().format('dddd'),
+                              showTime: [],
+                              alarmInterval: 0,
+                              selectedHour: '',
+                              selectedMinute: '',
+                              alarmMedicine: [],
+                            });
+                            alarmMedicineGetParam = [];
+                            this.props.navigation.navigate('Calendar');
                           })
                           .catch((err) => console.log(err));
                       })
@@ -265,13 +290,11 @@ export default class AlarmScreen extends React.Component {
         <NavigationEvents
           onDidFocus={(payload) => {
             const resultArr = this.state.alarmMedicine;
-            const alarmMedicineGetParam = this.props.navigation.getParam('alarmMedicine');
-
+            let alarmMedicineGetParam = this.props.navigation.getParam('alarmMedicine');
             alarmMedicineGetParam === undefined
               ? this.state.alarmMedicine
               : resultArr.push(alarmMedicineGetParam);
             this.setState({ alarmMedicine: resultArr });
-
             console.log('alarmMedicine  =>', this.state.alarmMedicine);
             console.log('resultArr  =>', resultArr);
           }}

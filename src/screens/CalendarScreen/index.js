@@ -37,6 +37,7 @@ const CalendarMain = ({ navigation }) => {
 
   //여기부터 API 입니다.
   useEffect(() => {
+    console.log('++++++++++++++++++GET MONTHLY API+++++++++++++++++');
     async function get_token() {
       const token = await getItem();
       return token;
@@ -45,6 +46,7 @@ const CalendarMain = ({ navigation }) => {
       axios({
         method: 'get',
         url: 'https://hj-medisharp.herokuapp.com/schedules-dates/check/month',
+        //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,
         },
@@ -138,9 +140,10 @@ const CalendarMain = ({ navigation }) => {
           console.error(err);
         });
     });
-  }, [selectedMonth, nextMonth]);
+  }, [selectedMonth, nextMonth, navigation]);
 
   useEffect(() => {
+    console.log('==============Clicked Alarm List=============');
     async function get_token() {
       const token = await getItem();
       return token;
@@ -149,6 +152,7 @@ const CalendarMain = ({ navigation }) => {
       axios({
         method: 'get',
         url: `https://hj-medisharp.herokuapp.com/schedules-dates/schedules-commons/alarm`,
+        //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,
         },
@@ -163,7 +167,7 @@ const CalendarMain = ({ navigation }) => {
           console.error(err);
         });
     });
-  }, [clickedDate]);
+  }, [clickedDate, navigation]);
 
   return (
     <View
