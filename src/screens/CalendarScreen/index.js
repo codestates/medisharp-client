@@ -44,7 +44,8 @@ const CalendarMain = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/schedules-dates/check/month',
+        url: 'https://gentle-anchorage-17372.herokuapp.com/schedules-dates/check/month',
+        //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,
         },
@@ -138,7 +139,7 @@ const CalendarMain = ({ navigation }) => {
           console.error(err);
         });
     });
-  }, [selectedMonth, nextMonth]);
+  }, [selectedMonth, nextMonth, navigation]);
 
   useEffect(() => {
     async function get_token() {
@@ -148,7 +149,8 @@ const CalendarMain = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
+        url: `https://gentle-anchorage-17372.herokuapp.com/schedules-dates/schedules-commons/alarm`,
+        //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,
         },
@@ -163,7 +165,7 @@ const CalendarMain = ({ navigation }) => {
           console.error(err);
         });
     });
-  }, [clickedDate]);
+  }, [clickedDate, navigation]);
 
   return (
     <View

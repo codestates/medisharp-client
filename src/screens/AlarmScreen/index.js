@@ -35,18 +35,7 @@ export default class AlarmScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      alarmMedicine: [
-        {
-          name: '하이투벤',
-          image_dir:
-            'https://medisharp.s3.ap-northeast-2.amazonaws.com//43D997B1-DCC1-451F-B331-458580722917.jpg_L',
-          camera: true,
-          title: null,
-          effect: null,
-          capacity: null,
-          validity: null,
-        },
-      ],
+      alarmMedicine: [],
       weekName: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
       nowHour: moment().format().substring(11, 13) + 12,
       nowMinute: moment().format().substring(14, 16),
@@ -66,8 +55,8 @@ export default class AlarmScreen extends React.Component {
       startDatePickerShow: false,
       endDatePickerShow: false,
       timePickerShow: false,
-      selectedHour: '',
-      selectedMinute: '',
+      selectedHour: '13',
+      selectedMinute: '00',
       koreanStandardTime: Date.UTC(
         this.startYear,
         this.startMonth - 1,
@@ -158,7 +147,7 @@ export default class AlarmScreen extends React.Component {
       .then((token) => {
         axios
           .post(
-            'http://127.0.0.1:5000/medicines',
+            'https://gentle-anchorage-17372.herokuapp.com/medicines',
             { medicine: this.state.alarmMedicine },
             {
               headers: {
@@ -168,10 +157,10 @@ export default class AlarmScreen extends React.Component {
           )
           .then((res) => {
             let medi_ids = res.data.medicine_id;
-            console.log('medicines API');
+            console.log('medicines API', medi_ids);
             axios
               .post(
-                'http://127.0.0.1:5000/schedules-commons',
+                'https://gentle-anchorage-17372.herokuapp.com/schedules-commons',
                 {
                   schedules_common: {
                     title: this.state.alarmTitle,
@@ -191,15 +180,21 @@ export default class AlarmScreen extends React.Component {
               .then((res) => {
                 let schedules_common_id = res.data.results['new_schedules_common_id'];
                 let time = res.data.results['time'];
-                console.log('schedules common API');
+                let startdate = res.data.results['startdate'];
+                let endtdate = res.data.results['enddate'];
+                let cycle = res.data.results['cycle'];
+                console.log('schedules common API', schedules_common_id, time, medi_ids);
                 axios
                   .post(
-                    'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+                    'https://gentle-anchorage-17372.herokuapp.com/schedules-commons/schedules-dates',
                     {
                       schedules_common: {
                         medicines_id: medi_ids,
                         schedules_common_id: schedules_common_id,
                         time: time,
+                        startdate: startdate,
+                        enddate: endtdate,
+                        cycle: cycle,
                       },
                     },
                     {
@@ -212,7 +207,7 @@ export default class AlarmScreen extends React.Component {
                     console.log('schedules common, schedules date API');
                     axios
                       .post(
-                        'http://127.0.0.1:5000/medicines/schedules-medicines',
+                        'https://gentle-anchorage-17372.herokuapp.com/medicines/schedules-medicines',
                         {
                           schedules_common_medicines: {
                             medicines_id: medi_ids,
@@ -229,7 +224,7 @@ export default class AlarmScreen extends React.Component {
                         console.log('schedules medicines, medicines API');
                         axios
                           .post(
-                            'http://127.0.0.1:5000/medicines/users-medicines',
+                            'https://gentle-anchorage-17372.herokuapp.com/medicines/users-medicines',
                             {
                               medicines: {
                                 medicines_id: medi_ids,
@@ -243,7 +238,25 @@ export default class AlarmScreen extends React.Component {
                           )
                           .then(() => {
                             console.log('medicines, user medicines API');
-                            this.props.navigation.navigate('CalendarScreen');
+                            this.setState({
+                              alarmTitle: '',
+                              alarmMemo: '',
+                              startYear: moment().format().substring(0, 4),
+                              startMonth: moment().format().substring(5, 7),
+                              startDate: moment().format().substring(8, 10),
+                              startDay: moment().format('dddd'),
+                              endYear: moment().format().substring(0, 4),
+                              endMonth: moment().format().substring(5, 7),
+                              endDate: moment().format().substring(8, 10),
+                              endDay: moment().format('dddd'),
+                              showTime: [],
+                              alarmInterval: 0,
+                              selectedHour: '',
+                              selectedMinute: '',
+                              alarmMedicine: [],
+                            });
+                            alarmMedicineGetParam = [];
+                            this.props.navigation.navigate('Calendar');
                           })
                           .catch((err) => console.log(err));
                       })
@@ -264,13 +277,11 @@ export default class AlarmScreen extends React.Component {
         <NavigationEvents
           onDidFocus={(payload) => {
             const resultArr = this.state.alarmMedicine;
-            const alarmMedicineGetParam = this.props.navigation.getParam('alarmMedicine');
-
+            let alarmMedicineGetParam = this.props.navigation.getParam('alarmMedicine');
             alarmMedicineGetParam === undefined
               ? this.state.alarmMedicine
               : resultArr.push(alarmMedicineGetParam);
             this.setState({ alarmMedicine: resultArr });
-
             console.log('alarmMedicine  =>', this.state.alarmMedicine);
             console.log('resultArr  =>', resultArr);
           }}
