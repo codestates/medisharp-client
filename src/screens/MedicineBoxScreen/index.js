@@ -18,7 +18,52 @@ const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
-const MedicineBox = () => {
+const MedicineBox = ({ navigation }) => {
+//   const [fakeMedicineByCamera, setFakeMedicineByCamera] = useState({
+//     medicine: [
+//       {
+//         name: '타이레놀',
+//         title: '머리 아플 때 먹어',
+//         image_dir: '../../img/sampleMedi.png',
+//         effect: '두통',
+//         capacity: '성인2알',
+//         validity: '개봉 후 2년',
+//         camera: true,
+//       },
+//       {
+//         name: '이가탄',
+//         title: '물고 뜯고 씹고 맛 보고 즐기고',
+//         image_dir: '../../img/sampleMedi.png',
+//         effect: '치통',
+//         capacity: '성인1알',
+//         validity: '개봉 후 2년',
+//         camera: true,
+//       },
+//     ],
+//   });
+//   const [fakeMedicineBySelf, setFakeMedicineBySelf] = useState({
+//     medicine: [
+//       {
+//         name: '타이레놀',
+//         title: '머리 아플 때 먹어',
+//         image_dir: '../../img/sampleMedi.png',
+//         effect: '두통',
+//         capacity: '성인2알',
+//         validity: '개봉 후 2년',
+//         camera: false,
+//       },
+//       {
+//         name: '이가탄',
+//         title: '이 아플 때 먹어',
+//         image_dir: '../../img/sampleMedi.png',
+//         effect: '치통',
+//         capacity: '성인1알',
+//         validity: '개봉 후 2년',
+//         camera: false,
+//       },
+//     ],
+
+// const MedicineBox = () => {
   const [myMedicines, setMyMedicines] = useState([]);
 
   useEffect(() => {
@@ -122,7 +167,13 @@ const MedicineBox = () => {
           data={MedicineByCamera}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View
+            <View>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('MedicineDetail', { MedicineData: item });
+                }}
+              >
+                 <View
               style={{
                 height: window.height * 0.12,
                 marginTop: 10,
@@ -152,6 +203,10 @@ const MedicineBox = () => {
                 </Text> */}
                 {/* <Text>{item.effect}</Text> */}
               </View>
+            
+               
+                </View>
+              </TouchableOpacity>
             </View>
           )}
         ></FlatList>
@@ -159,7 +214,14 @@ const MedicineBox = () => {
     );
   } else {
     return (
-      <View style={{ backgroundColor: 'white', height: window.height * 0.92 - 1, paddingLeft: 20 }}>
+      <View
+        style={{
+          backgroundColor: 'white',
+          height: window.height * 0.92 - 1,
+          paddingLeft: 20,
+          paddingTop: getStatusBarHeight(),
+        }}
+      >
         <Text
           style={{
             marginTop: 30,
@@ -211,7 +273,13 @@ const MedicineBox = () => {
           data={MedicineBySelf}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View
+            <View>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('MedicineDetail', { MedicineData: item });
+                }}
+              >
+                <View
               style={{
                 height: window.height * 0.12,
                 marginTop: 10,
@@ -241,6 +309,9 @@ const MedicineBox = () => {
                 </Text> */}
                 {/* <Text>{item.effect}</Text> */}
               </View>
+             
+                </View>
+              </TouchableOpacity>
             </View>
           )}
         ></FlatList>
