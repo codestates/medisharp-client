@@ -32,7 +32,8 @@ export default class AlarmUpdateScreen extends React.Component {
     super(props);
     this.state = {
       item: [this.props.navigation.getParam('item')],
-      medicineName: [],
+      clickedDate: this.props.navigation.getParam('clickedDate'),
+      medicines: [],
       alarmMemo: [],
       startDatePickerShow: false,
       endDatePickerShow: false,
@@ -72,6 +73,8 @@ export default class AlarmUpdateScreen extends React.Component {
         .then((data) => {
           let startdate = data.data.results[0]['startdate'].split('-');
           let enddate = data.data.results[0]['enddate'].split('-');
+          let hour = data.data.results[0]['time'].split(':')[0];
+          let minute = data.data.results[0]['time'].split(':')[1];
           this.setState({
             totalStartDate: data.data.results[0]['startdate'],
             totalEndDate: data.data.results[0]['enddate'],
@@ -83,6 +86,9 @@ export default class AlarmUpdateScreen extends React.Component {
             endDate: enddate[2],
             check: data.data.results[0]['check'],
             alarmInterval: data.data.results[0]['cycle'],
+            selectedHour: hour,
+            selectedMinute: minute,
+            showTime: [data.data.results[0]['time']],
             schedules_common_id: data.data.results[0]['schedules_common_id'],
           });
 
@@ -98,7 +104,7 @@ export default class AlarmUpdateScreen extends React.Component {
           })
             .then((data) => {
               let medicineList = data.data.results.map((el) => el.name);
-              this.setState({ medicineName: medicineList });
+              this.setState({ medicines: medicineList });
             })
             .catch((err) => {
               console.error(err);
@@ -120,7 +126,7 @@ export default class AlarmUpdateScreen extends React.Component {
         axios
           .post(
             'http://127.0.0.1:5000/medicines',
-            { medicine: this.state.medicineName },
+            { medicine: this.state.medicines },
             {
               headers: {
                 Authorization: token,
@@ -222,6 +228,35 @@ export default class AlarmUpdateScreen extends React.Component {
           .catch((err) => console.error(err));
       })
       .catch((err) => console.error(err));
+  };
+
+  patchCheck = () => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios
+        .patch(
+          'http://127.0.0.1:5000/schedules-dates/check',
+          {
+            schedules_common: {
+              schedules_common_id: this.state.schedules_common_id,
+              clickedDate: this.state.clickedDate,
+            },
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
+        .then((res) => {
+          const changedCheck = res.data.results['check'];
+          this.setState({ check: changedCheck });
+          console.log('patch check API');
+        });
+    });
   };
 
   checkChangeTrue = () => {
@@ -409,12 +444,19 @@ export default class AlarmUpdateScreen extends React.Component {
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Icon name="pills" size={22} color={'#D6E4E1'} />
                 <Text style={styles.seclectText}>약 올리기</Text>
+                <TouchableOpacity
+                  onPress={() => this.props.navigation.navigate('CameraNoticeScreen')}
+                >
+                  <Text style={{ fontSize: 16 }}>
+                    사진으로 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
             <View>
               <FlatList
                 horizontal={true}
-                data={this.state.medicineName}
+                data={this.state.alarmMedicine}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <View style={{ marginBottom: 10 }}>
@@ -423,21 +465,37 @@ export default class AlarmUpdateScreen extends React.Component {
                         flexDirection: 'row',
                         margin: 5,
                         alignSelf: 'flex-start',
-                        borderWidth: 2,
-                        borderColor: '#6a9c90',
+                        borderWidth: 1,
+                        borderColor: '#939393',
                         borderStyle: 'solid',
                         borderRadius: 5,
                         padding: 5,
                       }}
                     >
-                      <Text
-                        style={{
-                          fontSize: 18,
-                          fontWeight: 'bold',
-                          color: '#6a9c90',
-                        }}
-                      >
+                      <Text style={{ fontSize: 18, marginRight: 5 }}>
                         {item}
+                        {'  '}
+                        <Icon
+                          onPress={() => {
+                            const filteredMedicine = [];
+                            for (let i = 0; i < this.state.medicines.length; i++) {
+                              console.log('this.state.medicines[i] =>', this.state.medicines[i]);
+                              console.log('item =>', item);
+                              if (item !== this.state.medicines[i]) {
+                                filteredMedicine.push(this.state.medicines[i]);
+                              } else {
+                              }
+                            }
+
+                            this.setState({ medicines: filteredMedicine });
+                          }}
+                          name="times-circle"
+                          size={20}
+                          color={'#9a6464'}
+                          style={{
+                            marginLeft: 5,
+                          }}
+                        />
                       </Text>
                     </View>
                   </View>
@@ -611,7 +669,7 @@ export default class AlarmUpdateScreen extends React.Component {
                     >
                       <Text style={{ fontSize: 22, textAlign: 'right', marginRight: 5 }}>
                         {item}
-                        {'  '}
+                        {''}
                         <Icon
                           onPress={() => {
                             this.setState({ showTime: [] });
@@ -644,8 +702,6 @@ export default class AlarmUpdateScreen extends React.Component {
                       textAlign: 'center',
                       fontSize: 16,
                     }}
-                    placeholder="0"
-                    placeholderTextColor={'gray'}
                     maxLength={2}
                     onChangeText={(alarmInterval) =>
                       this.setState({ alarmInterval: alarmInterval })
