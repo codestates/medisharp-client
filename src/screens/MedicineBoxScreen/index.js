@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import Axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,55 +9,95 @@ import {
   StyleSheet,
   Image,
 } from 'react-native';
+import axios from 'axios';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
+import { get } from 'react-native/Libraries/Utilities/PixelRatio';
+
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
 const MedicineBox = ({ navigation }) => {
-  const [fakeMedicineByCamera, setFakeMedicineByCamera] = useState({
-    medicine: [
-      {
-        name: '타이레놀',
-        title: '머리 아플 때 먹어',
-        image_dir: '../../img/sampleMedi.png',
-        effect: '두통',
-        capacity: '성인2알',
-        validity: '개봉 후 2년',
-        camera: true,
-      },
-      {
-        name: '이가탄',
-        title: '물고 뜯고 씹고 맛 보고 즐기고',
-        image_dir: '../../img/sampleMedi.png',
-        effect: '치통',
-        capacity: '성인1알',
-        validity: '개봉 후 2년',
-        camera: true,
-      },
-    ],
+//   const [fakeMedicineByCamera, setFakeMedicineByCamera] = useState({
+//     medicine: [
+//       {
+//         name: '타이레놀',
+//         title: '머리 아플 때 먹어',
+//         image_dir: '../../img/sampleMedi.png',
+//         effect: '두통',
+//         capacity: '성인2알',
+//         validity: '개봉 후 2년',
+//         camera: true,
+//       },
+//       {
+//         name: '이가탄',
+//         title: '물고 뜯고 씹고 맛 보고 즐기고',
+//         image_dir: '../../img/sampleMedi.png',
+//         effect: '치통',
+//         capacity: '성인1알',
+//         validity: '개봉 후 2년',
+//         camera: true,
+//       },
+//     ],
+//   });
+//   const [fakeMedicineBySelf, setFakeMedicineBySelf] = useState({
+//     medicine: [
+//       {
+//         name: '타이레놀',
+//         title: '머리 아플 때 먹어',
+//         image_dir: '../../img/sampleMedi.png',
+//         effect: '두통',
+//         capacity: '성인2알',
+//         validity: '개봉 후 2년',
+//         camera: false,
+//       },
+//       {
+//         name: '이가탄',
+//         title: '이 아플 때 먹어',
+//         image_dir: '../../img/sampleMedi.png',
+//         effect: '치통',
+//         capacity: '성인1알',
+//         validity: '개봉 후 2년',
+//         camera: false,
+//       },
+//     ],
+
+// const MedicineBox = () => {
+  const [myMedicines, setMyMedicines] = useState([]);
+
+  useEffect(() => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: 'http://127.0.0.1:5000/medicines',
+        headers: {
+          Authorization: token,
+        },
+      })
+        .then((data) => {
+          setMyMedicines(data.data.results);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
+  }, []);
+
+  let MedicineByCamera = [];
+  let MedicineBySelf = [];
+  myMedicines.forEach((el) => {
+    if (el.camera === true) {
+      MedicineByCamera.push(el);
+    } else {
+      MedicineBySelf.push(el);
+    }
   });
-  const [fakeMedicineBySelf, setFakeMedicineBySelf] = useState({
-    medicine: [
-      {
-        name: '타이레놀',
-        title: '머리 아플 때 먹어',
-        image_dir: '../../img/sampleMedi.png',
-        effect: '두통',
-        capacity: '성인2알',
-        validity: '개봉 후 2년',
-        camera: false,
-      },
-      {
-        name: '이가탄',
-        title: '이 아플 때 먹어',
-        image_dir: '../../img/sampleMedi.png',
-        effect: '치통',
-        capacity: '성인1알',
-        validity: '개봉 후 2년',
-        camera: false,
-      },
-    ],
-  });
+
   const [cameraTabSelected, setCameraTabSelected] = useState(true);
   const [selfTabSelected, setSelfTabSelected] = useState(false);
 
@@ -123,7 +164,7 @@ const MedicineBox = ({ navigation }) => {
 
         <FlatList
           style={{ width: window.width - 40 }}
-          data={fakeMedicineByCamera.medicine}
+          data={MedicineByCamera}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View>
@@ -132,36 +173,38 @@ const MedicineBox = ({ navigation }) => {
                   navigation.navigate('MedicineDetail', { MedicineData: item });
                 }}
               >
-                <View
-                  style={{
-                    height: window.height * 0.12,
-                    marginTop: 10,
-                    marginBottom: 5,
-                    borderBottomColor: '#6a9c90',
-                    borderBottomWidth: 1,
-                    borderStyle: 'solid',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  <Image
-                    source={require('../../img/sampleMedi.png')}
-                    style={{ width: window.width * 0.35, resizeMode: 'contain', marginBottom: 10 }}
-                  />
-                  <View
-                    style={{
-                      width: window.width * 0.35,
-                      marginLeft: 20,
-                      justifyContent: 'center',
-                      color: '#6a9c90',
-                    }}
-                  >
-                    <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
-                    <Text ellipsizeMode={'tail'} numberOfLines={1}>
-                      {item.title}
-                    </Text>
-                    <Text>{item.effect}</Text>
-                  </View>
+                 <View
+              style={{
+                height: window.height * 0.12,
+                marginTop: 10,
+                marginBottom: 5,
+                borderBottomColor: '#6a9c90',
+                borderBottomWidth: 1,
+                borderStyle: 'solid',
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+              }}
+            >
+              <Image
+                source={{ uri: item.image_dir }}
+                style={{ width: window.width * 0.35, resizeMode: 'contain', marginBottom: 10 }}
+              />
+              <View
+                style={{
+                  width: window.width * 0.35,
+                  marginLeft: 20,
+                  justifyContent: 'center',
+                  color: '#6a9c90',
+                }}
+              >
+                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
+                {/* <Text ellipsizeMode={'tail'} numberOfLines={1}>
+                  {item.title}
+                </Text> */}
+                {/* <Text>{item.effect}</Text> */}
+              </View>
+            
+               
                 </View>
               </TouchableOpacity>
             </View>
@@ -227,7 +270,7 @@ const MedicineBox = ({ navigation }) => {
 
         <FlatList
           style={{ width: window.width - 40 }}
-          data={fakeMedicineBySelf.medicine}
+          data={MedicineBySelf}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View>
@@ -237,35 +280,36 @@ const MedicineBox = ({ navigation }) => {
                 }}
               >
                 <View
-                  style={{
-                    height: window.height * 0.12,
-                    marginTop: 10,
-                    marginBottom: 5,
-                    borderBottomColor: '#6a9c90',
-                    borderBottomWidth: 1,
-                    borderStyle: 'solid',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  <Image
-                    source={require('../../img/sampleMedi.png')}
-                    style={{ width: window.width * 0.35, resizeMode: 'contain', marginBottom: 10 }}
-                  />
-                  <View
-                    style={{
-                      width: window.width * 0.35,
-                      marginLeft: 20,
-                      justifyContent: 'center',
-                      color: '#6a9c90',
-                    }}
-                  >
-                    <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
-                    <Text ellipsizeMode={'tail'} numberOfLines={1}>
-                      {item.title}
-                    </Text>
-                    <Text>{item.effect}</Text>
-                  </View>
+              style={{
+                height: window.height * 0.12,
+                marginTop: 10,
+                marginBottom: 5,
+                borderBottomColor: '#6a9c90',
+                borderBottomWidth: 1,
+                borderStyle: 'solid',
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+              }}
+            >
+              <Image
+                source={{ uri: item.image_dir }}
+                style={{ width: window.width * 0.35, resizeMode: 'contain', marginBottom: 10 }}
+              />
+              <View
+                style={{
+                  width: window.width * 0.35,
+                  marginLeft: 20,
+                  justifyContent: 'center',
+                  color: '#6a9c90',
+                }}
+              >
+                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
+                {/* <Text ellipsizeMode={'tail'} numberOfLines={1}>
+                  {item.title}
+                </Text> */}
+                {/* <Text>{item.effect}</Text> */}
+              </View>
+             
                 </View>
               </TouchableOpacity>
             </View>
