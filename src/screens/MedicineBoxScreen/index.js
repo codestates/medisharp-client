@@ -22,7 +22,6 @@ const MedicineBox = () => {
   const [myMedicines, setMyMedicines] = useState([]);
 
   useEffect(() => {
-    console.log('{{{{{{{{{{내 약 목록들 받아온다!!!}}}}}}}}}}');
     async function get_token() {
       const token = await getItem();
       return token;
@@ -36,7 +35,6 @@ const MedicineBox = () => {
         },
       })
         .then((data) => {
-          console.log('{{{{{{{{응답받았다!!}}}}}}}');
           setMyMedicines(data.data.results);
         })
         .catch((err) => {
@@ -45,20 +43,15 @@ const MedicineBox = () => {
     });
   }, []);
 
-  console.log('{{{{{get my medicine 받아온 myMedicines: ', myMedicines);
-
-  // 받아온 다음에 이를 fakeMedicineByCamera.medicine, fakeMedicineBySelf.medicine로 나눠야함
-  let fakeMedicineByCamera = [];
-  let fakeMedicineBySelf = [];
+  let MedicineByCamera = [];
+  let MedicineBySelf = [];
   myMedicines.forEach((el) => {
     if (el.camera === true) {
-      fakeMedicineByCamera.push(el);
+      MedicineByCamera.push(el);
     } else {
-      fakeMedicineBySelf.push(el);
+      MedicineBySelf.push(el);
     }
   });
-  console.log('{{{{{{{{{{fakeMedicineByCamera}}}}}}}}: ', fakeMedicineByCamera);
-  console.log('{{{{{{{{{{fakeMedicineBySelf}}}}}}}}: ', fakeMedicineBySelf);
 
   const [cameraTabSelected, setCameraTabSelected] = useState(true);
   const [selfTabSelected, setSelfTabSelected] = useState(false);
@@ -126,7 +119,7 @@ const MedicineBox = () => {
 
         <FlatList
           style={{ width: window.width - 40 }}
-          data={fakeMedicineByCamera}
+          data={MedicineByCamera}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View
@@ -215,7 +208,7 @@ const MedicineBox = () => {
 
         <FlatList
           style={{ width: window.width - 40 }}
-          data={fakeMedicineBySelf}
+          data={MedicineBySelf}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View
