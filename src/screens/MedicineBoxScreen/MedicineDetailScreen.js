@@ -12,8 +12,10 @@ export default class MedicineDetailScreen extends React.Component {
     this.state = {
       uri: '',
       MedicineName: '',
+      MedicineImage: '',
       MedicineEffect: '',
       MedicineCapacity: '',
+      MedicineValidity: '',
     };
   }
 
@@ -32,8 +34,10 @@ export default class MedicineDetailScreen extends React.Component {
             let item = this.props.navigation.getParam('MedicineData');
             this.setState({ uri: '받아온 uri' });
             this.setState({ MedicineName: item['name'] });
+            this.setState({ MedicineImage: item['image_dir'] });
             this.setState({ MedicineEffect: item['effect'] });
             this.setState({ MedicineCapacity: item['capacity'] });
+            this.setState({ MedicineValidity: item['validity'] });
           }}
         />
 
@@ -70,7 +74,7 @@ export default class MedicineDetailScreen extends React.Component {
         <ScrollView>
           {/* -- 약 사진 -- */}
           <Image
-            source={require('../../img/sampleMedi.png')} // 하드코딩입니닷 this.state.uri 로 대체될듯합니닷
+            source={{ uri: this.state.MedicineImage }} // 하드코딩입니닷 this.state.uri 로 대체될듯합니닷
             style={{
               width: window.width - 40,
               height: window.width - 40,
@@ -127,6 +131,20 @@ export default class MedicineDetailScreen extends React.Component {
           >
             <Text style={styles.titleText}>용법/용량</Text>
             <Text style={styles.bodyText}>{this.state.MedicineCapacity}</Text>
+          </View>
+
+          {/* -- 약 유효기간 뷰 -- */}
+          <View
+            style={{
+              marginBottom: window.height * 0.01,
+              borderBottomWidth: 1,
+              borderBottomColor: '#6A9C90',
+              borderStyle: 'solid',
+              width: window.width - 40,
+            }}
+          >
+            <Text style={styles.titleText}>유효기간</Text>
+            <Text style={styles.bodyText}>{this.state.MedicineValidity}</Text>
           </View>
 
           {/* -- 삭제하기 버튼 -- */}
