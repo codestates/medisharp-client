@@ -99,12 +99,13 @@ export default class AlarmUpdateScreen extends React.Component {
               Authorization: token,
             },
             params: {
-              schedules_common_id: data.data.results[0]['schedules_common_id'],
+              schedules_common_id: this.state.schedules_common_id,
             },
           })
             .then((data) => {
-              let medicineList = data.data.results.map((el) => el.name);
-              this.setState({ medicines: medicineList });
+              console.log(data.data.results);
+              //let medicineList = data.data.results.map((el) => el['name']);
+              this.setState({ medicines: data.data.results });
             })
             .catch((err) => {
               console.error(err);
@@ -341,6 +342,14 @@ export default class AlarmUpdateScreen extends React.Component {
             const endDayValue = new Date(this.state.totalEndDate).getDay();
             this.setState({ startDay: this.state.weekName[startDayValue] });
             this.setState({ endDay: this.state.weekName[endDayValue] });
+            const resultArr = this.state.medicines;
+            let alarmMedicineGetParam = this.props.navigation.getParam('alarmMedicine');
+            alarmMedicineGetParam === undefined
+              ? this.state.medicines
+              : resultArr.push(alarmMedicineGetParam);
+            this.setState({ medicines: resultArr });
+            console.log('alarmMedicine  =>', this.state.medicines);
+            console.log('resultArr  =>', resultArr);
           }}
         />
 
@@ -456,7 +465,7 @@ export default class AlarmUpdateScreen extends React.Component {
             <View>
               <FlatList
                 horizontal={true}
-                data={this.state.alarmMedicine}
+                data={this.state.medicines}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <View style={{ marginBottom: 10 }}>
@@ -473,7 +482,7 @@ export default class AlarmUpdateScreen extends React.Component {
                       }}
                     >
                       <Text style={{ fontSize: 18, marginRight: 5 }}>
-                        {item}
+                        {item.name}
                         {'  '}
                         <Icon
                           onPress={() => {
@@ -702,6 +711,8 @@ export default class AlarmUpdateScreen extends React.Component {
                       textAlign: 'center',
                       fontSize: 16,
                     }}
+                    placeholder={this.state.alarmInterval}
+                    placeholderTextColor={'gray'}
                     maxLength={2}
                     onChangeText={(alarmInterval) =>
                       this.setState({ alarmInterval: alarmInterval })
