@@ -331,7 +331,10 @@ const CalendarMain = ({ navigation }) => {
               <TouchableOpacity
                 onPress={() => {
                   console.log(item);
-                  navigation.navigate('AlarmUpdateScreen', { item: item });
+                  navigation.navigate('AlarmUpdateScreen', {
+                    item: item,
+                    clickedDate: clickedDate,
+                  });
                 }}
               >
                 <View
