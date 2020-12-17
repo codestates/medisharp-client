@@ -22,9 +22,6 @@ export default class MedicineDetailScreen extends React.Component {
       MedicineValidity: '',
     };
     console.log('this.state.item', this.state.item);
-  }
-
-  getMyMedicineInfo = (item) => {
     console.log('{{{{{{{약정보가져온다!!!!}}}}}}}');
     async function get_token() {
       const token = await getItem();
@@ -40,9 +37,9 @@ export default class MedicineDetailScreen extends React.Component {
             Authorization: token,
           },
           params: {
-            id: item['id'],
-            name: item['name'],
-            camera: item['camera'],
+            id: this.state.item['id'],
+            name: this.state.item['name'],
+            camera: this.state.item['camera'],
           },
         })
           .then((data) => {
@@ -70,7 +67,7 @@ export default class MedicineDetailScreen extends React.Component {
       .catch((err) => {
         console.error(err);
       });
-  };
+  }
 
   render() {
     return (
@@ -82,11 +79,11 @@ export default class MedicineDetailScreen extends React.Component {
           paddingTop: getStatusBarHeight(),
         }}
       >
-        <NavigationEvents
+        {/* <NavigationEvents
           onDidFocus={(payload) => {
             this.getMyMedicineInfo(this.state.item);
           }}
-        />
+        /> */}
 
         {/* -- 상단 타이틀 -- */}
         <Text
