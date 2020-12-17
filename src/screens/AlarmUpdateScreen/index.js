@@ -40,16 +40,21 @@ export default class AlarmUpdateScreen extends React.Component {
       weekName: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
       totalStartDate: '',
       totalEndDate: '',
+      startYear: '',
       startMonth: '',
       startDate: '',
       startDay: '',
+      endYear: '',
       endMonth: '',
       endDate: '',
       endDay: '',
+      selectedHour: '',
+      selectedMinute: '',
       date: new Date(this.koreanStandardTime),
       showTime: [],
       check: false,
       alarmInterval: 0,
+      schedules_common_id: null,
     };
     async function get_token() {
       const token = await getItem();
@@ -70,12 +75,15 @@ export default class AlarmUpdateScreen extends React.Component {
           this.setState({
             totalStartDate: data.data.results[0]['startdate'],
             totalEndDate: data.data.results[0]['enddate'],
+            startYear: startdate[0],
             startMonth: startdate[1],
             startDate: startdate[2],
+            endYear: enddate[0],
             endMonth: enddate[1],
             endDate: enddate[2],
             check: data.data.results[0]['check'],
             alarmInterval: data.data.results[0]['cycle'],
+            schedules_common_id: data.data.results[0]['schedules_common_id'],
           });
 
           axios({
@@ -121,13 +129,13 @@ export default class AlarmUpdateScreen extends React.Component {
           )
           .then((res) => {
             let medi_ids = res.data.medicine_id;
-            console.log('medicines API', medi_ids);
+            console.log('post medicines API', medi_ids);
             axios
-              .post(
+              .patch(
                 'http://127.0.0.1:5000/schedules-commons',
                 {
                   schedules_common: {
-                    title: this.state.alarmTitle,
+                    schedules_common_id: this.state.schedules_common_id,
                     memo: this.state.alarmMemo,
                     startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
                     enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
@@ -142,19 +150,18 @@ export default class AlarmUpdateScreen extends React.Component {
                 },
               )
               .then((res) => {
-                let schedules_common_id = res.data.results['new_schedules_common_id'];
                 let time = res.data.results['time'];
                 let startdate = res.data.results['startdate'];
                 let endtdate = res.data.results['enddate'];
                 let cycle = res.data.results['cycle'];
                 console.log('schedules common API', schedules_common_id, time, medi_ids);
                 axios
-                  .post(
+                  .patch(
                     'http://127.0.0.1:5000/schedules-commons/schedules-dates',
                     {
                       schedules_common: {
                         medicines_id: medi_ids,
-                        schedules_common_id: schedules_common_id,
+                        schedules_common_id: this.state.schedules_common_id,
                         time: time,
                         startdate: startdate,
                         enddate: endtdate,
@@ -175,7 +182,7 @@ export default class AlarmUpdateScreen extends React.Component {
                         {
                           schedules_common_medicines: {
                             medicines_id: medi_ids,
-                            schedules_common_id: schedules_common_id,
+                            schedules_common_id: this.state.schedules_common_id,
                           },
                         },
                         {
@@ -202,24 +209,6 @@ export default class AlarmUpdateScreen extends React.Component {
                           )
                           .then(() => {
                             console.log('medicines, user medicines API');
-                            this.setState({
-                              alarmTitle: '',
-                              alarmMemo: '',
-                              startYear: moment().format().substring(0, 4),
-                              startMonth: moment().format().substring(5, 7),
-                              startDate: moment().format().substring(8, 10),
-                              startDay: moment().format('dddd'),
-                              endYear: moment().format().substring(0, 4),
-                              endMonth: moment().format().substring(5, 7),
-                              endDate: moment().format().substring(8, 10),
-                              endDay: moment().format('dddd'),
-                              showTime: [],
-                              alarmInterval: 0,
-                              selectedHour: '',
-                              selectedMinute: '',
-                              alarmMedicine: [],
-                            });
-                            alarmMedicineGetParam = [];
                             this.props.navigation.navigate('Calendar');
                           })
                           .catch((err) => console.log(err));
@@ -671,7 +660,7 @@ export default class AlarmUpdateScreen extends React.Component {
 
           {/* -- 하단 버튼 -- */}
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity onPress={() => console.log('수정하기 눌려따!')}>
+            <TouchableOpacity onPress={this.patchSChedules}>
               <View
                 style={{
                   justifyContent: 'center',
