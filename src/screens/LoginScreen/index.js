@@ -53,7 +53,7 @@ export default class LoginScreen extends Component {
   onPressSocial = async (social) => {
     this.setState({
       socialModalVisible: !this.state.socialModalVisible,
-      source: `배포 서버 주소/oauth/${social}`,
+      source: `https://yag-olim-test-prod.herokuapp.com/oauth/${social}`,
     });
   };
 
