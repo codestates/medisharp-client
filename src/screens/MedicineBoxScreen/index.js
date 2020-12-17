@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import Axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,55 +9,57 @@ import {
   StyleSheet,
   Image,
 } from 'react-native';
+import axios from 'axios';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
+import { get } from 'react-native/Libraries/Utilities/PixelRatio';
+
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
 const MedicineBox = () => {
-  const [fakeMedicineByCamera, setFakeMedicineByCamera] = useState({
-    medicine: [
-      {
-        name: '타이레놀',
-        title: '머리 아플 때 먹어',
-        image_dir: '../../img/sampleMedi.png',
-        effect: '두통',
-        capacity: '성인2알',
-        validity: '개봉 후 2년',
-        camera: false,
-      },
-      {
-        name: '이가탄',
-        title: '물고 뜯고 씹고 맛 보고 즐기고',
-        image_dir: '../../img/sampleMedi.png',
-        effect: '치통',
-        capacity: '성인1알',
-        validity: '개봉 후 2년',
-        camera: false,
-      },
-    ],
+  const [myMedicines, setMyMedicines] = useState([]);
+
+  useEffect(() => {
+    console.log('{{{{{{{{{{내 약 목록들 받아온다!!!}}}}}}}}}}');
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: 'https://hj-medisharp.herokuapp.com/medicines',
+        headers: {
+          Authorization: token,
+        },
+      })
+        .then((data) => {
+          console.log('{{{{{{{{응답받았다!!}}}}}}}');
+          setMyMedicines(data.data.ressults);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
+  }, []);
+
+  console.log('{{{{{get my medicine 받아온 myMedicines: ', myMedicines);
+
+  // 받아온 다음에 이를 fakeMedicineByCamera.medicine, fakeMedicineBySelf.medicine로 나눠야함
+  let fakeMedicineByCamera = [];
+  let fakeMedicineBySelf = [];
+  myMedicines.forEach((el) => {
+    if (el.camera === true) {
+      fakeMedicineByCamera.push(el);
+    } else {
+      fakeMedicineBySelf.push(el);
+    }
   });
-  const [fakeMedicineBySelf, setFakeMedicineBySelf] = useState({
-    medicine: [
-      {
-        name: '타이레놀',
-        title: '머리 아플 때 먹어',
-        image_dir: '../../img/sampleMedi.png',
-        effect: '두통',
-        capacity: '성인2알',
-        validity: '개봉 후 2년',
-        camera: false,
-      },
-      {
-        name: '이가탄',
-        title: '이 아플 때 먹어',
-        image_dir: '../../img/sampleMedi.png',
-        effect: '치통',
-        capacity: '성인1알',
-        validity: '개봉 후 2년',
-        camera: false,
-      },
-    ],
-  });
+  console.log('{{{{{{{{{{fakeMedicineByCamera}}}}}}}}: ', fakeMedicineByCamera);
+  console.log('{{{{{{{{{{fakeMedicineBySelf}}}}}}}}: ', fakeMedicineBySelf);
+
   const [cameraTabSelected, setCameraTabSelected] = useState(true);
   const [selfTabSelected, setSelfTabSelected] = useState(false);
 
@@ -123,7 +126,7 @@ const MedicineBox = () => {
 
         <FlatList
           style={{ width: window.width - 40 }}
-          data={fakeMedicineByCamera.medicine}
+          data={fakeMedicineByCamera}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View
@@ -151,10 +154,10 @@ const MedicineBox = () => {
                 }}
               >
                 <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
-                <Text ellipsizeMode={'tail'} numberOfLines={1}>
+                {/* <Text ellipsizeMode={'tail'} numberOfLines={1}>
                   {item.title}
-                </Text>
-                <Text>{item.effect}</Text>
+                </Text> */}
+                {/* <Text>{item.effect}</Text> */}
               </View>
             </View>
           )}
@@ -212,7 +215,7 @@ const MedicineBox = () => {
 
         <FlatList
           style={{ width: window.width - 40 }}
-          data={fakeMedicineBySelf.medicine}
+          data={fakeMedicineBySelf}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View
@@ -240,10 +243,10 @@ const MedicineBox = () => {
                 }}
               >
                 <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
-                <Text ellipsizeMode={'tail'} numberOfLines={1}>
+                {/* <Text ellipsizeMode={'tail'} numberOfLines={1}>
                   {item.title}
-                </Text>
-                <Text>{item.effect}</Text>
+                </Text> */}
+                {/* <Text>{item.effect}</Text> */}
               </View>
             </View>
           )}
