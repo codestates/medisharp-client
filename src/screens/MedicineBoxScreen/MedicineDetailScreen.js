@@ -1,8 +1,12 @@
 import React from 'react';
+import axios from 'axios';
 import { View, Text, Image, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { NavigationEvents } from 'react-navigation';
+
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
@@ -10,14 +14,63 @@ export default class MedicineDetailScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      uri: '',
+      item: this.props.navigation.getParam('MedicineData'),
       MedicineName: '',
-      MedicineImage: '',
+      // MedicineImage: '',
       MedicineEffect: '',
       MedicineCapacity: '',
       MedicineValidity: '',
     };
+    console.log('this.state.item', this.state.item);
   }
+
+  getMyMedicineInfo = (item) => {
+    console.log('{{{{{{{약정보가져온다!!!!}}}}}}}');
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token()
+      .then((token) => {
+        console.log('약 상세page token: ', token);
+        axios({
+          method: 'get',
+          url: 'https://hj-medisharp.herokuapp.com/medicines/name', //'http://127.0.0.1:5000/medicines',
+          headers: {
+            Authorization: token,
+          },
+          params: {
+            id: item['id'],
+            name: item['name'],
+            camera: item['camera'],
+          },
+        })
+          .then((data) => {
+            console.log('{{{{{{받아온 약정보}}}}}}}', data.data.results);
+            let { name, effect, capacity, validity } = data.data.results[0];
+            console.log(name, effect, capacity, validity);
+            if (Array.isArray(capacity)) {
+              capacity = capacity.join('\n');
+            }
+            if (Array.isArray(validity)) {
+              validity = validity.join('\n');
+            }
+
+            this.setState({
+              MedicineName: name,
+              MedicineEffect: effect, //camera인식된 약은 array형태, 직접입력한 약은 string
+              MedicineCapacity: capacity, //camera인식된 약은 array형태, 직접입력한 약은 string
+              MedicineValidity: validity,
+            });
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   render() {
     return (
@@ -31,13 +84,7 @@ export default class MedicineDetailScreen extends React.Component {
       >
         <NavigationEvents
           onDidFocus={(payload) => {
-            let item = this.props.navigation.getParam('MedicineData');
-            this.setState({ uri: '받아온 uri' });
-            this.setState({ MedicineName: item['name'] });
-            this.setState({ MedicineImage: item['image_dir'] });
-            this.setState({ MedicineEffect: item['effect'] });
-            this.setState({ MedicineCapacity: item['capacity'] });
-            this.setState({ MedicineValidity: item['validity'] });
+            this.getMyMedicineInfo(this.state.item);
           }}
         />
 
@@ -74,7 +121,7 @@ export default class MedicineDetailScreen extends React.Component {
         <ScrollView>
           {/* -- 약 사진 -- */}
           <Image
-            source={{ uri: this.state.MedicineImage }} // 하드코딩입니닷 this.state.uri 로 대체될듯합니닷
+            source={{ uri: this.state.item['image_dir'] }}
             style={{
               width: window.width - 40,
               height: window.width - 40,
@@ -101,7 +148,7 @@ export default class MedicineDetailScreen extends React.Component {
                 marginBottom: 15,
               }}
             >
-              {this.state.MedicineName}
+              {this.state.item['name']}
             </Text>
           </View>
 
