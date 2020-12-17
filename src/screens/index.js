@@ -34,6 +34,7 @@ const CalendarStack = createStackNavigator(
   {
     Calendar: CalendarScreen,
     AlarmUpdateScreen: AlarmUpdateScreen,
+    SelfInputScreen: SelfInputScreen,
   },
   {
     headerMode: 'none',
