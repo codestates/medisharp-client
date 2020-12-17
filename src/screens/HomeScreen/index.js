@@ -23,7 +23,7 @@ const HomeScreen = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/schedules-dates/check/today',
+        url: 'https://hj-medisharp.herokuapp.com/schedules-dates/check/today',
         //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,
@@ -43,7 +43,7 @@ const HomeScreen = ({ navigation }) => {
       get_token().then((token) => {
         axios({
           method: 'get',
-          url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
+          url: `https://hj-medisharp.herokuapp.com/schedules-dates/schedules-commons/alarm`,
           //https://yag-ollim.herokuapp.com/ -> 배포용 주소
           headers: {
             Authorization: token,
