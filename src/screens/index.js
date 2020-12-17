@@ -15,6 +15,7 @@ import CameraNoticeScreen from './CameraNoticeScreen';
 import CheckScreen from './CheckScreen';
 import SelfInputScreen from './SelfInputScreen';
 import AlarmUpdateScreen from './AlarmUpdateScreen';
+import MedicineDetailScreen from './MedicineBoxScreen/MedicineDetailScreen';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const window = Dimensions.get('window');
@@ -42,17 +43,23 @@ const CalendarStack = createStackNavigator(
   },
 );
 
-// const SetAlarmStack = createStackNavigator({
-//   Alarm: AlarmScreen,
-//   Calendar: CalendarScreen,
-// });
+const MedicineBoxStack = createStackNavigator(
+  {
+    MedicineBox: MedicineBoxScreen,
+    MedicineDetail: MedicineDetailScreen,
+  },
+  {
+    headerMode: 'none',
+    headerShown: false,
+  },
+);
 
 const TabNavigator = createBottomTabNavigator(
   {
     Home: { screen: HomeScreen },
     Calendar: { screen: CalendarStack },
     Alarm: { screen: AlarmStack },
-    MedicineBox: { screen: MedicineBoxScreen },
+    MedicineBox: { screen: MedicineBoxStack },
     Mypage: { screen: MypageScreen },
   },
   {

@@ -12,7 +12,7 @@ import { getStatusBarHeight } from 'react-native-status-bar-height';
 
 const window = Dimensions.get('window');
 
-const MedicineBox = () => {
+const MedicineBox = ({ navigation }) => {
   const [fakeMedicineByCamera, setFakeMedicineByCamera] = useState({
     medicine: [
       {
@@ -22,7 +22,7 @@ const MedicineBox = () => {
         effect: '두통',
         capacity: '성인2알',
         validity: '개봉 후 2년',
-        camera: false,
+        camera: true,
       },
       {
         name: '이가탄',
@@ -31,7 +31,7 @@ const MedicineBox = () => {
         effect: '치통',
         capacity: '성인1알',
         validity: '개봉 후 2년',
-        camera: false,
+        camera: true,
       },
     ],
   });
@@ -126,36 +126,44 @@ const MedicineBox = () => {
           data={fakeMedicineByCamera.medicine}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View
-              style={{
-                height: window.height * 0.12,
-                marginTop: 10,
-                marginBottom: 5,
-                borderBottomColor: '#6a9c90',
-                borderBottomWidth: 1,
-                borderStyle: 'solid',
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-              }}
-            >
-              <Image
-                source={require('../../img/sampleMedi.png')}
-                style={{ width: window.width * 0.35, resizeMode: 'contain', marginBottom: 10 }}
-              />
-              <View
-                style={{
-                  width: window.width * 0.35,
-                  marginLeft: 20,
-                  justifyContent: 'center',
-                  color: '#6a9c90',
+            <View>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('MedicineDetail', { MedicineData: item });
                 }}
               >
-                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
-                <Text ellipsizeMode={'tail'} numberOfLines={1}>
-                  {item.title}
-                </Text>
-                <Text>{item.effect}</Text>
-              </View>
+                <View
+                  style={{
+                    height: window.height * 0.12,
+                    marginTop: 10,
+                    marginBottom: 5,
+                    borderBottomColor: '#6a9c90',
+                    borderBottomWidth: 1,
+                    borderStyle: 'solid',
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <Image
+                    source={require('../../img/sampleMedi.png')}
+                    style={{ width: window.width * 0.35, resizeMode: 'contain', marginBottom: 10 }}
+                  />
+                  <View
+                    style={{
+                      width: window.width * 0.35,
+                      marginLeft: 20,
+                      justifyContent: 'center',
+                      color: '#6a9c90',
+                    }}
+                  >
+                    <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
+                    <Text ellipsizeMode={'tail'} numberOfLines={1}>
+                      {item.title}
+                    </Text>
+                    <Text>{item.effect}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
             </View>
           )}
         ></FlatList>
@@ -163,7 +171,14 @@ const MedicineBox = () => {
     );
   } else {
     return (
-      <View style={{ backgroundColor: 'white', height: window.height * 0.92 - 1, paddingLeft: 20 }}>
+      <View
+        style={{
+          backgroundColor: 'white',
+          height: window.height * 0.92 - 1,
+          paddingLeft: 20,
+          paddingTop: getStatusBarHeight(),
+        }}
+      >
         <Text
           style={{
             marginTop: 30,
@@ -215,36 +230,44 @@ const MedicineBox = () => {
           data={fakeMedicineBySelf.medicine}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View
-              style={{
-                height: window.height * 0.12,
-                marginTop: 10,
-                marginBottom: 5,
-                borderBottomColor: '#6a9c90',
-                borderBottomWidth: 1,
-                borderStyle: 'solid',
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-              }}
-            >
-              <Image
-                source={require('../../img/sampleMedi.png')}
-                style={{ width: window.width * 0.35, resizeMode: 'contain', marginBottom: 10 }}
-              />
-              <View
-                style={{
-                  width: window.width * 0.35,
-                  marginLeft: 20,
-                  justifyContent: 'center',
-                  color: '#6a9c90',
+            <View>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('MedicineDetail', { MedicineData: item });
                 }}
               >
-                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
-                <Text ellipsizeMode={'tail'} numberOfLines={1}>
-                  {item.title}
-                </Text>
-                <Text>{item.effect}</Text>
-              </View>
+                <View
+                  style={{
+                    height: window.height * 0.12,
+                    marginTop: 10,
+                    marginBottom: 5,
+                    borderBottomColor: '#6a9c90',
+                    borderBottomWidth: 1,
+                    borderStyle: 'solid',
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <Image
+                    source={require('../../img/sampleMedi.png')}
+                    style={{ width: window.width * 0.35, resizeMode: 'contain', marginBottom: 10 }}
+                  />
+                  <View
+                    style={{
+                      width: window.width * 0.35,
+                      marginLeft: 20,
+                      justifyContent: 'center',
+                      color: '#6a9c90',
+                    }}
+                  >
+                    <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
+                    <Text ellipsizeMode={'tail'} numberOfLines={1}>
+                      {item.title}
+                    </Text>
+                    <Text>{item.effect}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
             </View>
           )}
         ></FlatList>
