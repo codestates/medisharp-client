@@ -32,7 +32,8 @@ export default class AlarmUpdateScreen extends React.Component {
     super(props);
     this.state = {
       item: [this.props.navigation.getParam('item')],
-      medicineName: [],
+      clickedDate: this.props.navigation.getParam('clickedDate'),
+      medicines: [],
       alarmMemo: [],
       startDatePickerShow: false,
       endDatePickerShow: false,
@@ -40,16 +41,21 @@ export default class AlarmUpdateScreen extends React.Component {
       weekName: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
       totalStartDate: '',
       totalEndDate: '',
+      startYear: '',
       startMonth: '',
       startDate: '',
       startDay: '',
+      endYear: '',
       endMonth: '',
       endDate: '',
       endDay: '',
+      selectedHour: '',
+      selectedMinute: '',
       date: new Date(this.koreanStandardTime),
       showTime: [],
       check: false,
       alarmInterval: 0,
+      schedules_common_id: null,
     };
     async function get_token() {
       const token = await getItem();
@@ -67,15 +73,23 @@ export default class AlarmUpdateScreen extends React.Component {
         .then((data) => {
           let startdate = data.data.results[0]['startdate'].split('-');
           let enddate = data.data.results[0]['enddate'].split('-');
+          let hour = data.data.results[0]['time'].split(':')[0];
+          let minute = data.data.results[0]['time'].split(':')[1];
           this.setState({
             totalStartDate: data.data.results[0]['startdate'],
             totalEndDate: data.data.results[0]['enddate'],
+            startYear: startdate[0],
             startMonth: startdate[1],
             startDate: startdate[2],
+            endYear: enddate[0],
             endMonth: enddate[1],
             endDate: enddate[2],
             check: data.data.results[0]['check'],
             alarmInterval: data.data.results[0]['cycle'],
+            selectedHour: hour,
+            selectedMinute: minute,
+            showTime: [data.data.results[0]['time']],
+            schedules_common_id: data.data.results[0]['schedules_common_id'],
           });
 
           axios({
@@ -85,12 +99,13 @@ export default class AlarmUpdateScreen extends React.Component {
               Authorization: token,
             },
             params: {
-              schedules_common_id: data.data.results[0]['schedules_common_id'],
+              schedules_common_id: this.state.schedules_common_id,
             },
           })
             .then((data) => {
-              let medicineList = data.data.results.map((el) => el.name);
-              this.setState({ medicineName: medicineList });
+              console.log(data.data.results);
+              //let medicineList = data.data.results.map((el) => el['name']);
+              this.setState({ medicines: data.data.results });
             })
             .catch((err) => {
               console.error(err);
@@ -101,6 +116,149 @@ export default class AlarmUpdateScreen extends React.Component {
         });
     });
   }
+
+  patchSChedules = () => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token()
+      .then((token) => {
+        axios
+          .post(
+            'http://127.0.0.1:5000/medicines',
+            { medicine: this.state.medicines },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          )
+          .then((res) => {
+            let medi_ids = res.data.medicine_id;
+            console.log('post medicines API', medi_ids);
+            axios
+              .patch(
+                'http://127.0.0.1:5000/schedules-commons',
+                {
+                  schedules_common: {
+                    schedules_common_id: this.state.schedules_common_id,
+                    memo: this.state.alarmMemo,
+                    startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
+                    enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
+                    cycle: this.state.alarmInterval,
+                    time: `${this.state.selectedHour}:${this.state.selectedMinute}`,
+                  },
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              )
+              .then((res) => {
+                let time = res.data.results['time'];
+                let startdate = res.data.results['startdate'];
+                let endtdate = res.data.results['enddate'];
+                let cycle = res.data.results['cycle'];
+                console.log('schedules common API', schedules_common_id, time, medi_ids);
+                axios
+                  .patch(
+                    'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+                    {
+                      schedules_common: {
+                        medicines_id: medi_ids,
+                        schedules_common_id: this.state.schedules_common_id,
+                        time: time,
+                        startdate: startdate,
+                        enddate: endtdate,
+                        cycle: cycle,
+                      },
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  )
+                  .then(() => {
+                    console.log('schedules common, schedules date API');
+                    axios
+                      .post(
+                        'http://127.0.0.1:5000/medicines/schedules-medicines',
+                        {
+                          schedules_common_medicines: {
+                            medicines_id: medi_ids,
+                            schedules_common_id: this.state.schedules_common_id,
+                          },
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      )
+                      .then(() => {
+                        console.log('schedules medicines, medicines API');
+                        axios
+                          .post(
+                            'http://127.0.0.1:5000/medicines/users-medicines',
+                            {
+                              medicines: {
+                                medicines_id: medi_ids,
+                              },
+                            },
+                            {
+                              headers: {
+                                Authorization: token,
+                              },
+                            },
+                          )
+                          .then(() => {
+                            console.log('medicines, user medicines API');
+                            this.props.navigation.navigate('Calendar');
+                          })
+                          .catch((err) => console.log(err));
+                      })
+                      .catch((err) => console.log(err));
+                  })
+                  .catch((err) => console.log(err));
+              })
+              .catch((err) => console.log(err));
+          })
+          .catch((err) => console.error(err));
+      })
+      .catch((err) => console.error(err));
+  };
+
+  patchCheck = () => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios
+        .patch(
+          'http://127.0.0.1:5000/schedules-dates/check',
+          {
+            schedules_common: {
+              schedules_common_id: this.state.schedules_common_id,
+              clickedDate: this.state.clickedDate,
+            },
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
+        .then((res) => {
+          const changedCheck = res.data.results['check'];
+          this.setState({ check: changedCheck });
+          console.log('patch check API');
+        });
+    });
+  };
 
   checkChangeTrue = () => {
     this.setState({ check: true });
@@ -184,6 +342,14 @@ export default class AlarmUpdateScreen extends React.Component {
             const endDayValue = new Date(this.state.totalEndDate).getDay();
             this.setState({ startDay: this.state.weekName[startDayValue] });
             this.setState({ endDay: this.state.weekName[endDayValue] });
+            const resultArr = this.state.medicines;
+            let alarmMedicineGetParam = this.props.navigation.getParam('alarmMedicine');
+            alarmMedicineGetParam === undefined
+              ? this.state.medicines
+              : resultArr.push(alarmMedicineGetParam);
+            this.setState({ medicines: resultArr });
+            console.log('alarmMedicine  =>', this.state.medicines);
+            console.log('resultArr  =>', resultArr);
           }}
         />
 
@@ -287,12 +453,19 @@ export default class AlarmUpdateScreen extends React.Component {
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Icon name="pills" size={22} color={'#D6E4E1'} />
                 <Text style={styles.seclectText}>약 올리기</Text>
+                <TouchableOpacity
+                  onPress={() => this.props.navigation.navigate('CameraNoticeScreen')}
+                >
+                  <Text style={{ fontSize: 16 }}>
+                    사진으로 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
             <View>
               <FlatList
                 horizontal={true}
-                data={this.state.medicineName}
+                data={this.state.medicines}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <View style={{ marginBottom: 10 }}>
@@ -301,21 +474,37 @@ export default class AlarmUpdateScreen extends React.Component {
                         flexDirection: 'row',
                         margin: 5,
                         alignSelf: 'flex-start',
-                        borderWidth: 2,
-                        borderColor: '#6a9c90',
+                        borderWidth: 1,
+                        borderColor: '#939393',
                         borderStyle: 'solid',
                         borderRadius: 5,
                         padding: 5,
                       }}
                     >
-                      <Text
-                        style={{
-                          fontSize: 18,
-                          fontWeight: 'bold',
-                          color: '#6a9c90',
-                        }}
-                      >
-                        {item}
+                      <Text style={{ fontSize: 18, marginRight: 5 }}>
+                        {item.name}
+                        {'  '}
+                        <Icon
+                          onPress={() => {
+                            const filteredMedicine = [];
+                            for (let i = 0; i < this.state.medicines.length; i++) {
+                              console.log('this.state.medicines[i] =>', this.state.medicines[i]);
+                              console.log('item =>', item);
+                              if (item !== this.state.medicines[i]) {
+                                filteredMedicine.push(this.state.medicines[i]);
+                              } else {
+                              }
+                            }
+
+                            this.setState({ medicines: filteredMedicine });
+                          }}
+                          name="times-circle"
+                          size={20}
+                          color={'#9a6464'}
+                          style={{
+                            marginLeft: 5,
+                          }}
+                        />
                       </Text>
                     </View>
                   </View>
@@ -489,7 +678,7 @@ export default class AlarmUpdateScreen extends React.Component {
                     >
                       <Text style={{ fontSize: 22, textAlign: 'right', marginRight: 5 }}>
                         {item}
-                        {'  '}
+                        {''}
                         <Icon
                           onPress={() => {
                             this.setState({ showTime: [] });
@@ -522,7 +711,7 @@ export default class AlarmUpdateScreen extends React.Component {
                       textAlign: 'center',
                       fontSize: 16,
                     }}
-                    placeholder="0"
+                    placeholder={this.state.alarmInterval}
                     placeholderTextColor={'gray'}
                     maxLength={2}
                     onChangeText={(alarmInterval) =>
@@ -538,7 +727,7 @@ export default class AlarmUpdateScreen extends React.Component {
 
           {/* -- 하단 버튼 -- */}
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity onPress={() => console.log('수정하기 눌려따!')}>
+            <TouchableOpacity onPress={this.patchSChedules}>
               <View
                 style={{
                   justifyContent: 'center',
