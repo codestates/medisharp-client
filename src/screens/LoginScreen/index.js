@@ -36,7 +36,10 @@ export default class LoginScreen extends Component {
   };
 
   componentDidMount = async () => {
-    await this.read();
+    // await this.read();
+    await setItem(
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MX0.UgGrWBSBD2t1PHbjRRr3kSqWr3ECc65oXndQaaCrKqc',
+    );
     //await removeItem();
   };
 

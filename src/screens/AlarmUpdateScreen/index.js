@@ -16,6 +16,9 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { NavigationEvents } from 'react-navigation';
 import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-storage';
+
+import { getStatusBarHeight } from 'react-native-status-bar-height';
+
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
@@ -300,7 +303,14 @@ export default class AlarmUpdateScreen extends React.Component {
 
   render() {
     return (
-      <View style={{ backgroundColor: 'white' }}>
+      <View
+        style={{
+          height: window.height * 0.92 - 1,
+          backgroundColor: 'white',
+          paddingTop: getStatusBarHeight(),
+          paddingLeft: 20,
+        }}
+      >
         <NavigationEvents
           onDidFocus={(payload) => {
             const startDayValue = new Date(this.state.totalStartDate).getDay();
@@ -309,44 +319,38 @@ export default class AlarmUpdateScreen extends React.Component {
             this.setState({ endDay: this.state.weekName[endDayValue] });
           }}
         />
-        <ScrollView
+
+        <Text
           style={{
             marginTop: 30,
-            backgroundColor: 'white',
-            paddingLeft: 20,
-            height: window.height * 0.92 - 30,
+            fontSize: 24,
+            fontWeight: '300',
+          }}
+        >
+          알람 수정
+        </Text>
+        <View
+          style={{
+            borderBottomStyle: 'solid',
+            borderBottomWidth: 5,
+            borderBottomColor: '#6a9c90',
+            alignSelf: 'flex-start',
+            marginBottom: window.height * 0.02,
           }}
         >
           <Text
             style={{
-              fontSize: 24,
-              fontWeight: '300',
+              alignSelf: 'center',
+              marginTop: 5,
+              fontSize: 20,
+              fontWeight: 'bold',
+              paddingBottom: 5,
             }}
           >
-            알람 수정
+            복용 알람 수정하기
           </Text>
-          <View
-            style={{
-              borderBottomStyle: 'solid',
-              borderBottomWidth: 5,
-              borderBottomColor: '#6a9c90',
-              alignSelf: 'flex-start',
-              marginBottom: window.height * 0.02,
-            }}
-          >
-            <Text
-              style={{
-                alignSelf: 'center',
-                marginTop: 5,
-                fontSize: 20,
-                fontWeight: 'bold',
-                paddingBottom: 5,
-              }}
-            >
-              복용 알람 수정하기
-            </Text>
-          </View>
-
+        </View>
+        <ScrollView>
           {/* -- 상단 복용 여부 버튼 -- */}
           <View
             style={{

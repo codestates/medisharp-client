@@ -19,6 +19,7 @@ import { onChange } from 'react-native-reanimated';
 import CameraScreen from '../CameraScreen';
 import CameraNoticeScreen from '../CameraNoticeScreen';
 import { createStackNavigator } from 'react-navigation-stack';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
 
 import { NavigationEvents } from 'react-navigation';
 
@@ -145,6 +146,7 @@ export default class AlarmScreen extends React.Component {
     }
     get_token()
       .then((token) => {
+        console.log('medicines API token, ', token);
         axios
           .post(
             'http://127.0.0.1:5000/medicines',
@@ -158,6 +160,7 @@ export default class AlarmScreen extends React.Component {
           .then((res) => {
             let medi_ids = res.data.medicine_id;
             console.log('medicines API', medi_ids);
+            console.log('schedules-commons API token, ', token);
             axios
               .post(
                 'http://127.0.0.1:5000/schedules-commons',
@@ -183,7 +186,7 @@ export default class AlarmScreen extends React.Component {
                 let startdate = res.data.results['startdate'];
                 let endtdate = res.data.results['enddate'];
                 let cycle = res.data.results['cycle'];
-                console.log('schedules common API', schedules_common_id, time, medi_ids);
+                console.log('schedules date API', schedules_common_id, time, medi_ids);
                 axios
                   .post(
                     'http://127.0.0.1:5000/schedules-commons/schedules-dates',
@@ -204,7 +207,7 @@ export default class AlarmScreen extends React.Component {
                     },
                   )
                   .then(() => {
-                    console.log('schedules common, schedules date API');
+                    console.log('schedules common, schedules date API', token);
                     axios
                       .post(
                         'http://127.0.0.1:5000/medicines/schedules-medicines',
@@ -273,7 +276,14 @@ export default class AlarmScreen extends React.Component {
 
   render() {
     return (
-      <View style={{ backgroundColor: 'white' }}>
+      <View
+        style={{
+          backgroundColor: 'white',
+          paddingTop: getStatusBarHeight(),
+          height: window.height * 0.92 - 1,
+          paddingLeft: 20,
+        }}
+      >
         <NavigationEvents
           onDidFocus={(payload) => {
             const resultArr = this.state.alarmMedicine;
@@ -286,43 +296,37 @@ export default class AlarmScreen extends React.Component {
             console.log('resultArr  =>', resultArr);
           }}
         />
-        <ScrollView
+        <Text
           style={{
             marginTop: 30,
-            backgroundColor: 'white',
-            paddingLeft: 20,
-            height: window.height * 0.92 - 30,
+            fontSize: 24,
+            fontWeight: '300',
+          }}
+        >
+          약 올리기
+        </Text>
+        <View
+          style={{
+            borderBottomStyle: 'solid',
+            borderBottomWidth: 5,
+            borderBottomColor: '#6a9c90',
+            alignSelf: 'flex-start',
+            marginBottom: window.height * 0.02,
           }}
         >
           <Text
             style={{
-              fontSize: 24,
-              fontWeight: '300',
+              alignSelf: 'center',
+              marginTop: 5,
+              fontSize: 20,
+              fontWeight: 'bold',
+              paddingBottom: 5,
             }}
           >
-            약 올리기
+            복용 알람 등록하기
           </Text>
-          <View
-            style={{
-              borderBottomStyle: 'solid',
-              borderBottomWidth: 5,
-              borderBottomColor: '#6a9c90',
-              alignSelf: 'flex-start',
-              marginBottom: window.height * 0.02,
-            }}
-          >
-            <Text
-              style={{
-                alignSelf: 'center',
-                marginTop: 5,
-                fontSize: 20,
-                fontWeight: 'bold',
-                paddingBottom: 5,
-              }}
-            >
-              복용 알람 등록하기
-            </Text>
-          </View>
+        </View>
+        <ScrollView>
           {/* -- 약 올리기 뷰 -- */}
           <View style={styles.viewBox}>
             <View style={styles.seclectView}>

@@ -3,7 +3,7 @@ import axios from 'axios';
 import moment from 'moment';
 import { View, Text, Dimensions, FlatList, StyleSheet, ScrollView } from 'react-native';
 import CountdownTimer from '../../components/CountdownTimer';
-// import AlarmList from '../../components/AlarmList';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
 
 import Alarm from '../../components/Alarm';
 import { useAsyncStorage } from '@react-native-community/async-storage';
@@ -23,7 +23,7 @@ const HomeScreen = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://yag-olim-test-stage2.herokuapp.com//schedules-dates/check/today',
+        url: 'http://127.0.0.1:5000/schedules-dates/check/today',
         //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,
@@ -43,7 +43,7 @@ const HomeScreen = ({ navigation }) => {
       get_token().then((token) => {
         axios({
           method: 'get',
-          url: `https://yag-olim-test-stage2.herokuapp.com//schedules-dates/schedules-commons/alarm`,
+          url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
           //https://yag-ollim.herokuapp.com/ -> 배포용 주소
           headers: {
             Authorization: token,
@@ -76,6 +76,8 @@ const HomeScreen = ({ navigation }) => {
     <View
       style={{
         height: window.height,
+        backgroundColor: 'white',
+        paddingTop: getStatusBarHeight(),
       }}
     >
       <View

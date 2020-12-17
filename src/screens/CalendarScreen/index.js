@@ -6,6 +6,9 @@ import axios from 'axios';
 import moment from 'moment';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useAsyncStorage } from '@react-native-community/async-storage';
+
+import { getStatusBarHeight } from 'react-native-status-bar-height';
+
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
@@ -28,7 +31,26 @@ const CalendarMain = ({ navigation }) => {
 
   const [clickedDate, setClickedDate] = useState(todayDate);
   console.log('clickedDate:', clickedDate);
-  const [clickedList, setClickedList] = useState([]);
+  const [clickedList, setClickedList] = useState([
+    {
+      title: '비타민',
+      cycle: 1,
+      memo: '아침마다',
+      schedules_date_id: 10,
+      schedules_common_id: 2,
+      time: '22:00',
+      check: false,
+    },
+    {
+      title: '비타민',
+      cycle: 2,
+      memo: '자기 전에 꼭 먹어',
+      schedules_date_id: 33,
+      schedules_common_id: 5,
+      time: '23:30',
+      check: false,
+    },
+  ]);
   console.log('clickedList:', clickedList);
   //여기까지 제가 짠 코드입니다.
 
@@ -37,6 +59,7 @@ const CalendarMain = ({ navigation }) => {
 
   //여기부터 API 입니다.
   useEffect(() => {
+    console.log('++++++++++++++++++GET MONTHLY API+++++++++++++++++');
     async function get_token() {
       const token = await getItem();
       return token;
@@ -44,7 +67,7 @@ const CalendarMain = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://yag-olim-test-prod.herokuapp.com/schedules-dates/check/month',
+        url: 'http://127.0.0.1:5000/schedules-dates/check/month',
         //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,
@@ -142,6 +165,7 @@ const CalendarMain = ({ navigation }) => {
   }, [selectedMonth, nextMonth, navigation]);
 
   useEffect(() => {
+    console.log('==============Clicked Alarm List=============');
     async function get_token() {
       const token = await getItem();
       return token;
@@ -149,7 +173,7 @@ const CalendarMain = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: `https://yag-olim-test-prod.herokuapp.com/schedules-dates/schedules-commons/alarm`,
+        url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
         //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,
@@ -170,9 +194,9 @@ const CalendarMain = ({ navigation }) => {
   return (
     <View
       style={{
+        paddingTop: getStatusBarHeight(),
         backgroundColor: 'white',
         height: window.height * 0.92 - 1,
-
         flex: 1,
         flexDirection: 'column',
       }}
