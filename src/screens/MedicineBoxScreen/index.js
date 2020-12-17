@@ -37,7 +37,7 @@ const MedicineBox = () => {
       })
         .then((data) => {
           console.log('{{{{{{{{응답받았다!!}}}}}}}');
-          setMyMedicines(data.data.ressults);
+          setMyMedicines(data.data.results);
         })
         .catch((err) => {
           console.error(err);
@@ -142,7 +142,7 @@ const MedicineBox = () => {
               }}
             >
               <Image
-                source={require('../../img/sampleMedi.png')}
+                source={{ uri: item.image_dir }}
                 style={{ width: window.width * 0.35, resizeMode: 'contain', marginBottom: 10 }}
               />
               <View
@@ -231,7 +231,7 @@ const MedicineBox = () => {
               }}
             >
               <Image
-                source={require('../../img/sampleMedi.png')}
+                source={{ uri: item.image_dir }}
                 style={{ width: window.width * 0.35, resizeMode: 'contain', marginBottom: 10 }}
               />
               <View
