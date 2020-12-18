@@ -7,6 +7,8 @@ import { getStatusBarHeight } from 'react-native-status-bar-height';
 
 import Alarm from '../../components/Alarm';
 import { useAsyncStorage } from '@react-native-community/async-storage';
+
+import { NavigationEvents } from 'react-navigation';
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
@@ -14,7 +16,7 @@ const window = Dimensions.get('window');
 const HomeScreen = ({ navigation }) => {
   const [fakeGetTodayChecked, setfakeGetTodayChecked] = useState([]);
   const [alarmList, setTodayAlarm] = useState([]);
-  useEffect(() => {
+  const useEffectForToday = () => {
     async function get_token() {
       const token = await getItem();
       return token;
@@ -60,7 +62,11 @@ const HomeScreen = ({ navigation }) => {
           });
       });
     });
-  }, [navigation]);
+  };
+
+  useEffect(() => {
+    useEffectForToday();
+  }, []);
 
   const totalCount = fakeGetTodayChecked.length;
   const checkCounting = function () {
@@ -80,6 +86,11 @@ const HomeScreen = ({ navigation }) => {
         paddingTop: getStatusBarHeight(),
       }}
     >
+      <NavigationEvents
+        onDidFocus={(payload) => {
+          useEffectForToday();
+        }}
+      />
       <View
         style={{
           paddingLeft: 20,
