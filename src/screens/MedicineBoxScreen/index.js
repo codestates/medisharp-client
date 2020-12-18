@@ -1,4 +1,3 @@
-import Axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -19,52 +18,40 @@ const { getItem } = useAsyncStorage('@yag_olim');
 const window = Dimensions.get('window');
 
 const MedicineBox = ({ navigation }) => {
-  //   const [fakeMedicineByCamera, setFakeMedicineByCamera] = useState({
-  //     medicine: [
-  //       {
-  //         name: '타이레놀',
-  //         title: '머리 아플 때 먹어',
-  //         image_dir: '../../img/sampleMedi.png',
-  //         effect: '두통',
-  //         capacity: '성인2알',
-  //         validity: '개봉 후 2년',
-  //         camera: true,
-  //       },
-  //       {
-  //         name: '이가탄',
-  //         title: '물고 뜯고 씹고 맛 보고 즐기고',
-  //         image_dir: '../../img/sampleMedi.png',
-  //         effect: '치통',
-  //         capacity: '성인1알',
-  //         validity: '개봉 후 2년',
-  //         camera: true,
-  //       },
-  //     ],
-  //   });
-  //   const [fakeMedicineBySelf, setFakeMedicineBySelf] = useState({
-  //     medicine: [
-  //       {
-  //         name: '타이레놀',
-  //         title: '머리 아플 때 먹어',
-  //         image_dir: '../../img/sampleMedi.png',
-  //         effect: '두통',
-  //         capacity: '성인2알',
-  //         validity: '개봉 후 2년',
-  //         camera: false,
-  //       },
-  //       {
-  //         name: '이가탄',
-  //         title: '이 아플 때 먹어',
-  //         image_dir: '../../img/sampleMedi.png',
-  //         effect: '치통',
-  //         capacity: '성인1알',
-  //         validity: '개봉 후 2년',
-  //         camera: false,
-  //       },
-  //     ],
-
-  // const MedicineBox = () => {
   const [myMedicines, setMyMedicines] = useState([]);
+  let MedicineDetailInfo;
+
+  const getMyMedicineInfo = (item) => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token()
+      .then((token) => {
+        axios({
+          method: 'get',
+          url: 'http://127.0.0.1:5000/medicines', //'https://hj-medisharp.herokuapp.com/medicines/name',
+          headers: {
+            Authorization: token,
+          },
+          params: {
+            id: item.id,
+            name: item.name,
+            camera: item.camera,
+          },
+        })
+          .then((data) => {
+            MedicineDetailInfo = data.data.results;
+            navigation.navigate('MedicineDetail', { MedicineData: MedicineDetailInfo[0] });
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   useEffect(() => {
     async function get_token() {
@@ -74,7 +61,7 @@ const MedicineBox = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/medicines',
+        url: 'http://127.0.0.1:5000/medicines', //'https://hj-medisharp.herokuapp.com/medicines'
         headers: {
           Authorization: token,
         },
@@ -170,7 +157,7 @@ const MedicineBox = ({ navigation }) => {
             <View>
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate('MedicineDetail', { MedicineData: item });
+                  getMyMedicineInfo(item);
                 }}
               >
                 <View
@@ -274,7 +261,7 @@ const MedicineBox = ({ navigation }) => {
             <View>
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate('MedicineDetail', { MedicineData: item });
+                  getMyMedicineInfo(item);
                 }}
               >
                 <View
