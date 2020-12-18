@@ -22,7 +22,6 @@ const window = Dimensions.get('window');
 
 const AlarmStack = createStackNavigator(
   {
-    Calendar: CalendarScreen,
     Alarm: AlarmScreen,
     SelfInputScreen: SelfInputScreen,
   },
