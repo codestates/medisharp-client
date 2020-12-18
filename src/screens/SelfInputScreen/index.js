@@ -36,11 +36,15 @@ export default class CheckScreen extends React.Component {
       capacity: '',
       validity: '',
       imgS3Uri: null,
+      update: this.props.navigation.getParam('update'),
+      item: this.props.navigation.getParam('item'),
+      clickedDate: this.props.navigation.getParam('clickedDate'),
     };
   }
 
   async componentDidMount() {
     const getImg = await FileSystem.getInfoAsync(this.state.uri);
+    console.log(getImg['uri']);
     this.setState({ getImg: getImg['uri'] });
   }
 
@@ -59,22 +63,39 @@ export default class CheckScreen extends React.Component {
             },
           })
           .then((res) => {
+            console.log(res.data.results);
             this.setState({
               imgS3Uri: res.data.results,
             });
           })
           .then(() => {
-            this.props.navigation.navigate('Alarm', {
-              alarmMedicine: {
-                name: this.state.medicineName,
-                image_dir: this.state.imgS3Uri,
-                camera: false,
-                title: null,
-                effect: this.state.effect,
-                capacity: this.state.capacity,
-                validity: this.state.validity,
-              },
-            });
+            if (this.state.update === true) {
+              this.props.navigation.navigate('AlarmUpdateScreen', {
+                alarmMedicine: {
+                  name: this.state.medicineName,
+                  image_dir: this.state.imgS3Uri,
+                  camera: false,
+                  title: null,
+                  effect: this.state.effect,
+                  capacity: this.state.capacity,
+                  validity: this.state.validity,
+                },
+                item: this.state.item,
+                clickedDate: this.state.clickedDate,
+              });
+            } else {
+              this.props.navigation.navigate('Alarm', {
+                alarmMedicine: {
+                  name: this.state.medicineName,
+                  image_dir: this.state.imgS3Uri,
+                  camera: false,
+                  title: null,
+                  effect: this.state.effect,
+                  capacity: this.state.capacity,
+                  validity: this.state.validity,
+                },
+              });
+            }
           })
           .catch((err) => console.log(err));
       })
