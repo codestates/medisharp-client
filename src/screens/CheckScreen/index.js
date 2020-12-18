@@ -14,6 +14,7 @@ import axios from 'axios';
 import medisharpLogo from '../../img/medisharpLogo.png';
 import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
+import { NavigationEvents } from 'react-navigation';
 
 const window = Dimensions.get('window');
 
@@ -33,8 +34,29 @@ export default class CheckScreen extends React.Component {
       imgS3Uri: null,
       camera: false,
       //카메라 촬영여부 표시 위한 state입니다. 직접등록의 경우, 다음 화면에서 해당 부분을 false로 해서 전달하면 될거 같아요
+      update: this.props.navigation.getParam('update'),
+      item: this.props.navigation.getParam('item'),
+      clickedDate: this.props.navigation.getParam('clickedDate'),
     };
   }
+
+  test = () => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: 'https://yag-olim-test-stage2.herokuapp.com',
+        headers: {
+          Authorization: token,
+        },
+      }).catch((err) => {
+        console.error(err);
+      });
+    });
+  };
 
   async componentDidMount() {
     const getImg = await FileSystem.getInfoAsync(this.state.uri);
@@ -49,7 +71,7 @@ export default class CheckScreen extends React.Component {
     }
     get_token().then((token) => {
       axios
-        .post('http://127.0.0.1:5000/medicines/upload', this.state.form_data, {
+        .post('https://yag-olim-test-stage2.herokuapp.com/medicines/upload', this.state.form_data, {
           headers: {
             'content-type': 'multipart/form-data',
             Authorization: token,
@@ -63,17 +85,33 @@ export default class CheckScreen extends React.Component {
         })
         .then(() => {
           console.log('S3 uri:', this.state.imgS3Uri);
-          this.props.navigation.navigate('Alarm', {
-            alarmMedicine: {
-              name: this.state.mediname,
-              image_dir: this.state.imgS3Uri,
-              camera: this.state.camera,
-              title: null,
-              effect: null,
-              capacity: null,
-              validity: null,
-            },
-          });
+          if (this.state.update === true) {
+            this.props.navigation.navigate('AlarmUpdateScreen', {
+              alarmMedicine: {
+                name: this.state.mediname,
+                image_dir: this.state.imgS3Uri,
+                camera: this.state.camera,
+                title: null,
+                effect: null,
+                capacity: null,
+                validity: null,
+              },
+              item: this.props.navigation.getParam('item'),
+              clickedDate: this.props.navigation.getParam('clickedDate'),
+            });
+          } else {
+            this.props.navigation.navigate('Alarm', {
+              alarmMedicine: {
+                name: this.state.mediname,
+                image_dir: this.state.imgS3Uri,
+                camera: this.state.camera,
+                title: null,
+                effect: null,
+                capacity: null,
+                validity: null,
+              },
+            });
+          }
         })
         .catch((err) => console.log(err));
     });
@@ -97,6 +135,11 @@ export default class CheckScreen extends React.Component {
           alignItems: 'center',
         }}
       >
+        <NavigationEvents
+          onDidFocus={(payload) => {
+            this.test();
+          }}
+        />
         <Image
           style={{
             width: window.width - 40,
@@ -150,6 +193,9 @@ export default class CheckScreen extends React.Component {
             this.props.navigation.navigate('SelfInputScreen', {
               uri: this.state.uri,
               form_data: this.state.form_data,
+              update: this.state.update,
+              item: this.state.item,
+              clickedDate: this.state.clickedDate,
             });
           }}
         >
