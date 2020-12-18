@@ -64,7 +64,7 @@ export default class AlarmUpdateScreen extends React.Component {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/schedules-commons',
+        url: 'https://hj-medisharp.herokuapp.com/schedules-commons',
         headers: {
           Authorization: token,
         },
@@ -94,7 +94,7 @@ export default class AlarmUpdateScreen extends React.Component {
 
           axios({
             method: 'get',
-            url: 'http://127.0.0.1:5000/medicines',
+            url: 'https://hj-medisharp.herokuapp.com/medicines',
             headers: {
               Authorization: token,
             },
@@ -126,7 +126,7 @@ export default class AlarmUpdateScreen extends React.Component {
       .then((token) => {
         axios
           .post(
-            'http://127.0.0.1:5000/medicines',
+            'https://hj-medisharp.herokuapp.com/medicines',
             { medicine: this.state.medicines },
             {
               headers: {
@@ -139,7 +139,7 @@ export default class AlarmUpdateScreen extends React.Component {
             console.log('post medicines API', medi_ids);
             axios
               .patch(
-                'http://127.0.0.1:5000/schedules-commons',
+                'https://hj-medisharp.herokuapp.com/schedules-commons',
                 {
                   schedules_common: {
                     schedules_common_id: this.state.schedules_common_id,
@@ -164,7 +164,7 @@ export default class AlarmUpdateScreen extends React.Component {
                 console.log('schedules common API', schedules_common_id, time, medi_ids);
                 axios
                   .patch(
-                    'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+                    'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
                     {
                       schedules_common: {
                         medicines_id: medi_ids,
@@ -185,7 +185,7 @@ export default class AlarmUpdateScreen extends React.Component {
                     console.log('schedules common, schedules date API');
                     axios
                       .post(
-                        'http://127.0.0.1:5000/medicines/schedules-medicines',
+                        'https://hj-medisharp.herokuapp.com/medicines/schedules-medicines',
                         {
                           schedules_common_medicines: {
                             medicines_id: medi_ids,
@@ -202,7 +202,7 @@ export default class AlarmUpdateScreen extends React.Component {
                         console.log('schedules medicines, medicines API');
                         axios
                           .post(
-                            'http://127.0.0.1:5000/medicines/users-medicines',
+                            'https://hj-medisharp.herokuapp.com/medicines/users-medicines',
                             {
                               medicines: {
                                 medicines_id: medi_ids,
@@ -239,7 +239,7 @@ export default class AlarmUpdateScreen extends React.Component {
     get_token().then((token) => {
       axios
         .patch(
-          'http://127.0.0.1:5000/schedules-dates/check',
+          'https://hj-medisharp.herokuapp.com/schedules-dates/check',
           {
             schedules_common: {
               schedules_common_id: this.state.schedules_common_id,
@@ -256,6 +256,69 @@ export default class AlarmUpdateScreen extends React.Component {
           const changedCheck = res.data.results['check'];
           this.setState({ check: changedCheck });
           console.log('patch check API');
+        });
+    });
+  };
+
+  deleteWholeSchedules = () => {
+    console.log('전체 삭제하기 눌려따!');
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios
+        .delete(
+          'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
+          {
+            schedules_common: {
+              schedules_common_id: this.state.schedules_common_id,
+            },
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
+        .then((res) => {
+          console.log('전체 알람 일정 삭제 완료: ', res.data.message);
+          this.props.navigation.navigate('Calendar'); //삭제 후 calendarpage로 리다이렉트
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
+  };
+
+  deleteClickedSchedules = () => {
+    console.log('해당 날짜 알람 삭제하기 눌려따!');
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios
+        .delete(
+          'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
+          {
+            schedules_common: {
+              schedules_common_id: this.state.schedules_common_id,
+              date: this.state.clickedDate,
+            },
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
+        .then((res) => {
+          console.log('해당 날짜 알람 삭제 완료: ', res.data.message);
+          this.props.navigation.navigate('Calendar'); //삭제 후 calendarpage로 리다이렉트
+        })
+        .catch((err) => {
+          console.error(err);
         });
     });
   };
@@ -742,7 +805,7 @@ export default class AlarmUpdateScreen extends React.Component {
                 <Text style={{ fontSize: 20, color: 'white' }}>수정하기</Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log('삭제하기 눌려따!')}>
+            <TouchableOpacity onPress={this.deleteWholeSchedules}>
               <View
                 style={{
                   justifyContent: 'center',
@@ -754,7 +817,22 @@ export default class AlarmUpdateScreen extends React.Component {
                   borderRadius: 20,
                 }}
               >
-                <Text style={{ fontSize: 20, color: 'white' }}>삭제하기</Text>
+                <Text style={{ fontSize: 20, color: 'white' }}>알람일정 전체 삭제하기</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={this.deleteClickedSchedules}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  marginTop: 10,
+                  alignItems: 'center',
+                  width: window.width * 0.7,
+                  height: window.height * 0.075,
+                  backgroundColor: '#9a6464',
+                  borderRadius: 20,
+                }}
+              >
+                <Text style={{ fontSize: 20, color: 'white' }}>해당 날짜의 알람만 삭제하기</Text>
               </View>
             </TouchableOpacity>
           </View>
