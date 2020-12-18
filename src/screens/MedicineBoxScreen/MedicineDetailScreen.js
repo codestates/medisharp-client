@@ -1,19 +1,34 @@
 import React from 'react';
+import axios from 'axios';
 import { View, Text, Image, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { NavigationEvents } from 'react-navigation';
+
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
 export default class MedicineDetailScreen extends React.Component {
   constructor(props) {
     super(props);
+
+    let { name, effect, capacity, validity, image_dir } = this.props.navigation.getParam(
+      'MedicineData',
+    );
+    if (Array.isArray(capacity)) {
+      capacity = capacity.join('\n');
+    }
+    if (Array.isArray(validity)) {
+      validity = validity.join('\n');
+    }
     this.state = {
-      uri: '',
-      MedicineName: '',
-      MedicineEffect: '',
-      MedicineCapacity: '',
+      MedicineName: name,
+      MedicineImage: image_dir,
+      MedicineEffect: effect,
+      MedicineCapacity: capacity,
+      MedicineValidity: validity,
     };
   }
 
@@ -27,16 +42,6 @@ export default class MedicineDetailScreen extends React.Component {
           paddingTop: getStatusBarHeight(),
         }}
       >
-        <NavigationEvents
-          onDidFocus={(payload) => {
-            let item = this.props.navigation.getParam('MedicineData');
-            this.setState({ uri: '받아온 uri' });
-            this.setState({ MedicineName: item['name'] });
-            this.setState({ MedicineEffect: item['effect'] });
-            this.setState({ MedicineCapacity: item['capacity'] });
-          }}
-        />
-
         {/* -- 상단 타이틀 -- */}
         <Text
           style={{
@@ -70,11 +75,11 @@ export default class MedicineDetailScreen extends React.Component {
         <ScrollView>
           {/* -- 약 사진 -- */}
           <Image
-            source={require('../../img/sampleMedi.png')} // 하드코딩입니닷 this.state.uri 로 대체될듯합니닷
+            source={{ uri: this.state.MedicineImage }}
             style={{
               width: window.width - 40,
               height: window.width - 40,
-              // resizeMode: 'contain',  실제로 구현될때는 바로 위 하이트 값 삭제하고 리사이즈모드를 살리면 될듯합니닷!
+              //resizeMode: 'contain', //실제로 구현될때는 바로 위 하이트 값 삭제하고 리사이즈모드를 살리면 될듯합니닷!
               marginBottom: 10,
               borderRadius: 50,
             }}
@@ -127,6 +132,20 @@ export default class MedicineDetailScreen extends React.Component {
           >
             <Text style={styles.titleText}>용법/용량</Text>
             <Text style={styles.bodyText}>{this.state.MedicineCapacity}</Text>
+          </View>
+
+          {/* -- 약 유효기간 뷰 -- */}
+          <View
+            style={{
+              marginBottom: window.height * 0.01,
+              borderBottomWidth: 1,
+              borderBottomColor: '#6A9C90',
+              borderStyle: 'solid',
+              width: window.width - 40,
+            }}
+          >
+            <Text style={styles.titleText}>유효기간</Text>
+            <Text style={styles.bodyText}>{this.state.MedicineValidity}</Text>
           </View>
 
           {/* -- 삭제하기 버튼 -- */}
