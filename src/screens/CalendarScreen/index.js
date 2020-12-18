@@ -8,7 +8,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-
+import { NavigationEvents } from 'react-navigation';
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
@@ -57,8 +57,31 @@ const CalendarMain = ({ navigation }) => {
   const [markingDays, setMarkingDays] = useState([]);
   const [markedDates, setMarkedDates] = useState({});
 
+  const test = () => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: 'https://yag-olim-test-stage2.herokuapp.com',
+        headers: {
+          Authorization: token,
+        },
+      }).catch((err) => {
+        console.error(err);
+      });
+    });
+  };
+
   //여기부터 API 입니다.
   useEffect(() => {
+    useEffectForMonth();
+    useEffectForClicked();
+  }, [selectedMonth, nextMonth, navigation, clickedDate]);
+
+  const useEffectForMonth = () => {
     console.log('++++++++++++++++++GET MONTHLY API+++++++++++++++++');
     async function get_token() {
       const token = await getItem();
@@ -67,8 +90,7 @@ const CalendarMain = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/schedules-dates/check/month',
-        //https://yag-ollim.herokuapp.com/ -> 배포용 주소
+        url: 'https://yag-olim-test-prod.herokuapp.com/schedules-dates/check/month',
         headers: {
           Authorization: token,
         },
@@ -162,9 +184,9 @@ const CalendarMain = ({ navigation }) => {
           console.error(err);
         });
     });
-  }, [selectedMonth, nextMonth, navigation]);
+  };
 
-  useEffect(() => {
+  const useEffectForClicked = () => {
     console.log('==============Clicked Alarm List=============');
     async function get_token() {
       const token = await getItem();
@@ -173,7 +195,7 @@ const CalendarMain = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
+        url: `https://yag-olim-test-prod.herokuapp.com/schedules-dates/schedules-commons/alarm`,
         //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,
@@ -189,7 +211,7 @@ const CalendarMain = ({ navigation }) => {
           console.error(err);
         });
     });
-  }, [clickedDate, navigation]);
+  };
 
   return (
     <View
@@ -201,6 +223,13 @@ const CalendarMain = ({ navigation }) => {
         flexDirection: 'column',
       }}
     >
+      <NavigationEvents
+        onDidFocus={(payload) => {
+          test();
+          useEffectForMonth();
+          useEffectForClicked();
+        }}
+      />
       <View
         style={{
           paddingLeft: 20,
@@ -332,7 +361,7 @@ const CalendarMain = ({ navigation }) => {
                 onPress={() => {
                   console.log(item);
                   navigation.navigate('AlarmUpdateScreen', {
-                    item: item,
+                    item: [item],
                     clickedDate: clickedDate,
                   });
                 }}

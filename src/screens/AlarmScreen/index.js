@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
 import { onChange } from 'react-native-reanimated';
 import CameraScreen from '../CameraScreen';
 import CameraNoticeScreen from '../CameraNoticeScreen';
@@ -69,6 +68,32 @@ export default class AlarmScreen extends React.Component {
       date: new Date(this.koreanStandardTime),
     };
   }
+
+  test = () => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: 'https://yag-olim-test-prod.herokuapp.com',
+        headers: {
+          Authorization: token,
+        },
+      }).catch((err) => {
+        console.error(err);
+      });
+    });
+  };
+
+  componentDidMount = () => {
+    this.test();
+  };
+
+  componentDidUpdate = () => {
+    this.test();
+  };
 
   screenDidFocus() {
     // navigation.push('Alarm') 을 통해 stack을 열게되면 기존의 param들이 모두 날아가버리기때문에
@@ -149,7 +174,7 @@ export default class AlarmScreen extends React.Component {
         console.log('medicines API token, ', token);
         axios
           .post(
-            'http://127.0.0.1:5000/medicines',
+            'https://yag-olim-test-prod.herokuapp.com/medicines',
             { medicine: this.state.alarmMedicine },
             {
               headers: {
@@ -158,12 +183,13 @@ export default class AlarmScreen extends React.Component {
             },
           )
           .then((res) => {
+            console.log(res);
             let medi_ids = res.data.medicine_id;
             console.log('medicines API', medi_ids);
             console.log('schedules-commons API token, ', token);
             axios
               .post(
-                'http://127.0.0.1:5000/schedules-commons',
+                'https://yag-olim-test-prod.herokuapp.com/schedules-commons',
                 {
                   schedules_common: {
                     title: this.state.alarmTitle,
@@ -189,7 +215,7 @@ export default class AlarmScreen extends React.Component {
                 console.log('schedules date API', schedules_common_id, time, medi_ids);
                 axios
                   .post(
-                    'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+                    'https://yag-olim-test-prod.herokuapp.com/schedules-commons/schedules-dates',
                     {
                       schedules_common: {
                         medicines_id: medi_ids,
@@ -210,7 +236,7 @@ export default class AlarmScreen extends React.Component {
                     console.log('schedules common, schedules date API', token);
                     axios
                       .post(
-                        'http://127.0.0.1:5000/medicines/schedules-medicines',
+                        'https://yag-olim-test-prod.herokuapp.com/medicines/schedules-medicines',
                         {
                           schedules_common_medicines: {
                             medicines_id: medi_ids,
@@ -227,7 +253,7 @@ export default class AlarmScreen extends React.Component {
                         console.log('schedules medicines, medicines API');
                         axios
                           .post(
-                            'http://127.0.0.1:5000/medicines/users-medicines',
+                            'https://yag-olim-test-prod.herokuapp.com/medicines/users-medicines',
                             {
                               medicines: {
                                 medicines_id: medi_ids,
@@ -294,6 +320,7 @@ export default class AlarmScreen extends React.Component {
             this.setState({ alarmMedicine: resultArr });
             console.log('alarmMedicine  =>', this.state.alarmMedicine);
             console.log('resultArr  =>', resultArr);
+            this.test();
           }}
         />
         <Text
@@ -335,7 +362,13 @@ export default class AlarmScreen extends React.Component {
                 <Text style={styles.seclectText}>약 올리기</Text>
               </View>
               <TouchableOpacity
-                onPress={() => this.props.navigation.navigate('CameraNoticeScreen')}
+                onPress={() =>
+                  this.props.navigation.navigate('CameraNoticeScreen', {
+                    update: '',
+                    item: '',
+                    clickedDate: '',
+                  })
+                }
               >
                 <Text style={{ fontSize: 16 }}>
                   사진으로 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />

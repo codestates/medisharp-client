@@ -4,8 +4,6 @@ import { ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
-import * as MediaLibrary from 'expo-media-library';
-import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
 import medisharpLogo from '../../img/medisharpLogo.png';
@@ -13,6 +11,7 @@ import medisharpLogo from '../../img/medisharpLogo.png';
 import * as FileSystem from 'expo-file-system';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
+import { NavigationEvents } from 'react-navigation';
 
 const window = Dimensions.get('window');
 
@@ -30,9 +29,30 @@ export default class CameraScreen extends React.Component {
       image: require('../../img/medicineBox.png'), //디폴트 이미지
       show: true,
       isLoading: false,
+      update: this.props.navigation.getParam('update'),
+      item: this.props.navigation.getParam('item'),
+      clickedDate: this.props.navigation.getParam('clickedDate'),
     };
     this.cameraRef = React.createRef();
   }
+
+  test = () => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: 'https://yag-olim-test-stage2.herokuapp.com',
+        headers: {
+          Authorization: token,
+        },
+      }).catch((err) => {
+        console.error(err);
+      });
+    });
+  };
   componentDidMount = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     if (status === 'granted') {
@@ -41,7 +61,13 @@ export default class CameraScreen extends React.Component {
       this.setState({ hasPermission: true });
       // this.setState({ hasPermission: false });
     }
+    this.test();
   };
+
+  componentDidUpdate = async () => {
+    this.test();
+  };
+
   render() {
     const { hasPermission, cameraType, isLoading } = this.state;
     if (isLoading === true) {
@@ -276,7 +302,7 @@ export default class CameraScreen extends React.Component {
     get_token()
       .then((token) => {
         axios
-          .post('http://127.0.0.1:5000/medicines/image', form_data, {
+          .post('https://yag-olim-test-stage2.herokuapp.com/medicines/image', form_data, {
             headers: {
               'content-type': 'multipart/form-data',
               Authorization: token,
@@ -287,6 +313,9 @@ export default class CameraScreen extends React.Component {
               form_data: form_data,
               uri: this.state.photo,
               mediname: res.data.prediction,
+              update: this.state.update,
+              item: this.state.item,
+              clickedDate: this.state.clickedDate,
             });
           })
           .catch((err) => console.log(err));
