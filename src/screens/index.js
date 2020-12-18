@@ -16,6 +16,7 @@ import CheckScreen from './CheckScreen';
 import SelfInputScreen from './SelfInputScreen';
 import AlarmUpdateScreen from './AlarmUpdateScreen';
 import MedicineDetailScreen from './MedicineBoxScreen/MedicineDetailScreen';
+import DeleteCheckScreen from './AlarmUpdateScreen/DeleteCheck';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const window = Dimensions.get('window');
@@ -35,6 +36,7 @@ const CalendarStack = createStackNavigator(
     Calendar: CalendarScreen,
     AlarmUpdateScreen: AlarmUpdateScreen,
     SelfInputScreen: SelfInputScreen,
+    DeleteCheck: DeleteCheckScreen,
   },
   {
     headerMode: 'none',

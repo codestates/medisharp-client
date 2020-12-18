@@ -861,7 +861,29 @@ export default class AlarmUpdateScreen extends React.Component {
                 <Text style={{ fontSize: 20, color: 'white' }}>수정하기</Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={this.deleteWholeSchedules}>
+
+            {/* -- 삭제하기 분기페이지로 슝! -- */}
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('DeleteCheck');
+              }}
+            >
+              <View
+                style={{
+                  justifyContent: 'center',
+                  marginTop: 10,
+                  alignItems: 'center',
+                  width: window.width * 0.7,
+                  height: window.height * 0.075,
+                  backgroundColor: '#9a6464',
+                  borderRadius: 20,
+                }}
+              >
+                <Text style={{ fontSize: 20, color: 'white' }}>해당 날짜의 알람만 삭제하기</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* <TouchableOpacity onPress={this.deleteWholeSchedules}>
               <View
                 style={{
                   justifyContent: 'center',
@@ -890,7 +912,7 @@ export default class AlarmUpdateScreen extends React.Component {
               >
                 <Text style={{ fontSize: 20, color: 'white' }}>해당 날짜의 알람만 삭제하기</Text>
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </ScrollView>
       </View>
