@@ -64,7 +64,7 @@ export default class AlarmUpdateScreen extends React.Component {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://hj-medisharp.herokuapp.com/schedules-commons',
+        url: 'http://127.0.0.1:5000/schedules-commons',
         headers: {
           Authorization: token,
         },
@@ -94,7 +94,7 @@ export default class AlarmUpdateScreen extends React.Component {
 
           axios({
             method: 'get',
-            url: 'https://hj-medisharp.herokuapp.com/medicines',
+            url: 'http://127.0.0.1:5000/medicines',
             headers: {
               Authorization: token,
             },
@@ -126,7 +126,7 @@ export default class AlarmUpdateScreen extends React.Component {
       .then((token) => {
         axios
           .post(
-            'https://hj-medisharp.herokuapp.com/medicines',
+            'http://127.0.0.1:5000/medicines',
             { medicine: this.state.medicines },
             {
               headers: {
@@ -139,7 +139,7 @@ export default class AlarmUpdateScreen extends React.Component {
             console.log('post medicines API', medi_ids);
             axios
               .patch(
-                'https://hj-medisharp.herokuapp.com/schedules-commons',
+                'http://127.0.0.1:5000/schedules-commons',
                 {
                   schedules_common: {
                     schedules_common_id: this.state.schedules_common_id,
@@ -164,7 +164,7 @@ export default class AlarmUpdateScreen extends React.Component {
                 console.log('schedules common API', schedules_common_id, time, medi_ids);
                 axios
                   .patch(
-                    'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
+                    'http://127.0.0.1:5000/schedules-commons/schedules-dates',
                     {
                       schedules_common: {
                         medicines_id: medi_ids,
@@ -185,7 +185,7 @@ export default class AlarmUpdateScreen extends React.Component {
                     console.log('schedules common, schedules date API');
                     axios
                       .post(
-                        'https://hj-medisharp.herokuapp.com/medicines/schedules-medicines',
+                        'http://127.0.0.1:5000/medicines/schedules-medicines',
                         {
                           schedules_common_medicines: {
                             medicines_id: medi_ids,
@@ -202,7 +202,7 @@ export default class AlarmUpdateScreen extends React.Component {
                         console.log('schedules medicines, medicines API');
                         axios
                           .post(
-                            'https://hj-medisharp.herokuapp.com/medicines/users-medicines',
+                            'http://127.0.0.1:5000/medicines/users-medicines',
                             {
                               medicines: {
                                 medicines_id: medi_ids,
@@ -239,7 +239,7 @@ export default class AlarmUpdateScreen extends React.Component {
     get_token().then((token) => {
       axios
         .patch(
-          'https://hj-medisharp.herokuapp.com/schedules-dates/check',
+          'http://127.0.0.1:5000/schedules-dates/check',
           {
             schedules_common: {
               schedules_common_id: this.state.schedules_common_id,
@@ -269,7 +269,7 @@ export default class AlarmUpdateScreen extends React.Component {
     get_token().then((token) => {
       axios
         .delete(
-          'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
+          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
           {
             schedules_common: {
               schedules_common_id: this.state.schedules_common_id,
@@ -281,7 +281,7 @@ export default class AlarmUpdateScreen extends React.Component {
             },
           },
         )
-        .then((res) => {
+        .then((res) => {s
           console.log('전체 알람 일정 삭제 완료: ', res.data.message);
           this.props.navigation.navigate('Calendar'); //삭제 후 calendarpage로 리다이렉트
         })
@@ -300,7 +300,7 @@ export default class AlarmUpdateScreen extends React.Component {
     get_token().then((token) => {
       axios
         .delete(
-          'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
+          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
           {
             schedules_common: {
               schedules_common_id: this.state.schedules_common_id,
