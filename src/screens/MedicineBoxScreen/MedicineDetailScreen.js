@@ -13,60 +13,23 @@ const window = Dimensions.get('window');
 export default class MedicineDetailScreen extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      item: this.props.navigation.getParam('MedicineData'),
-      MedicineName: '',
-      // MedicineImage: '',
-      MedicineEffect: '',
-      MedicineCapacity: '',
-      MedicineValidity: '',
-    };
-    console.log('this.state.item', this.state.item);
-    console.log('{{{{{{{약정보가져온다!!!!}}}}}}}');
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token()
-      .then((token) => {
-        console.log('약 상세page token: ', token);
-        axios({
-          method: 'get',
-          url: 'https://hj-medisharp.herokuapp.com/medicines/name', //'http://127.0.0.1:5000/medicines',
-          headers: {
-            Authorization: token,
-          },
-          params: {
-            id: this.state.item['id'],
-            name: this.state.item['name'],
-            camera: this.state.item['camera'],
-          },
-        })
-          .then((data) => {
-            console.log('{{{{{{받아온 약정보}}}}}}}', data.data.results);
-            let { name, effect, capacity, validity } = data.data.results[0];
-            console.log(name, effect, capacity, validity);
-            if (Array.isArray(capacity)) {
-              capacity = capacity.join('\n');
-            }
-            if (Array.isArray(validity)) {
-              validity = validity.join('\n');
-            }
 
-            this.setState({
-              MedicineName: name,
-              MedicineEffect: effect, //camera인식된 약은 array형태, 직접입력한 약은 string
-              MedicineCapacity: capacity, //camera인식된 약은 array형태, 직접입력한 약은 string
-              MedicineValidity: validity,
-            });
-          })
-          .catch((err) => {
-            console.error(err);
-          });
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    let { name, effect, capacity, validity, image_dir } = this.props.navigation.getParam(
+      'MedicineData',
+    );
+    if (Array.isArray(capacity)) {
+      capacity = capacity.join('\n');
+    }
+    if (Array.isArray(validity)) {
+      validity = validity.join('\n');
+    }
+    this.state = {
+      MedicineName: name,
+      MedicineImage: image_dir,
+      MedicineEffect: effect,
+      MedicineCapacity: capacity,
+      MedicineValidity: validity,
+    };
   }
 
   render() {
@@ -79,12 +42,6 @@ export default class MedicineDetailScreen extends React.Component {
           paddingTop: getStatusBarHeight(),
         }}
       >
-        {/* <NavigationEvents
-          onDidFocus={(payload) => {
-            this.getMyMedicineInfo(this.state.item);
-          }}
-        /> */}
-
         {/* -- 상단 타이틀 -- */}
         <Text
           style={{
@@ -118,11 +75,11 @@ export default class MedicineDetailScreen extends React.Component {
         <ScrollView>
           {/* -- 약 사진 -- */}
           <Image
-            source={{ uri: this.state.item['image_dir'] }}
+            source={{ uri: this.state.MedicineImage }}
             style={{
               width: window.width - 40,
               height: window.width - 40,
-              // resizeMode: 'contain',  실제로 구현될때는 바로 위 하이트 값 삭제하고 리사이즈모드를 살리면 될듯합니닷!
+              //resizeMode: 'contain', //실제로 구현될때는 바로 위 하이트 값 삭제하고 리사이즈모드를 살리면 될듯합니닷!
               marginBottom: 10,
               borderRadius: 50,
             }}
@@ -145,7 +102,7 @@ export default class MedicineDetailScreen extends React.Component {
                 marginBottom: 15,
               }}
             >
-              {this.state.item['name']}
+              {this.state.MedicineName}
             </Text>
           </View>
 
