@@ -31,10 +31,10 @@ export default class AlarmUpdateScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      item: [this.props.navigation.getParam('item')],
+      item: this.props.navigation.getParam('item'),
       clickedDate: this.props.navigation.getParam('clickedDate'),
       medicines: [],
-      alarmMemo: [],
+      alarmMemo: '',
       startDatePickerShow: false,
       endDatePickerShow: false,
       timePickerShow: false,
@@ -64,7 +64,7 @@ export default class AlarmUpdateScreen extends React.Component {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/schedules-commons',
+        url: 'https://yag-olim-test-prod.herokuapp.com/schedules-commons',
         headers: {
           Authorization: token,
         },
@@ -90,11 +90,12 @@ export default class AlarmUpdateScreen extends React.Component {
             selectedMinute: minute,
             showTime: [data.data.results[0]['time']],
             schedules_common_id: data.data.results[0]['schedules_common_id'],
+            alarmMemo: data.data.results[0]['memo'],
           });
 
           axios({
             method: 'get',
-            url: 'http://127.0.0.1:5000/medicines',
+            url: 'https://yag-olim-test-prod.herokuapp.com/medicines',
             headers: {
               Authorization: token,
             },
@@ -103,7 +104,8 @@ export default class AlarmUpdateScreen extends React.Component {
             },
           })
             .then((data) => {
-              console.log(data.data.results);
+              console.log('medi:', data.data.results);
+              console.log('schedules_common_id:', this.state.schedules_common_id);
               //let medicineList = data.data.results.map((el) => el['name']);
               this.setState({ medicines: data.data.results });
             })
@@ -116,6 +118,31 @@ export default class AlarmUpdateScreen extends React.Component {
         });
     });
   }
+  test = () => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: 'https://yag-olim-test-prod.herokuapp.com',
+        headers: {
+          Authorization: token,
+        },
+      }).catch((err) => {
+        console.error(err);
+      });
+    });
+  };
+
+  componentDidMount = () => {
+    this.test();
+  };
+
+  componentDidUpdate = () => {
+    this.test();
+  };
 
   patchSChedules = () => {
     async function get_token() {
@@ -126,7 +153,7 @@ export default class AlarmUpdateScreen extends React.Component {
       .then((token) => {
         axios
           .post(
-            'http://127.0.0.1:5000/medicines',
+            'https://yag-olim-test-prod.herokuapp.com/medicines',
             { medicine: this.state.medicines },
             {
               headers: {
@@ -137,12 +164,14 @@ export default class AlarmUpdateScreen extends React.Component {
           .then((res) => {
             let medi_ids = res.data.medicine_id;
             console.log('post medicines API', medi_ids);
+            console.log('scid:', this.state.schedules_common_id);
+            schedules_common_id = this.state.schedules_common_id;
             axios
               .patch(
-                'http://127.0.0.1:5000/schedules-commons',
+                'https://yag-olim-test-prod.herokuapp.com/schedules-commons',
                 {
                   schedules_common: {
-                    schedules_common_id: this.state.schedules_common_id,
+                    schedules_common_id: schedules_common_id,
                     memo: this.state.alarmMemo,
                     startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
                     enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
@@ -160,11 +189,12 @@ export default class AlarmUpdateScreen extends React.Component {
                 let time = res.data.results['time'];
                 let startdate = res.data.results['startdate'];
                 let endtdate = res.data.results['enddate'];
-                let cycle = res.data.results['cycle'];
+                let cycle = Number(res.data.results['cycle']);
                 console.log('schedules common API', schedules_common_id, time, medi_ids);
+                console.log('cycle:', cycle, typeof cycle);
                 axios
                   .patch(
-                    'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+                    'https://yag-olim-test-prod.herokuapp.com/schedules-commons/schedules-dates',
                     {
                       schedules_common: {
                         medicines_id: medi_ids,
@@ -185,7 +215,7 @@ export default class AlarmUpdateScreen extends React.Component {
                     console.log('schedules common, schedules date API');
                     axios
                       .post(
-                        'http://127.0.0.1:5000/medicines/schedules-medicines',
+                        'https://yag-olim-test-prod.herokuapp.com/medicines/schedules-medicines',
                         {
                           schedules_common_medicines: {
                             medicines_id: medi_ids,
@@ -202,7 +232,7 @@ export default class AlarmUpdateScreen extends React.Component {
                         console.log('schedules medicines, medicines API');
                         axios
                           .post(
-                            'http://127.0.0.1:5000/medicines/users-medicines',
+                            'https://yag-olim-test-prod.herokuapp.com/medicines/users-medicines',
                             {
                               medicines: {
                                 medicines_id: medi_ids,
@@ -239,7 +269,7 @@ export default class AlarmUpdateScreen extends React.Component {
     get_token().then((token) => {
       axios
         .patch(
-          'http://127.0.0.1:5000/schedules-dates/check',
+          'https://yag-olim-test-prod.herokuapp.com/schedules-dates/check',
           {
             schedules_common: {
               schedules_common_id: this.state.schedules_common_id,
@@ -257,6 +287,24 @@ export default class AlarmUpdateScreen extends React.Component {
           this.setState({ check: changedCheck });
           console.log('patch check API');
         });
+    });
+  };
+
+  test = () => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: 'https://yag-olim-test-stage2.herokuapp.com',
+        headers: {
+          Authorization: token,
+        },
+      }).catch((err) => {
+        console.error(err);
+      });
     });
   };
 
@@ -350,6 +398,7 @@ export default class AlarmUpdateScreen extends React.Component {
             this.setState({ medicines: resultArr });
             console.log('alarmMedicine  =>', this.state.medicines);
             console.log('resultArr  =>', resultArr);
+            this.test();
           }}
         />
 
@@ -454,7 +503,13 @@ export default class AlarmUpdateScreen extends React.Component {
                 <Icon name="pills" size={22} color={'#D6E4E1'} />
                 <Text style={styles.seclectText}>약 올리기</Text>
                 <TouchableOpacity
-                  onPress={() => this.props.navigation.navigate('CameraNoticeScreen')}
+                  onPress={() =>
+                    this.props.navigation.navigate('CameraNoticeScreen', {
+                      update: true,
+                      item: this.state.item,
+                      clickedDate: this.state.clickedDate,
+                    })
+                  }
                 >
                   <Text style={{ fontSize: 16 }}>
                     사진으로 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />
@@ -711,7 +766,7 @@ export default class AlarmUpdateScreen extends React.Component {
                       textAlign: 'center',
                       fontSize: 16,
                     }}
-                    placeholder={this.state.alarmInterval}
+                    placeholder="0"
                     placeholderTextColor={'gray'}
                     maxLength={2}
                     onChangeText={(alarmInterval) =>
