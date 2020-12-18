@@ -118,6 +118,7 @@ export default class AlarmUpdateScreen extends React.Component {
         });
     });
   }
+
   test = () => {
     async function get_token() {
       const token = await getItem();
@@ -286,6 +287,69 @@ export default class AlarmUpdateScreen extends React.Component {
           const changedCheck = res.data.results['check'];
           this.setState({ check: changedCheck });
           console.log('patch check API');
+        });
+    });
+  };
+
+  deleteWholeSchedules = () => {
+    console.log('전체 삭제하기 눌려따!');
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios
+        .delete(
+          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+          {
+            schedules_common: {
+              schedules_common_id: this.state.schedules_common_id,
+            },
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
+        .then((res) => {
+          console.log('전체 알람 일정 삭제 완료: ', res.data.message);
+          this.props.navigation.navigate('Calendar'); //삭제 후 calendarpage로 리다이렉트
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
+  };
+
+  deleteClickedSchedules = () => {
+    console.log('해당 날짜 알람 삭제하기 눌려따!');
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios
+        .delete(
+          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+          {
+            schedules_common: {
+              schedules_common_id: this.state.schedules_common_id,
+              date: this.state.clickedDate,
+            },
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
+        .then((res) => {
+          console.log('해당 날짜 알람 삭제 완료: ', res.data.message);
+          this.props.navigation.navigate('Calendar'); //삭제 후 calendarpage로 리다이렉트
+        })
+        .catch((err) => {
+          console.error(err);
         });
     });
   };
@@ -797,7 +861,7 @@ export default class AlarmUpdateScreen extends React.Component {
                 <Text style={{ fontSize: 20, color: 'white' }}>수정하기</Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log('삭제하기 눌려따!')}>
+            <TouchableOpacity onPress={this.deleteWholeSchedules}>
               <View
                 style={{
                   justifyContent: 'center',
@@ -809,7 +873,22 @@ export default class AlarmUpdateScreen extends React.Component {
                   borderRadius: 20,
                 }}
               >
-                <Text style={{ fontSize: 20, color: 'white' }}>삭제하기</Text>
+                <Text style={{ fontSize: 20, color: 'white' }}>알람일정 전체 삭제하기</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={this.deleteClickedSchedules}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  marginTop: 10,
+                  alignItems: 'center',
+                  width: window.width * 0.7,
+                  height: window.height * 0.075,
+                  backgroundColor: '#9a6464',
+                  borderRadius: 20,
+                }}
+              >
+                <Text style={{ fontSize: 20, color: 'white' }}>해당 날짜의 알람만 삭제하기</Text>
               </View>
             </TouchableOpacity>
           </View>
