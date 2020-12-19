@@ -53,7 +53,7 @@ export default class AlarmUpdateScreen extends React.Component {
       selectedMinute: '',
       date: new Date(this.koreanStandardTime),
       showTime: [],
-      check: false,
+      check: this.props.navigation.getParam('item')[0]['check'],
       alarmInterval: 0,
       schedules_common_id: null,
     };
@@ -84,7 +84,6 @@ export default class AlarmUpdateScreen extends React.Component {
             endYear: enddate[0],
             endMonth: enddate[1],
             endDate: enddate[2],
-            check: data.data.results[0]['check'],
             alarmInterval: data.data.results[0]['cycle'],
             selectedHour: hour,
             selectedMinute: minute,
