@@ -40,24 +40,6 @@ export default class CheckScreen extends React.Component {
     };
   }
 
-  test = () => {
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token().then((token) => {
-      axios({
-        method: 'get',
-        url: 'https://yag-olim-test-stage2.herokuapp.com',
-        headers: {
-          Authorization: token,
-        },
-      }).catch((err) => {
-        console.error(err);
-      });
-    });
-  };
-
   async componentDidMount() {
     const getImg = await FileSystem.getInfoAsync(this.state.uri);
     console.log(getImg['uri']);
@@ -135,11 +117,6 @@ export default class CheckScreen extends React.Component {
           alignItems: 'center',
         }}
       >
-        <NavigationEvents
-          onDidFocus={(payload) => {
-            this.test();
-          }}
-        />
         <Image
           style={{
             width: window.width - 40,

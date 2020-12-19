@@ -118,32 +118,6 @@ export default class AlarmUpdateScreen extends React.Component {
     });
   }
 
-  test = () => {
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token().then((token) => {
-      axios({
-        method: 'get',
-        url: 'https://yag-olim-test-prod.herokuapp.com',
-        headers: {
-          Authorization: token,
-        },
-      }).catch((err) => {
-        console.error(err);
-      });
-    });
-  };
-
-  componentDidMount = () => {
-    this.test();
-  };
-
-  componentDidUpdate = () => {
-    this.test();
-  };
-
   patchSChedules = () => {
     async function get_token() {
       const token = await getItem();
@@ -353,24 +327,6 @@ export default class AlarmUpdateScreen extends React.Component {
     });
   };
 
-  test = () => {
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token().then((token) => {
-      axios({
-        method: 'get',
-        url: 'https://yag-olim-test-stage2.herokuapp.com',
-        headers: {
-          Authorization: token,
-        },
-      }).catch((err) => {
-        console.error(err);
-      });
-    });
-  };
-
   checkChangeTrue = () => {
     this.setState({ check: true });
   };
@@ -461,7 +417,6 @@ export default class AlarmUpdateScreen extends React.Component {
             this.setState({ medicines: resultArr });
             console.log('alarmMedicine  =>', this.state.medicines);
             console.log('resultArr  =>', resultArr);
-            this.test();
           }}
         />
 

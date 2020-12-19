@@ -36,23 +36,6 @@ export default class CameraScreen extends React.Component {
     this.cameraRef = React.createRef();
   }
 
-  test = () => {
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token().then((token) => {
-      axios({
-        method: 'get',
-        url: 'https://yag-olim-test-stage2.herokuapp.com',
-        headers: {
-          Authorization: token,
-        },
-      }).catch((err) => {
-        console.error(err);
-      });
-    });
-  };
   componentDidMount = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     if (status === 'granted') {
@@ -61,11 +44,6 @@ export default class CameraScreen extends React.Component {
       this.setState({ hasPermission: true });
       // this.setState({ hasPermission: false });
     }
-    this.test();
-  };
-
-  componentDidUpdate = async () => {
-    this.test();
   };
 
   render() {
