@@ -36,10 +36,10 @@ export default class LoginScreen extends Component {
   };
 
   componentDidMount = async () => {
-    // await this.read();
-    await setItem(
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MX0.UgGrWBSBD2t1PHbjRRr3kSqWr3ECc65oXndQaaCrKqc',
-    );
+    await this.read();
+    // await setItem(
+    //   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MX0.UgGrWBSBD2t1PHbjRRr3kSqWr3ECc65oXndQaaCrKqc',
+    // );
     //await removeItem();
   };
 
@@ -56,7 +56,7 @@ export default class LoginScreen extends Component {
   onPressSocial = async (social) => {
     this.setState({
       socialModalVisible: !this.state.socialModalVisible,
-      source: `https://yag-olim-test-prod.herokuapp.com/oauth/${social}`,
+      source: `https://yag-olim-test-prod.herokuapp.com/users/oauth/${social}`,
     });
   };
 
