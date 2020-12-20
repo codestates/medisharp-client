@@ -18,6 +18,9 @@ import AlarmUpdateScreen from './AlarmUpdateScreen';
 import MedicineDetailScreen from './MedicineBoxScreen/MedicineDetailScreen';
 import DeleteCheckScreen from './AlarmUpdateScreen/DeleteCheck';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import SignUpScreen from './LoginScreen/SignUp';
+import FindIdScreen from './LoginScreen/FindId';
+import FindPwScreen from './LoginScreen/FindPw';
 
 const window = Dimensions.get('window');
 
@@ -135,6 +138,9 @@ const AppStack = createStackNavigator({
   CameraStack: CameraScreen,
   CheckScreen: CheckScreen,
   CameraNoticeScreen: CameraNoticeScreen,
+  SignUpScreen: SignUpScreen,
+  FindIdScreen: FindIdScreen,
+  FindPwScreen: FindPwScreen,
   TabNavigator: {
     screen: TabNavigator,
     navigationOptions: ({ navigation }) => ({

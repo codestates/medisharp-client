@@ -182,7 +182,6 @@ export default class LoginScreen extends Component {
                 borderRadius: 20,
                 height: 60,
                 padding: 10,
-                marginBottom: 50,
                 flexDirection: 'row',
               }}
               onPress={() => this.onPressSocial('kakao')}
@@ -194,6 +193,43 @@ export default class LoginScreen extends Component {
               <Text style={{ color: '#391B1B', fontSize: 18, fontWeight: 'bold' }}>
                 카카오 로그인
               </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+            <TouchableOpacity
+              style={{
+                justifyContent: 'center',
+                padding: 10,
+              }}
+              onPress={() => {
+                this.props.navigation.navigate('SignUpScreen');
+              }}
+            >
+              <Text style={{ fontSize: 14, color: 'white' }}>회원가입</Text>
+            </TouchableOpacity>
+            <Text style={{ fontSize: 14, color: 'white', paddingTop: 10 }}>|</Text>
+            <TouchableOpacity
+              style={{
+                justifyContent: 'center',
+                padding: 10,
+              }}
+              onPress={() => {
+                this.props.navigation.navigate('FindIdScreen');
+              }}
+            >
+              <Text style={{ fontSize: 14, color: 'white' }}>아이디 찾기</Text>
+            </TouchableOpacity>
+            <Text style={{ fontSize: 14, color: 'white', paddingTop: 10 }}>|</Text>
+            <TouchableOpacity
+              style={{
+                justifyContent: 'center',
+                padding: 10,
+              }}
+              onPress={() => {
+                this.props.navigation.navigate('FindPwScreen');
+              }}
+            >
+              <Text style={{ fontSize: 14, color: 'white' }}>비밀번호 찾기</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -218,7 +254,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    marginTop: 30,
-    paddingTop: 30,
   },
 });
