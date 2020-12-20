@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 
@@ -42,7 +43,7 @@ export default class FindPw extends React.Component {
         });
       } else {
         this.setState({ isAvailedName: '' });
-        this.setState({ [key]: value });
+        this.setState({ name: value });
       }
     }
     if (key === 'phoneNumber') {
@@ -54,38 +55,64 @@ export default class FindPw extends React.Component {
         });
       } else {
         this.setState({ isAvailedPhoneNumber: '' });
-        this.setState({ [key]: value });
+        this.setState({ phoneNumber: value });
       }
     }
     if (key === 'useremail') {
       var emailreg = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
       var useremail = value;
-      this.setState({ [key]: useremail });
+      this.setState({ useremail: useremail });
       if (useremail.length > 0 && false === emailreg.test(useremail)) {
         this.setState({ isAvailedEmail: '올바른 이메일 형식이 아닙니다.' });
-      } else {
-        this.setState({ isAvailedEmail: '' });
-        axios({
-          method: 'post',
-          url: '',
-          data: {
-            useremail: value,
-          },
-        })
-          .then((res) => {
-            if (res.data !== null) {
-              this.setState({ isAvailedEmail: '이미 존재하는 email입니다.' });
-            } else {
-              this.setState({ isAvailedEmail: '' });
-              this.setState({ [key]: useremail });
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          });
       }
     }
   };
+
+  onFindPw() {
+    axios({
+      method: 'get',
+      url: 'https://yag-olim-test-prod.herokuapp.com/users/id',
+      params: {
+        email: this.state.useremail,
+      },
+    })
+      .then((data) => {
+        console.log(data.data.results);
+        let res_edit = data.data.results;
+        axios
+          .patch('https://yag-olim-test-prod.herokuapp.com/users/password', {
+            users: {
+              id: res_edit['id'],
+              password: res_edit['password'],
+            },
+          })
+          .then((res) => {
+            console.log(res.data);
+            Alert.alert(
+              '임시 비밀번호가 등록된 메일로 발송되었습니다.',
+              '로그인 후 비밀번호를 변경해주세요.',
+              [
+                {
+                  text: '다시 발급받기',
+                  onPress: () => console.log('Cancel Pressed'),
+                  style: 'cancel',
+                },
+                {
+                  text: '로그인하러가기',
+                  onPress: () => this.props.navigation.navigate('LoginScreen'),
+                },
+              ],
+              { cancelable: false },
+            );
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
 
   render() {
     return (
@@ -175,7 +202,7 @@ export default class FindPw extends React.Component {
             <Text style={styles.seclectText}>전화번호</Text>
             <TextInput
               style={styles.placeholderText}
-              placeholder="아이디를 찾을 때 사용됩니다."
+              placeholder="가입시 등록한 번호를 입력하세요."
               placeholderTextColor={'gray'}
               maxLength={11}
               onChangeText={(phoneNumberValue) =>
@@ -199,7 +226,7 @@ export default class FindPw extends React.Component {
             <Text style={styles.seclectText}>이메일 주소</Text>
             <TextInput
               style={styles.placeholderText}
-              placeholder="이메일 주소가 ID가 됩니다 :)"
+              placeholder="가입시 등록한 메일을 입력하세요"
               placeholderTextColor={'gray'}
               maxLength={30}
               onChangeText={(useremailValue) => this.handleSignUpValue('useremail', useremailValue)}
@@ -212,7 +239,7 @@ export default class FindPw extends React.Component {
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
             <TouchableOpacity
               onPress={() => {
-                console.log('비밀번호 이자무써!');
+                this.onFindPw();
               }}
             >
               <View
