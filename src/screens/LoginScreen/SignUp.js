@@ -68,28 +68,25 @@ export default class SignUpScreen extends React.Component {
       var check = emailreg.test(useremail);
       if (useremail.length > 0 && check === false) {
         this.setState({ isAvailedEmail: '올바른 이메일 형식이 아닙니다.' });
+      } else {
+        this.setState({ isAvailedEmail: '' });
+        axios({
+          method: 'get',
+          url: 'https://yag-olim-test-prod.herokuapp.com/users/email',
+          params: {
+            email: useremail,
+          },
+        })
+          .then((res) => {
+            console.log(res.data);
+            this.setState({ isAvailedEmail: '' });
+            this.setState({ key: useremail });
+          })
+          .catch((err) => {
+            console.error(err);
+            this.setState({ isAvailedEmail: '이미 존재하는 email입니다.' });
+          });
       }
-      // } else {
-      //   this.setState({ isAvailedEmail: '' });
-      //   axios({
-      //     method: 'post',
-      //     url: '',
-      //     data: {
-      //       useremail: value,
-      //     },
-      //   })
-      //     .then((res) => {
-      //       if (res.data !== null) {
-      //         this.setState({ isAvailedEmail: '이미 존재하는 email입니다.' });
-      //       } else {
-      //         this.setState({ isAvailedEmail: '' });
-      //         this.setState({ key: useremail });
-      //       }
-      //     })
-      //     .catch((err) => {
-      //       console.error(err);
-      //     });
-      // }
     }
     if (key === 'password') {
       var reg = /^(?=.*?[a-z])(?=.*?[0-9]).{8,}$/;
