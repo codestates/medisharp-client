@@ -7,11 +7,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import axios from 'axios';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { get } from 'react-native/Libraries/Utilities/PixelRatio';
 import { NavigationEvents } from 'react-navigation';
+
+import medisharpLogo from '../../img/medisharpLogo.png';
 
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
@@ -67,230 +70,260 @@ const MedicineBox = ({ navigation }) => {
     setSelfTabSelected(!selfTabSelected);
   };
 
-  if (cameraTabSelected) {
+  console.log('MyMedicine배열길이: ', myMedicines, myMedicines.length);
+
+  if (myMedicines.length === 0) {
+    //로딩
     return (
-      <View
-        style={{
-          backgroundColor: 'white',
-          height: window.height * 0.92 - 1,
-          paddingLeft: 20,
-          paddingTop: getStatusBarHeight(),
-        }}
-      >
+      <View style={styles.loginContainer}>
         <NavigationEvents
           onDidFocus={(payload) => {
             useEffectForMedicines();
           }}
         />
-        <Text
-          style={{
-            marginTop: 30,
-            fontSize: 24,
-          }}
-        >
-          약통
-        </Text>
-        <View
-          style={{
-            borderBottomStyle: 'solid',
-            borderBottomWidth: 5,
-            borderBottomColor: '#6a9c90',
-            alignSelf: 'flex-start',
-            marginBottom: 15,
-          }}
-        >
-          <Text
-            style={{
-              alignSelf: 'center',
-              marginTop: 5,
-              fontSize: 20,
-              fontWeight: 'bold',
-              paddingBottom: 5,
-            }}
-          >
-            나의 약 모두보기
-          </Text>
+        <View style={[styles.container, styles.horizontal]}>
+          <Image
+            style={{ width: 77, height: 71, marginTop: '60%', marginBottom: '20%' }}
+            source={medisharpLogo}
+          />
+          <ActivityIndicator size={60} color="#6a9c90" />
         </View>
-
-        <View
-          style={{
-            width: window.width - 40,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}
-        >
-          <TouchableOpacity onPress={tabChange} style={styles.medicineByChangeTabSelected}>
-            <Text style={styles.medicineByChangeTabSelectedText}>카메라로 등록한 약</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={tabChange} style={styles.medicineByChangeTabNotSelected}>
-            <Text style={styles.medicineByChangeTabNotSelectedText}>직접 등록한 약</Text>
-          </TouchableOpacity>
-        </View>
-
-        <FlatList
-          style={{ width: window.width - 40 }}
-          data={MedicineByCamera}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate('MedicineDetail', { MedicineData: item });
-                }}
-              >
-                <View
-                  style={{
-                    height: window.height * 0.12,
-                    marginTop: 10,
-                    marginBottom: 5,
-                    borderBottomColor: '#6a9c90',
-                    borderBottomWidth: 1,
-                    borderStyle: 'solid',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  <Image
-                    source={{ uri: item.image_dir }}
-                    style={{ width: window.width * 0.35, resizeMode: 'contain', marginBottom: 10 }}
-                  />
-                  <View
-                    style={{
-                      width: window.width * 0.35,
-                      marginLeft: 20,
-                      justifyContent: 'center',
-                      color: '#6a9c90',
-                    }}
-                  >
-                    <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
-                    {/* <Text ellipsizeMode={'tail'} numberOfLines={1}>
-                  {item.title}
-                </Text> */}
-                    {/* <Text>{item.effect}</Text> */}
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </View>
-          )}
-        ></FlatList>
       </View>
     );
   } else {
-    return (
-      <View
-        style={{
-          backgroundColor: 'white',
-          height: window.height * 0.92 - 1,
-          paddingLeft: 20,
-          paddingTop: getStatusBarHeight(),
-        }}
-      >
-        <NavigationEvents
-          onDidFocus={(payload) => {
-            useEffectForMedicines();
-          }}
-        />
-        <Text
-          style={{
-            marginTop: 30,
-            fontSize: 24,
-          }}
-        >
-          약통
-        </Text>
+    if (cameraTabSelected) {
+      return (
         <View
           style={{
-            borderBottomStyle: 'solid',
-            borderBottomWidth: 5,
-            borderBottomColor: '#6a9c90',
-            alignSelf: 'flex-start',
-            marginBottom: 15,
+            backgroundColor: 'white',
+            height: window.height * 0.92 - 1,
+            paddingLeft: 20,
+            paddingTop: getStatusBarHeight(),
           }}
         >
+          <NavigationEvents
+            onDidFocus={(payload) => {
+              useEffectForMedicines();
+            }}
+          />
           <Text
             style={{
-              alignSelf: 'center',
-              marginTop: 5,
-              fontSize: 20,
-              fontWeight: 'bold',
-              paddingBottom: 5,
+              marginTop: 30,
+              fontSize: 24,
             }}
           >
-            나의 약 모두보기
+            약통
           </Text>
-        </View>
+          <View
+            style={{
+              borderBottomStyle: 'solid',
+              borderBottomWidth: 5,
+              borderBottomColor: '#6a9c90',
+              alignSelf: 'flex-start',
+              marginBottom: 15,
+            }}
+          >
+            <Text
+              style={{
+                alignSelf: 'center',
+                marginTop: 5,
+                fontSize: 20,
+                fontWeight: 'bold',
+                paddingBottom: 5,
+              }}
+            >
+              나의 약 모두보기
+            </Text>
+          </View>
 
-        <View
-          style={{
-            width: window.width - 40,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}
-        >
-          <TouchableOpacity onPress={tabChange} style={styles.medicineByChangeTabNotSelected}>
-            <Text style={styles.medicineByChangeTabNotSelectedText}>카메라로 등록한 약</Text>
-          </TouchableOpacity>
+          <View
+            style={{
+              width: window.width - 40,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
+            <TouchableOpacity onPress={tabChange} style={styles.medicineByChangeTabSelected}>
+              <Text style={styles.medicineByChangeTabSelectedText}>카메라로 등록한 약</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={tabChange} style={styles.medicineByChangeTabSelected}>
-            <Text style={styles.medicineByChangeTabSelectedText}>직접 등록한 약</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity onPress={tabChange} style={styles.medicineByChangeTabNotSelected}>
+              <Text style={styles.medicineByChangeTabNotSelectedText}>직접 등록한 약</Text>
+            </TouchableOpacity>
+          </View>
 
-        <FlatList
-          style={{ width: window.width - 40 }}
-          data={MedicineBySelf}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate('MedicineDetail', { MedicineData: item });
-                }}
-              >
-                <View
-                  style={{
-                    height: window.height * 0.12,
-                    marginTop: 10,
-                    marginBottom: 5,
-                    borderBottomColor: '#6a9c90',
-                    borderBottomWidth: 1,
-                    borderStyle: 'solid',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
+          <FlatList
+            style={{ width: window.width - 40 }}
+            data={MedicineByCamera}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View>
+                <TouchableOpacity
+                  onPress={() => {
+                    //빈배열로 초기화
+                    setMyMedicines([]);
+                    navigation.navigate('MedicineDetail', { MedicineData: item });
                   }}
                 >
-                  <Image
-                    source={{ uri: item.image_dir }}
-                    style={{ width: window.width * 0.35, resizeMode: 'contain', marginBottom: 10 }}
-                  />
                   <View
                     style={{
-                      width: window.width * 0.35,
-                      marginLeft: 20,
-                      justifyContent: 'center',
-                      color: '#6a9c90',
+                      height: window.height * 0.12,
+                      marginTop: 10,
+                      marginBottom: 5,
+                      borderBottomColor: '#6a9c90',
+                      borderBottomWidth: 1,
+                      borderStyle: 'solid',
+                      flexDirection: 'row',
+                      justifyContent: 'flex-start',
                     }}
                   >
-                    <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
-                    {/* <Text ellipsizeMode={'tail'} numberOfLines={1}>
-                  {item.title}
-                </Text> */}
-                    {/* <Text>{item.effect}</Text> */}
+                    <Image
+                      source={{ uri: item.image_dir }}
+                      style={{
+                        width: window.width * 0.35,
+                        resizeMode: 'contain',
+                        marginBottom: 10,
+                      }}
+                    />
+                    <View
+                      style={{
+                        width: window.width * 0.35,
+                        marginLeft: 20,
+                        justifyContent: 'center',
+                        color: '#6a9c90',
+                      }}
+                    >
+                      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            </View>
-          )}
-        ></FlatList>
-      </View>
-    );
+                </TouchableOpacity>
+              </View>
+            )}
+          ></FlatList>
+        </View>
+      );
+    } else {
+      return (
+        <View
+          style={{
+            backgroundColor: 'white',
+            height: window.height * 0.92 - 1,
+            paddingLeft: 20,
+            paddingTop: getStatusBarHeight(),
+          }}
+        >
+          <NavigationEvents
+            onDidFocus={(payload) => {
+              useEffectForMedicines();
+            }}
+          />
+          <Text
+            style={{
+              marginTop: 30,
+              fontSize: 24,
+            }}
+          >
+            약통
+          </Text>
+          <View
+            style={{
+              borderBottomStyle: 'solid',
+              borderBottomWidth: 5,
+              borderBottomColor: '#6a9c90',
+              alignSelf: 'flex-start',
+              marginBottom: 15,
+            }}
+          >
+            <Text
+              style={{
+                alignSelf: 'center',
+                marginTop: 5,
+                fontSize: 20,
+                fontWeight: 'bold',
+                paddingBottom: 5,
+              }}
+            >
+              나의 약 모두보기
+            </Text>
+          </View>
+
+          <View
+            style={{
+              width: window.width - 40,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
+            <TouchableOpacity onPress={tabChange} style={styles.medicineByChangeTabNotSelected}>
+              <Text style={styles.medicineByChangeTabNotSelectedText}>카메라로 등록한 약</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={tabChange} style={styles.medicineByChangeTabSelected}>
+              <Text style={styles.medicineByChangeTabSelectedText}>직접 등록한 약</Text>
+            </TouchableOpacity>
+          </View>
+
+          <FlatList
+            style={{ width: window.width - 40 }}
+            data={MedicineBySelf}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View>
+                <TouchableOpacity
+                  onPress={() => {
+                    //빈배열로 초기화
+                    setMyMedicines([]);
+                    navigation.navigate('MedicineDetail', { MedicineData: item });
+                  }}
+                >
+                  <View
+                    style={{
+                      height: window.height * 0.12,
+                      marginTop: 10,
+                      marginBottom: 5,
+                      borderBottomColor: '#6a9c90',
+                      borderBottomWidth: 1,
+                      borderStyle: 'solid',
+                      flexDirection: 'row',
+                      justifyContent: 'flex-start',
+                    }}
+                  >
+                    <Image
+                      source={{ uri: item.image_dir }}
+                      style={{
+                        width: window.width * 0.35,
+                        resizeMode: 'contain',
+                        marginBottom: 10,
+                      }}
+                    />
+                    <View
+                      style={{
+                        width: window.width * 0.35,
+                        marginLeft: 20,
+                        justifyContent: 'center',
+                        color: '#6a9c90',
+                      }}
+                    >
+                      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            )}
+          ></FlatList>
+        </View>
+      );
+    }
   }
 };
 
 export default MedicineBox;
 
 const styles = StyleSheet.create({
+  loginContainer: {
+    alignItems: 'center',
+    height: '100%',
+  },
   medicineByChangeTabSelected: {
     backgroundColor: '#6a9c90',
     borderRadius: 40,
