@@ -11,6 +11,7 @@ import {
 import axios from 'axios';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { get } from 'react-native/Libraries/Utilities/PixelRatio';
+import { NavigationEvents } from 'react-navigation';
 
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
@@ -19,41 +20,13 @@ const window = Dimensions.get('window');
 
 const MedicineBox = ({ navigation }) => {
   const [myMedicines, setMyMedicines] = useState([]);
-  let MedicineDetailInfo;
-
-  const getMyMedicineInfo = (item) => {
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token()
-      .then((token) => {
-        axios({
-          method: 'get',
-          url: 'http://127.0.0.1:5000/medicines/name', //'https://hj-medisharp.herokuapp.com/medicines/name',
-          headers: {
-            Authorization: token,
-          },
-          params: {
-            id: item.id,
-            name: item.name,
-            camera: item.camera,
-          },
-        })
-          .then((data) => {
-            MedicineDetailInfo = data.data.results;
-            navigation.navigate('MedicineDetail', { MedicineData: MedicineDetailInfo[0] });
-          })
-          .catch((err) => {
-            console.error(err);
-          });
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
 
   useEffect(() => {
+    useEffectForMedicines();
+  }, []);
+
+  const useEffectForMedicines = () => {
+    console.log('=========약통현황page useEffectForMedicines=========');
     async function get_token() {
       const token = await getItem();
       return token;
@@ -61,19 +34,20 @@ const MedicineBox = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/medicines', //'https://hj-medisharp.herokuapp.com/medicines'
+        url: 'https://hj-medisharp.herokuapp.com/medicines', //'http://127.0.0.1:5000/medicines',
         headers: {
           Authorization: token,
         },
       })
         .then((data) => {
+          console.log('+++++++++결과 useEffectForMedicines=========', data.data.results);
           setMyMedicines(data.data.results);
         })
         .catch((err) => {
           console.error(err);
         });
     });
-  }, []);
+  };
 
   let MedicineByCamera = [];
   let MedicineBySelf = [];
@@ -103,6 +77,11 @@ const MedicineBox = ({ navigation }) => {
           paddingTop: getStatusBarHeight(),
         }}
       >
+        <NavigationEvents
+          onDidFocus={(payload) => {
+            useEffectForMedicines();
+          }}
+        />
         <Text
           style={{
             marginTop: 30,
@@ -157,7 +136,7 @@ const MedicineBox = ({ navigation }) => {
             <View>
               <TouchableOpacity
                 onPress={() => {
-                  getMyMedicineInfo(item);
+                  navigation.navigate('MedicineDetail', { MedicineData: item });
                 }}
               >
                 <View
@@ -207,6 +186,11 @@ const MedicineBox = ({ navigation }) => {
           paddingTop: getStatusBarHeight(),
         }}
       >
+        <NavigationEvents
+          onDidFocus={(payload) => {
+            useEffectForMedicines();
+          }}
+        />
         <Text
           style={{
             marginTop: 30,
@@ -261,7 +245,7 @@ const MedicineBox = ({ navigation }) => {
             <View>
               <TouchableOpacity
                 onPress={() => {
-                  getMyMedicineInfo(item);
+                  navigation.navigate('MedicineDetail', { MedicineData: item });
                 }}
               >
                 <View
