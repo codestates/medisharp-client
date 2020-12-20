@@ -1,10 +1,18 @@
 import React from 'react';
 import axios from 'axios';
-import { View, Text, Image, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { NavigationEvents } from 'react-navigation';
-
+import medisharpLogo from '../../img/medisharpLogo.png';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
 
@@ -13,169 +21,218 @@ const window = Dimensions.get('window');
 export default class MedicineDetailScreen extends React.Component {
   constructor(props) {
     super(props);
-
-    let { name, effect, capacity, validity, image_dir } = this.props.navigation.getParam(
-      'MedicineData',
-    );
-    if (Array.isArray(capacity)) {
-      capacity = capacity.join('\n');
-    }
-    if (Array.isArray(validity)) {
-      validity = validity.join('\n');
-    }
     this.state = {
-      MedicineName: name,
-      MedicineImage: image_dir,
-      MedicineEffect: effect,
-      MedicineCapacity: capacity,
-      MedicineValidity: validity,
+      item: this.props.navigation.getParam('MedicineData'),
+      MedicineName: '',
+      // MedicineImage: '',
+      MedicineEffect: '',
+      MedicineCapacity: '',
+      MedicineValidity: '',
+      isLoading: true,
     };
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token()
+      .then((token) => {
+        axios({
+          method: 'get',
+          url: 'http://127.0.0.1:5000/medicines/name', //'https://hj-medisharp.herokuapp.com/medicines/name',
+          headers: {
+            Authorization: token,
+          },
+          params: {
+            id: this.state.item['id'],
+            name: this.state.item['name'],
+            camera: this.state.item['camera'],
+          },
+        })
+          .then((data) => {
+            let { name, effect, capacity, validity } = data.data.results[0];
+            console.log(name, effect, capacity, validity);
+            if (Array.isArray(capacity)) {
+              capacity = capacity.join('\n');
+            }
+            if (Array.isArray(validity)) {
+              validity = validity.join('\n');
+            }
+            this.setState({
+              MedicineName: name,
+              MedicineEffect: effect, //camera인식된 약은 array형태, 직접입력한 약은 string
+              MedicineCapacity: capacity, //camera인식된 약은 array형태, 직접입력한 약은 string
+              MedicineValidity: validity,
+              isLoading: false,
+            });
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
   render() {
-    return (
-      <View
-        style={{
-          backgroundColor: 'white',
-          height: window.height * 0.92 - 1,
-          paddingLeft: 20,
-          paddingTop: getStatusBarHeight(),
-        }}
-      >
-        {/* -- 상단 타이틀 -- */}
-        <Text
-          style={{
-            marginTop: 30,
-            fontSize: 24,
-          }}
-        >
-          약통
-        </Text>
+    if (this.state.isLoading === true) {
+      return (
+        <View style={styles.loginContainer}>
+          <View style={[styles.container, styles.horizontal]}>
+            <Image
+              style={{ width: 77, height: 71, marginTop: '60%', marginBottom: '20%' }}
+              source={medisharpLogo}
+            />
+            <Text>약 정보를 가져오고 있습니다. 잠시만 기다려주세요.</Text>
+            <ActivityIndicator size={60} color="#6a9c90" />
+          </View>
+        </View>
+      );
+    } else {
+      return (
         <View
           style={{
-            borderBottomStyle: 'solid',
-            borderBottomWidth: 5,
-            borderBottomColor: '#6a9c90',
-            alignSelf: 'flex-start',
-            marginBottom: 15,
+            backgroundColor: 'white',
+            height: window.height * 0.92 - 1,
+            paddingLeft: 20,
+            paddingTop: getStatusBarHeight(),
           }}
         >
+          {/* -- 상단 타이틀 -- */}
           <Text
             style={{
-              alignSelf: 'center',
-              marginTop: 5,
-              fontSize: 20,
-              fontWeight: 'bold',
-              paddingBottom: 5,
+              marginTop: 30,
+              fontSize: 24,
             }}
           >
-            내가 복용하는 모든 약
+            약통
           </Text>
-        </View>
-        <ScrollView>
-          {/* -- 약 사진 -- */}
-          <Image
-            source={{ uri: this.state.MedicineImage }}
-            style={{
-              width: window.width - 40,
-              height: window.width - 40,
-              //resizeMode: 'contain', //실제로 구현될때는 바로 위 하이트 값 삭제하고 리사이즈모드를 살리면 될듯합니닷!
-              marginBottom: 10,
-              borderRadius: 50,
-            }}
-          />
-
-          {/* -- 약 이름 뷰 -- */}
           <View
             style={{
-              marginBottom: window.height * 0.01,
-              width: window.width - 40,
+              borderBottomStyle: 'solid',
+              borderBottomWidth: 5,
+              borderBottomColor: '#6a9c90',
+              alignSelf: 'flex-start',
+              marginBottom: 15,
             }}
           >
             <Text
               style={{
-                paddingLeft: 10,
-                fontSize: 22,
+                alignSelf: 'center',
+                marginTop: 5,
+                fontSize: 20,
                 fontWeight: 'bold',
-                textAlign: 'center',
-                marginTop: 15,
-                marginBottom: 15,
+                paddingBottom: 5,
               }}
             >
-              {this.state.MedicineName}
+              내가 복용하는 모든 약
             </Text>
           </View>
+          <ScrollView>
+            {/* -- 약 사진 -- */}
+            <Image
+              source={{ uri: this.state.item['image_dir'] }}
+              style={{
+                width: window.width - 40,
+                height: window.width - 40,
+                //resizeMode: 'contain', //실제로 구현될때는 바로 위 하이트 값 삭제하고 리사이즈모드를 살리면 될듯합니닷!
+                marginBottom: 10,
+                borderRadius: 50,
+              }}
+            />
 
-          {/* -- 약 효능/효과 뷰 -- */}
-          <View
-            style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
-            }}
-          >
-            <Text style={styles.titleText}>효능/효과</Text>
-            <Text style={styles.bodyText}>{this.state.MedicineEffect}</Text>
-          </View>
-
-          {/* -- 약 용법/용량 뷰 -- */}
-          <View
-            style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
-            }}
-          >
-            <Text style={styles.titleText}>용법/용량</Text>
-            <Text style={styles.bodyText}>{this.state.MedicineCapacity}</Text>
-          </View>
-
-          {/* -- 약 유효기간 뷰 -- */}
-          <View
-            style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
-            }}
-          >
-            <Text style={styles.titleText}>유효기간</Text>
-            <Text style={styles.bodyText}>{this.state.MedicineValidity}</Text>
-          </View>
-
-          {/* -- 삭제하기 버튼 -- */}
-          <View style={{ alignItems: 'center', marginLeft: -20 }}>
-            <TouchableOpacity onPress={() => console.log('삭제하기 눌려따!')}>
-              <View
+            {/* -- 약 이름 뷰 -- */}
+            <View
+              style={{
+                marginBottom: window.height * 0.01,
+                width: window.width - 40,
+              }}
+            >
+              <Text
                 style={{
-                  justifyContent: 'center',
-                  margin: 20,
-                  alignItems: 'center',
-                  width: window.width * 0.7,
-                  height: window.height * 0.075,
-                  backgroundColor: '#9a6464',
-                  borderRadius: 20,
+                  paddingLeft: 10,
+                  fontSize: 22,
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  marginTop: 15,
+                  marginBottom: 15,
                 }}
               >
-                <Text
+                {this.state.MedicineName}
+              </Text>
+            </View>
+
+            {/* -- 약 효능/효과 뷰 -- */}
+            <View
+              style={{
+                marginBottom: window.height * 0.01,
+                borderBottomWidth: 1,
+                borderBottomColor: '#6A9C90',
+                borderStyle: 'solid',
+                width: window.width - 40,
+              }}
+            >
+              <Text style={styles.titleText}>효능/효과</Text>
+              <Text style={styles.bodyText}>{this.state.MedicineEffect}</Text>
+            </View>
+
+            {/* -- 약 용법/용량 뷰 -- */}
+            <View
+              style={{
+                marginBottom: window.height * 0.01,
+                borderBottomWidth: 1,
+                borderBottomColor: '#6A9C90',
+                borderStyle: 'solid',
+                width: window.width - 40,
+              }}
+            >
+              <Text style={styles.titleText}>용법/용량</Text>
+              <Text style={styles.bodyText}>{this.state.MedicineCapacity}</Text>
+            </View>
+
+            {/* -- 약 유효기간 뷰 -- */}
+            <View
+              style={{
+                marginBottom: window.height * 0.01,
+                borderBottomWidth: 1,
+                borderBottomColor: '#6A9C90',
+                borderStyle: 'solid',
+                width: window.width - 40,
+              }}
+            >
+              <Text style={styles.titleText}>유효기간</Text>
+              <Text style={styles.bodyText}>{this.state.MedicineValidity}</Text>
+            </View>
+
+            {/* -- 삭제하기 버튼 -- */}
+            <View style={{ alignItems: 'center', marginLeft: -20 }}>
+              <TouchableOpacity onPress={() => console.log('삭제하기 눌려따!')}>
+                <View
                   style={{
-                    fontSize: 20,
-                    color: 'white',
+                    justifyContent: 'center',
+                    margin: 20,
+                    alignItems: 'center',
+                    width: window.width * 0.7,
+                    height: window.height * 0.075,
+                    backgroundColor: '#9a6464',
+                    borderRadius: 20,
                   }}
                 >
-                  삭제하기
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </View>
-    );
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      color: 'white',
+                    }}
+                  >
+                    삭제하기
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
+      );
+    }
   }
 }
 

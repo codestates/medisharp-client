@@ -19,40 +19,6 @@ const window = Dimensions.get('window');
 
 const MedicineBox = ({ navigation }) => {
   const [myMedicines, setMyMedicines] = useState([]);
-  let MedicineDetailInfo;
-
-  const getMyMedicineInfo = (item) => {
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token()
-      .then((token) => {
-        axios({
-          method: 'get',
-          url: 'http://127.0.0.1:5000/medicines/name', //'https://hj-medisharp.herokuapp.com/medicines/name',
-          headers: {
-            Authorization: token,
-          },
-          params: {
-            id: item.id,
-            name: item.name,
-            camera: item.camera,
-          },
-        })
-          .then((data) => {
-            MedicineDetailInfo = data.data.results;
-            navigation.navigate('MedicineDetail', { MedicineData: MedicineDetailInfo[0] });
-          })
-          .catch((err) => {
-            console.error(err);
-          });
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
-
   useEffect(() => {
     async function get_token() {
       const token = await getItem();
@@ -157,7 +123,7 @@ const MedicineBox = ({ navigation }) => {
             <View>
               <TouchableOpacity
                 onPress={() => {
-                  getMyMedicineInfo(item);
+                  navigation.navigate('MedicineDetail', { MedicineData: item });
                 }}
               >
                 <View
@@ -261,7 +227,7 @@ const MedicineBox = ({ navigation }) => {
             <View>
               <TouchableOpacity
                 onPress={() => {
-                  getMyMedicineInfo(item);
+                  navigation.navigate('MedicineDetail', { MedicineData: item });
                 }}
               >
                 <View
