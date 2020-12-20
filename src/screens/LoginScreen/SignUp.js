@@ -79,12 +79,15 @@ export default class SignUpScreen extends React.Component {
         })
           .then((res) => {
             console.log(res.data);
-            this.setState({ isAvailedEmail: '' });
-            this.setState({ key: useremail });
+            if (res.data['status'] === 'OK') {
+              this.setState({ isAvailedEmail: '' });
+              this.setState({ key: useremail });
+            } else {
+              this.setState({ isAvailedEmail: '이미 존재하는 email입니다.' });
+            }
           })
           .catch((err) => {
             console.error(err);
-            this.setState({ isAvailedEmail: '이미 존재하는 email입니다.' });
           });
       }
     }
