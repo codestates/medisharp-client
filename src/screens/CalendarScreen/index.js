@@ -38,24 +38,6 @@ const CalendarMain = ({ navigation }) => {
   const [markingDays, setMarkingDays] = useState([]);
   const [markedDates, setMarkedDates] = useState({});
 
-  const test = () => {
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token().then((token) => {
-      axios({
-        method: 'get',
-        url: 'https://yag-olim-test-stage2.herokuapp.com',
-        headers: {
-          Authorization: token,
-        },
-      }).catch((err) => {
-        console.error(err);
-      });
-    });
-  };
-
   //여기부터 API 입니다.
   useEffect(() => {
     useEffectForMonth();
@@ -206,7 +188,6 @@ const CalendarMain = ({ navigation }) => {
     >
       <NavigationEvents
         onDidFocus={(payload) => {
-          test();
           useEffectForMonth();
           useEffectForClicked();
         }}
