@@ -69,32 +69,6 @@ export default class AlarmScreen extends React.Component {
     };
   }
 
-  test = () => {
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token().then((token) => {
-      axios({
-        method: 'get',
-        url: 'https://yag-olim-test-prod.herokuapp.com',
-        headers: {
-          Authorization: token,
-        },
-      }).catch((err) => {
-        console.error(err);
-      });
-    });
-  };
-
-  componentDidMount = () => {
-    this.test();
-  };
-
-  componentDidUpdate = () => {
-    this.test();
-  };
-
   screenDidFocus() {
     // navigation.push('Alarm') 을 통해 stack을 열게되면 기존의 param들이 모두 날아가버리기때문에
     // 로컬에 저장해둔 약이름들을 불러오는 것으로 변경하는 것에대해 고려중임 => 네비게이션 구조를 변경하여 해결
@@ -320,7 +294,6 @@ export default class AlarmScreen extends React.Component {
             this.setState({ alarmMedicine: resultArr });
             console.log('alarmMedicine  =>', this.state.alarmMedicine);
             console.log('resultArr  =>', resultArr);
-            this.test();
           }}
         />
         <Text

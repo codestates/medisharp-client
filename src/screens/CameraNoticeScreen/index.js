@@ -21,24 +21,6 @@ export default class CameraNoticeScreen extends React.Component {
     };
   }
 
-  test = () => {
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token().then((token) => {
-      axios({
-        method: 'get',
-        url: 'https://yag-olim-test-stage2.herokuapp.com',
-        headers: {
-          Authorization: token,
-        },
-      }).catch((err) => {
-        console.error(err);
-      });
-    });
-  };
-
   render() {
     return (
       <View style={{ height: window.height * 0.92 - 40, marginTop: 40, alignItems: 'center' }}>
@@ -50,11 +32,6 @@ export default class CameraNoticeScreen extends React.Component {
             marginBottom: '30%',
           }}
         >
-          <NavigationEvents
-            onDidFocus={(payload) => {
-              this.test();
-            }}
-          />
           <Text style={{ fontSize: 18, textAlign: 'center' }}>
             의약품만 검색 가능하며{'\n'} 촬영여건에 따라 {'\n'}인식이 불가능 할 수 있습니다.
           </Text>
