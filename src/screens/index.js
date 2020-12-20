@@ -10,6 +10,7 @@ import AlarmScreen from './AlarmScreen';
 import MedicineBoxScreen from './MedicineBoxScreen';
 import LoginScreen from './LoginScreen';
 import MypageScreen from './MypageScreen';
+import EditMyinfoScreen from './MypageScreen/EditMyinfo';
 import CameraScreen from './CameraScreen';
 import CameraNoticeScreen from './CameraNoticeScreen';
 import CheckScreen from './CheckScreen';
@@ -24,6 +25,18 @@ import FindPwScreen from './LoginScreen/FindPw';
 
 const window = Dimensions.get('window');
 
+const MypageStack = createStackNavigator(
+  {
+    Mypage: MypageScreen,
+    EditMyinfoScreen: EditMyinfoScreen,
+  },
+  {
+    initialRouteName: 'Mypage',
+    headerMode: 'none',
+    headerShown: false,
+  },
+);
+
 const AlarmStack = createStackNavigator(
   {
     Alarm: AlarmScreen,
@@ -31,6 +44,8 @@ const AlarmStack = createStackNavigator(
   },
   {
     initialRouteName: 'Alarm',
+    headerMode: 'none',
+    headerShown: false,
   },
 );
 
@@ -64,7 +79,7 @@ const TabNavigator = createBottomTabNavigator(
     Calendar: { screen: CalendarStack },
     Alarm: { screen: AlarmStack },
     MedicineBox: { screen: MedicineBoxStack },
-    Mypage: { screen: MypageScreen },
+    Mypage: { screen: MypageStack },
   },
   {
     defaultNavigationOptions: ({ navigation }) => ({
