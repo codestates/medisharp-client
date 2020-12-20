@@ -41,7 +41,7 @@ export default class MedicineDetailScreen extends React.Component {
       .then((token) => {
         axios({
           method: 'get',
-          url: 'https://hj-medisharp.herokuapp.com/medicines/name', //'http://127.0.0.1:5000/medicines/name',
+          url: 'http://127.0.0.1:5000/medicines/name',
           headers: {
             Authorization: token,
           },
@@ -53,7 +53,6 @@ export default class MedicineDetailScreen extends React.Component {
         })
           .then((data) => {
             let { name, effect, capacity, validity } = data.data.results[0];
-            console.log(name, effect, capacity, validity);
             if (Array.isArray(capacity)) {
               capacity = capacity.join('\n');
             }
@@ -78,7 +77,6 @@ export default class MedicineDetailScreen extends React.Component {
   }
 
   deletemymedicine = () => {
-    console.log('삭제하기 눌려따!!!');
     async function get_token() {
       const token = await getItem();
       return token;
@@ -87,7 +85,7 @@ export default class MedicineDetailScreen extends React.Component {
       .then((token) => {
         axios({
           method: 'delete',
-          url: 'https://hj-medisharp.herokuapp.com/medicines',
+          url: 'http://127.0.0.1:5000/medicines',
           headers: {
             Authorization: token,
           },
@@ -96,8 +94,7 @@ export default class MedicineDetailScreen extends React.Component {
           },
         })
           .then((data) => {
-            console.log('삭제되었음: ', data.data);
-            //삭제 후 다시 약 현황 page로 navigate되면서 API요청 다시받아와야함.
+            //삭제 후 다시 약 현황 page로 navigate되면서 API요청
             this.props.navigation.navigate('MedicineBox');
           })
           .catch((err) => {

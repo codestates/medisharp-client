@@ -29,7 +29,6 @@ const MedicineBox = ({ navigation }) => {
   }, []);
 
   const useEffectForMedicines = () => {
-    console.log('=========약통현황page useEffectForMedicines=========');
     async function get_token() {
       const token = await getItem();
       return token;
@@ -37,13 +36,12 @@ const MedicineBox = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://hj-medisharp.herokuapp.com/medicines', //'http://127.0.0.1:5000/medicines',
+        url: 'http://127.0.0.1:5000/medicines',
         headers: {
           Authorization: token,
         },
       })
         .then((data) => {
-          console.log('+++++++++결과 useEffectForMedicines=========', data.data.results);
           setMyMedicines(data.data.results);
         })
         .catch((err) => {
