@@ -98,6 +98,7 @@ export default class MedicineDetailScreen extends React.Component {
           .then((data) => {
             console.log('삭제되었음: ', data.data);
             //삭제 후 다시 약 현황 page로 navigate되면서 API요청 다시받아와야함.
+            this.props.navigation.navigate('MedicineBox');
           })
           .catch((err) => {
             console.error(err);
