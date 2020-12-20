@@ -62,8 +62,11 @@ export default class FindPw extends React.Component {
       var emailreg = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
       var useremail = value;
       this.setState({ useremail: useremail });
-      if (useremail.length > 0 && false === emailreg.test(useremail)) {
+      var check = emailreg.test(useremail);
+      if (useremail.length > 0 && check === false) {
         this.setState({ isAvailedEmail: '올바른 이메일 형식이 아닙니다.' });
+      } else {
+        this.setState({ isAvailedEmail: '' });
       }
     }
   };
