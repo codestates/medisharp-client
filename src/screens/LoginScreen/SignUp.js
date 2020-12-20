@@ -46,7 +46,7 @@ export default class SignUpScreen extends React.Component {
         });
       } else {
         this.setState({ isAvailedName: '' });
-        this.setState({ [key]: value });
+        this.setState({ name: value });
       }
     }
     if (key === 'phoneNumber') {
@@ -58,30 +58,32 @@ export default class SignUpScreen extends React.Component {
         });
       } else {
         this.setState({ isAvailedPhoneNumber: '' });
-        this.setState({ [key]: value });
+        this.setState({ phoneNumber: value });
       }
     }
     if (key === 'useremail') {
       var emailreg = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
       var useremail = value;
-      this.setState({ [key]: useremail });
-      if (useremail.length > 0 && false === emailreg.test(useremail)) {
+      this.setState({ useremail: useremail });
+      var check = emailreg.test(useremail);
+      if (useremail.length > 0 && check === false) {
         this.setState({ isAvailedEmail: '올바른 이메일 형식이 아닙니다.' });
       } else {
         this.setState({ isAvailedEmail: '' });
         axios({
-          method: 'post',
-          url: '',
-          data: {
-            useremail: value,
+          method: 'get',
+          url: 'https://yag-olim-test-prod.herokuapp.com/users/email',
+          params: {
+            email: useremail,
           },
         })
           .then((res) => {
-            if (res.data !== null) {
-              this.setState({ isAvailedEmail: '이미 존재하는 email입니다.' });
-            } else {
+            console.log(res.data);
+            if (res.data['status'] === 'OK') {
               this.setState({ isAvailedEmail: '' });
-              this.setState({ [key]: useremail });
+              this.setState({ key: useremail });
+            } else {
+              this.setState({ isAvailedEmail: '이미 존재하는 email입니다.' });
             }
           })
           .catch((err) => {
@@ -97,19 +99,41 @@ export default class SignUpScreen extends React.Component {
           isAvailedPassword: '비밀번호는 8~16자이어야 하며, 숫자/소문자를 모두 포함해야 합니다.',
         });
       } else {
+        console.log(value);
         this.setState({ isAvailedPassword: '' });
-        this.setState({ [key]: value });
+        this.setState({ password: value });
       }
     }
     if (key === 'passwordCheck') {
       var passwordCheck = value;
+      console.log('value:', value);
+      console.log('this state:', this.state.password);
       if (passwordCheck.length > 0 && this.state.password !== passwordCheck) {
         this.setState({ isAvailedPasswordCheck: '비밀번호가 일치하지 않습니다.' });
       } else {
         this.setState({ isAvailedPasswordCheck: '' });
-        this.setState({ [key]: value });
+        this.setState({ passwordCheck: value });
       }
     }
+  };
+
+  onSignUp = () => {
+    axios
+      .post('https://yag-olim-test-prod.herokuapp.com/users/signup', {
+        users: {
+          email: this.state.useremail,
+          password: this.state.password,
+          full_name: this.state.name,
+          mobile: this.state.phoneNumber,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        this.props.navigation.navigate('LoginScreen');
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
   render() {
@@ -285,7 +309,7 @@ export default class SignUpScreen extends React.Component {
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
             <TouchableOpacity
               onPress={() => {
-                console.log('들어올 때는 마음대로였겠지만 나갈 때는 아니란다!');
+                this.onSignUp();
               }}
             >
               <View
