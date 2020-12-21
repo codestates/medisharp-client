@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import {
   View,
   Text,
@@ -11,6 +12,9 @@ import {
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { NavigationEvents } from 'react-navigation';
 
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
+
 const window = Dimensions.get('window');
 
 export default class Mypage extends React.Component {
@@ -18,9 +22,9 @@ export default class Mypage extends React.Component {
     super(props);
     this.state = {
       name: this.props.navigation.getParam('name'),
-      phoneNumber: this.props.navigation.getParam('phoneNumber'),
-      useremail: this.props.navigation.getParam('useremail'),
-      password: this.props.navigation.getParam('password'),
+      phoneNumber: '', //client에서 가지고 있으면 안되고 매번 API를 통해 검사해줘야 하는 것
+      useremail: this.props.navigation.getParam('useremail'), //just for rendering
+      password: '', //client에서 가지고 있으면 안되고 매번 API를 통해 검사해줘야 하는 것
       passwordCheck: '',
       isAvailedName: '',
       isAvailedPhoneNumber: '',
@@ -40,7 +44,7 @@ export default class Mypage extends React.Component {
         });
       } else {
         this.setState({ isAvailedName: '' });
-        this.setState({ [key]: value });
+        this.setState({ name: value });
       }
     }
     if (key === 'phoneNumber') {
@@ -52,35 +56,7 @@ export default class Mypage extends React.Component {
         });
       } else {
         this.setState({ isAvailedPhoneNumber: '' });
-        this.setState({ [key]: value });
-      }
-    }
-    if (key === 'useremail') {
-      var emailreg = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
-      var useremail = value;
-      this.setState({ [key]: useremail });
-      if (useremail.length > 0 && false === emailreg.test(useremail)) {
-        this.setState({ isAvailedEmail: '올바른 이메일 형식이 아닙니다.' });
-      } else {
-        this.setState({ isAvailedEmail: '' });
-        axios({
-          method: 'post',
-          url: '',
-          data: {
-            useremail: value,
-          },
-        })
-          .then((res) => {
-            if (res.data !== null) {
-              this.setState({ isAvailedEmail: '이미 존재하는 email입니다.' });
-            } else {
-              this.setState({ isAvailedEmail: '' });
-              this.setState({ [key]: useremail });
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          });
+        this.setState({ phoneNumber: value });
       }
     }
     if (key === 'password') {
@@ -91,17 +67,20 @@ export default class Mypage extends React.Component {
           isAvailedPassword: '비밀번호는 8~16자이어야 하며, 숫자/소문자를 모두 포함해야 합니다.',
         });
       } else {
+        // console.log(value);
         this.setState({ isAvailedPassword: '' });
-        this.setState({ [key]: value });
+        this.setState({ password: value });
       }
     }
     if (key === 'passwordCheck') {
       var passwordCheck = value;
+      // console.log('value:', value);
+      // console.log('this state:', this.state.password);
       if (passwordCheck.length > 0 && this.state.password !== passwordCheck) {
         this.setState({ isAvailedPasswordCheck: '비밀번호가 일치하지 않습니다.' });
       } else {
         this.setState({ isAvailedPasswordCheck: '' });
-        this.setState({ [key]: value });
+        this.setState({ passwordCheck: value });
       }
     }
   };
@@ -206,7 +185,7 @@ export default class Mypage extends React.Component {
           <Text style={styles.nonAvailableText}>{this.state.isAvailedPhoneNumber}</Text>
 
           {/* -- 이메일 입력 뷰 -- */}
-          <View
+          {/* <View
             style={{
               marginBottom: window.height * 0.01,
               borderBottomWidth: 1,
@@ -225,7 +204,30 @@ export default class Mypage extends React.Component {
               defaultValue={this.state.useremail}
             />
           </View>
-          <Text style={styles.nonAvailableText}>{this.state.isAvailedEmail}</Text>
+          <Text style={styles.nonAvailableText}>{this.state.isAvailedEmail}</Text> */}
+
+          {/* -- 이메일 뷰 -- */}
+          <View
+            style={{
+              marginBottom: window.height * 0.01,
+              borderBottomWidth: 1,
+              borderBottomColor: '#6A9C90',
+              borderStyle: 'solid',
+              width: window.width - 40,
+            }}
+          >
+            <Text
+              style={{
+                paddingLeft: 10,
+                fontSize: 18,
+                fontWeight: 'bold',
+                color: '#6a9c90',
+              }}
+            >
+              이메일
+            </Text>
+            <Text style={styles.placeholderText}>{this.state.useremail}</Text>
+          </View>
 
           {/* -- 비밀번호 입력 뷰 -- */}
           <View
