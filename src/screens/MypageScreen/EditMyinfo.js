@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import {
   View,
   Text,
@@ -7,9 +8,13 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { NavigationEvents } from 'react-navigation';
+
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
@@ -18,9 +23,9 @@ export default class Mypage extends React.Component {
     super(props);
     this.state = {
       name: this.props.navigation.getParam('name'),
-      phoneNumber: this.props.navigation.getParam('phoneNumber'),
-      useremail: this.props.navigation.getParam('useremail'),
-      password: this.props.navigation.getParam('password'),
+      phoneNumber: '', //client에서 가지고 있으면 안되고 매번 API를 통해 검사해줘야 하는 것
+      useremail: this.props.navigation.getParam('useremail'), //just for rendering
+      password: '', //client에서 가지고 있으면 안되고 매번 API를 통해 검사해줘야 하는 것
       passwordCheck: '',
       isAvailedName: '',
       isAvailedPhoneNumber: '',
@@ -40,7 +45,7 @@ export default class Mypage extends React.Component {
         });
       } else {
         this.setState({ isAvailedName: '' });
-        this.setState({ [key]: value });
+        this.setState({ name: value });
       }
     }
     if (key === 'phoneNumber') {
@@ -52,35 +57,7 @@ export default class Mypage extends React.Component {
         });
       } else {
         this.setState({ isAvailedPhoneNumber: '' });
-        this.setState({ [key]: value });
-      }
-    }
-    if (key === 'useremail') {
-      var emailreg = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
-      var useremail = value;
-      this.setState({ [key]: useremail });
-      if (useremail.length > 0 && false === emailreg.test(useremail)) {
-        this.setState({ isAvailedEmail: '올바른 이메일 형식이 아닙니다.' });
-      } else {
-        this.setState({ isAvailedEmail: '' });
-        axios({
-          method: 'post',
-          url: '',
-          data: {
-            useremail: value,
-          },
-        })
-          .then((res) => {
-            if (res.data !== null) {
-              this.setState({ isAvailedEmail: '이미 존재하는 email입니다.' });
-            } else {
-              this.setState({ isAvailedEmail: '' });
-              this.setState({ [key]: useremail });
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          });
+        this.setState({ phoneNumber: value });
       }
     }
     if (key === 'password') {
@@ -92,7 +69,7 @@ export default class Mypage extends React.Component {
         });
       } else {
         this.setState({ isAvailedPassword: '' });
-        this.setState({ [key]: value });
+        this.setState({ password: value });
       }
     }
     if (key === 'passwordCheck') {
@@ -101,8 +78,61 @@ export default class Mypage extends React.Component {
         this.setState({ isAvailedPasswordCheck: '비밀번호가 일치하지 않습니다.' });
       } else {
         this.setState({ isAvailedPasswordCheck: '' });
-        this.setState({ [key]: value });
+        this.setState({ passwordCheck: value });
       }
+    }
+  };
+
+  editUserInfo = () => {
+    if (
+      this.state.isAvailedName === '' &&
+      this.state.isAvailedPhoneNumber === '' &&
+      this.state.isAvailedEmail === '' &&
+      this.state.isAvailedPassword === '' &&
+      this.state.isAvailedPasswordCheck === ''
+    ) {
+      async function get_token() {
+        const token = await getItem();
+        return token;
+      }
+      get_token()
+        .then((token) => {
+          console.log(
+            '수정할 데이터: ',
+            this.state.phoneNumber,
+            this.state.name,
+            this.state.password,
+          );
+          axios({
+            method: 'patch',
+            url: 'http://127.0.0.1:5000/users', //'https://hj-medisharp.herokuapp.com/users',
+            headers: {
+              Authorization: token,
+            },
+            data: {
+              users: {
+                mobile: this.state.phoneNumber,
+                full_name: this.state.name,
+                password: this.state.password,
+              },
+            },
+          })
+            .then((data) => {
+              //삭제 후 다시  Mypage로 navigate
+              this.props.navigation.navigate('Mypage', {
+                edit_user: data.data.results,
+              });
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    } else {
+      //유효조건을 하나라도 만족하지 않으면 입력 확인해달라는 alert
+      Alert.alert('필수 입력조건을 만족해주세요.');
     }
   };
 
@@ -148,6 +178,7 @@ export default class Mypage extends React.Component {
               개인정보 수정
             </Text>
           </View>
+          <Text>수정할 정보를 입력하지 않으실 경우 기존의 정보로 유지됩니다.</Text>
         </View>
         <ScrollView>
           {/* -- 이름 입력 뷰 -- */}
@@ -205,7 +236,7 @@ export default class Mypage extends React.Component {
           </View>
           <Text style={styles.nonAvailableText}>{this.state.isAvailedPhoneNumber}</Text>
 
-          {/* -- 이메일 입력 뷰 -- */}
+          {/* -- 이메일 뷰 -- */}
           <View
             style={{
               marginBottom: window.height * 0.01,
@@ -215,17 +246,18 @@ export default class Mypage extends React.Component {
               width: window.width - 40,
             }}
           >
-            <Text style={styles.seclectText}>이메일 주소</Text>
-            <TextInput
-              style={styles.placeholderText}
-              placeholder="이메일 주소가 ID가 됩니다 :)"
-              placeholderTextColor={'gray'}
-              maxLength={30}
-              onChangeText={(useremailValue) => this.handleSignUpValue('useremail', useremailValue)}
-              defaultValue={this.state.useremail}
-            />
+            <Text
+              style={{
+                paddingLeft: 10,
+                fontSize: 18,
+                fontWeight: 'bold',
+                color: '#6a9c90',
+              }}
+            >
+              이메일
+            </Text>
+            <Text style={styles.placeholderText}>{this.state.useremail}</Text>
           </View>
-          <Text style={styles.nonAvailableText}>{this.state.isAvailedEmail}</Text>
 
           {/* -- 비밀번호 입력 뷰 -- */}
           <View
@@ -277,11 +309,7 @@ export default class Mypage extends React.Component {
 
           {/* -- 확인 버튼 -- */}
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity
-              onPress={() => {
-                console.log('들어올 때는 마음대로였겠지만 나갈 때는 아니란다!');
-              }}
-            >
+            <TouchableOpacity onPress={this.editUserInfo}>
               <View
                 style={{
                   justifyContent: 'center',

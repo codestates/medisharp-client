@@ -55,7 +55,14 @@ export default class Mypage extends React.Component {
           paddingLeft: 20,
         }}
       >
-        <NavigationEvents onDidFocus={(payload) => {}} />
+        <NavigationEvents
+          onDidFocus={(payload) => {
+            if (this.props.navigation.getParam('edit_user')) {
+              let { email, full_name } = this.props.navigation.getParam('edit_user');
+              this.setState({ name: full_name, useremail: email });
+            }
+          }}
+        />
         <View>
           <Text
             style={{
@@ -140,10 +147,8 @@ export default class Mypage extends React.Component {
             <TouchableOpacity
               onPress={() => {
                 this.props.navigation.navigate('EditMyinfoScreen', {
-                  name: '현달이',
-                  phoneNumber: '01082340420',
-                  useremail: 'hdaleee91@gmail.com',
-                  password: 'yagolim1!',
+                  name: this.state.name,
+                  useremail: this.state.useremail,
                 });
               }}
             >
