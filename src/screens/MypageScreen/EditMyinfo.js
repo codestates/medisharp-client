@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { NavigationEvents } from 'react-navigation';
@@ -67,15 +68,12 @@ export default class Mypage extends React.Component {
           isAvailedPassword: '비밀번호는 8~16자이어야 하며, 숫자/소문자를 모두 포함해야 합니다.',
         });
       } else {
-        // console.log(value);
         this.setState({ isAvailedPassword: '' });
         this.setState({ password: value });
       }
     }
     if (key === 'passwordCheck') {
       var passwordCheck = value;
-      // console.log('value:', value);
-      // console.log('this state:', this.state.password);
       if (passwordCheck.length > 0 && this.state.password !== passwordCheck) {
         this.setState({ isAvailedPasswordCheck: '비밀번호가 일치하지 않습니다.' });
       } else {
@@ -86,45 +84,56 @@ export default class Mypage extends React.Component {
   };
 
   editUserInfo = () => {
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token()
-      .then((token) => {
-        console.log(
-          '수정할 데이터: ',
-          this.state.phoneNumber,
-          this.state.name,
-          this.state.password,
-        );
-        axios({
-          method: 'patch',
-          url: 'https://hj-medisharp.herokuapp.com/users',
-          headers: {
-            Authorization: token,
-          },
-          data: {
-            users: {
-              mobile: this.state.phoneNumber,
-              full_name: this.state.name,
-              password: this.state.password,
+    if (
+      this.state.isAvailedName === '' &&
+      this.state.isAvailedPhoneNumber === '' &&
+      this.state.isAvailedEmail === '' &&
+      this.state.isAvailedPassword === '' &&
+      this.state.isAvailedPasswordCheck === ''
+    ) {
+      async function get_token() {
+        const token = await getItem();
+        return token;
+      }
+      get_token()
+        .then((token) => {
+          console.log(
+            '수정할 데이터: ',
+            this.state.phoneNumber,
+            this.state.name,
+            this.state.password,
+          );
+          axios({
+            method: 'patch',
+            url: 'http://127.0.0.1:5000/users', //'https://hj-medisharp.herokuapp.com/users',
+            headers: {
+              Authorization: token,
             },
-          },
-        })
-          .then((data) => {
-            //삭제 후 다시  Mypage로 navigate되면서 API요청
-            this.props.navigation.navigate('Mypage', {
-              edit_user: data.data.results,
-            });
+            data: {
+              users: {
+                mobile: this.state.phoneNumber,
+                full_name: this.state.name,
+                password: this.state.password,
+              },
+            },
           })
-          .catch((err) => {
-            console.error(err);
-          });
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+            .then((data) => {
+              //삭제 후 다시  Mypage로 navigate
+              this.props.navigation.navigate('Mypage', {
+                edit_user: data.data.results,
+              });
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    } else {
+      //유효조건을 하나라도 만족하지 않으면 입력 확인해달라는 alert
+      Alert.alert('필수 입력조건을 만족해주세요.');
+    }
   };
 
   render() {
