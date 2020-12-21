@@ -85,6 +85,47 @@ export default class Mypage extends React.Component {
     }
   };
 
+  editUserInfo = () => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token()
+      .then((token) => {
+        console.log(
+          '수정할 데이터: ',
+          this.state.phoneNumber,
+          this.state.name,
+          this.state.password,
+        );
+        axios({
+          method: 'patch',
+          url: 'https://hj-medisharp.herokuapp.com/users',
+          headers: {
+            Authorization: token,
+          },
+          data: {
+            users: {
+              mobile: this.state.phoneNumber,
+              full_name: this.state.name,
+              password: this.state.password,
+            },
+          },
+        })
+          .then((data) => {
+            //삭제 후 다시  Mypage로 navigate되면서 API요청
+            console.log('결과: ', data.data.results);
+            // this.props.navigation.navigate('MedicineBox');
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
   render() {
     return (
       <View
@@ -184,28 +225,6 @@ export default class Mypage extends React.Component {
           </View>
           <Text style={styles.nonAvailableText}>{this.state.isAvailedPhoneNumber}</Text>
 
-          {/* -- 이메일 입력 뷰 -- */}
-          {/* <View
-            style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
-            }}
-          >
-            <Text style={styles.seclectText}>이메일 주소</Text>
-            <TextInput
-              style={styles.placeholderText}
-              placeholder="이메일 주소가 ID가 됩니다 :)"
-              placeholderTextColor={'gray'}
-              maxLength={30}
-              onChangeText={(useremailValue) => this.handleSignUpValue('useremail', useremailValue)}
-              defaultValue={this.state.useremail}
-            />
-          </View>
-          <Text style={styles.nonAvailableText}>{this.state.isAvailedEmail}</Text> */}
-
           {/* -- 이메일 뷰 -- */}
           <View
             style={{
@@ -279,11 +298,7 @@ export default class Mypage extends React.Component {
 
           {/* -- 확인 버튼 -- */}
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity
-              onPress={() => {
-                console.log('들어올 때는 마음대로였겠지만 나갈 때는 아니란다!');
-              }}
-            >
+            <TouchableOpacity onPress={this.editUserInfo}>
               <View
                 style={{
                   justifyContent: 'center',
