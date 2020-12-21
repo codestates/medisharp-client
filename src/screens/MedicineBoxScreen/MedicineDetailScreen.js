@@ -12,7 +12,9 @@ import {
 import { ScrollView } from 'react-native-gesture-handler';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { NavigationEvents } from 'react-navigation';
+
 import medisharpLogo from '../../img/medisharpLogo.png';
+
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
 
@@ -38,7 +40,7 @@ export default class MedicineDetailScreen extends React.Component {
       .then((token) => {
         axios({
           method: 'get',
-          url: 'http://127.0.0.1:5000/medicines/name', //'https://hj-medisharp.herokuapp.com/medicines/name',
+          url: 'http://127.0.0.1:5000/medicines/name',
           headers: {
             Authorization: token,
           },
@@ -50,7 +52,6 @@ export default class MedicineDetailScreen extends React.Component {
         })
           .then((data) => {
             let { name, effect, capacity, validity } = data.data.results[0];
-            console.log(name, effect, capacity, validity);
             if (Array.isArray(capacity)) {
               capacity = capacity.join('\n');
             }
@@ -73,6 +74,36 @@ export default class MedicineDetailScreen extends React.Component {
         console.error(err);
       });
   }
+
+  deletemymedicine = () => {
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token()
+      .then((token) => {
+        axios({
+          method: 'delete',
+          url: 'http://127.0.0.1:5000/medicines',
+          headers: {
+            Authorization: token,
+          },
+          params: {
+            id: this.state.item['id'],
+          },
+        })
+          .then((data) => {
+            //삭제 후 다시 약 현황 page로 navigate되면서 API요청
+            this.props.navigation.navigate('MedicineBox');
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   render() {
     if (this.state.isLoading === true) {
@@ -206,7 +237,7 @@ export default class MedicineDetailScreen extends React.Component {
 
             {/* -- 삭제하기 버튼 -- */}
             <View style={{ alignItems: 'center', marginLeft: -20 }}>
-              <TouchableOpacity onPress={() => console.log('삭제하기 눌려따!')}>
+              <TouchableOpacity onPress={this.deletemymedicine}>
                 <View
                   style={{
                     justifyContent: 'center',
