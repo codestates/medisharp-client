@@ -114,8 +114,9 @@ export default class Mypage extends React.Component {
         })
           .then((data) => {
             //삭제 후 다시  Mypage로 navigate되면서 API요청
-            console.log('결과: ', data.data.results);
-            // this.props.navigation.navigate('MedicineBox');
+            this.props.navigation.navigate('Mypage', {
+              edit_user: data.data.results,
+            });
           })
           .catch((err) => {
             console.error(err);

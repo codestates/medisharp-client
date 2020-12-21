@@ -55,7 +55,14 @@ export default class Mypage extends React.Component {
           paddingLeft: 20,
         }}
       >
-        <NavigationEvents onDidFocus={(payload) => {}} />
+        <NavigationEvents
+          onDidFocus={(payload) => {
+            if (this.props.navigation.getParam('edit_user')) {
+              let { email, full_name } = this.props.navigation.getParam('edit_user');
+              this.setState({ name: full_name, useremail: email });
+            }
+          }}
+        />
         <View>
           <Text
             style={{
