@@ -1,7 +1,11 @@
 import React from 'react';
+import axios from 'axios';
 import { View, Text, Dimensions, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { NavigationEvents } from 'react-navigation';
+
+import { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
@@ -9,11 +13,36 @@ export default class Mypage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: '현달이',
-      phoneNumber: '01082340420',
-      useremail: 'hdaleee91@gmail.com',
-      password: 'yagolim1!',
+      name: '',
+      useremail: '',
     };
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token()
+      .then((token) => {
+        axios({
+          method: 'get',
+          url: 'http://127.0.0.1:5000/users', //https://hj-medisharp.herokuapp.com/users',
+          headers: {
+            Authorization: token,
+          },
+        })
+          .then((data) => {
+            let { email, full_name } = data.data.results;
+            this.setState({
+              name: full_name,
+              useremail: email,
+            });
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
   render() {
@@ -81,29 +110,6 @@ export default class Mypage extends React.Component {
               이름
             </Text>
             <Text style={styles.placeholderText}>{this.state.name}</Text>
-          </View>
-
-          {/* -- 전화번호 뷰 -- */}
-          <View
-            style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
-            }}
-          >
-            <Text
-              style={{
-                paddingLeft: 10,
-                fontSize: 18,
-                fontWeight: 'bold',
-                color: '#6a9c90',
-              }}
-            >
-              전화번호
-            </Text>
-            <Text style={styles.placeholderText}>{this.state.phoneNumber}</Text>
           </View>
 
           {/* -- 이메일 뷰 -- */}
