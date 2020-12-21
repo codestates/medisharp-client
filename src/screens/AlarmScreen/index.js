@@ -11,6 +11,7 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -35,7 +36,18 @@ export default class AlarmScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      alarmMedicine: [],
+      alarmMedicine: [
+        {
+          name: '하이투벤',
+          image_dir:
+            'https://medisharp.s3.ap-northeast-2.amazonaws.com//43D997B1-DCC1-451F-B331-458580722917.jpg_L',
+          camera: true,
+          title: null,
+          effect: null,
+          capacity: null,
+          validity: null,
+        },
+      ],
       weekName: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
       nowHour: moment().format().substring(11, 13) + 12,
       nowMinute: moment().format().substring(14, 16),
@@ -66,6 +78,9 @@ export default class AlarmScreen extends React.Component {
         0,
       ),
       date: new Date(this.koreanStandardTime),
+      token: '',
+      medi_ids: [],
+      schedules_common_id: '',
     };
   }
 
@@ -138,140 +153,212 @@ export default class AlarmScreen extends React.Component {
     });
   };
 
-  postSchedules = () => {
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token()
-      .then((token) => {
-        console.log('medicines API token, ', token);
-        axios
-          .post(
-            'https://yag-olim-test-prod.herokuapp.com/medicines',
-            { medicine: this.state.alarmMedicine },
+  get_token = async () => {
+    const token = await getItem();
+    this.setState({ token: token });
+    console.log(token);
+  };
+
+  postMedi = () => {
+    return axios
+      .post(
+        'https://yag-olim-test-prod.herokuapp.com/medicines',
+        { medicine: this.state.alarmMedicine },
+        {
+          headers: {
+            Authorization: this.state.token,
+          },
+        },
+      )
+      .then((res) => {
+        this.setState({ medi_ids: res.data['medicine_id'] });
+      })
+      .catch((e) => {
+        console.log('error postmedi');
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
             {
-              headers: {
-                Authorization: token,
+              text: '다시시도하기',
+              onPress: async () => {
+                await this.postMedi();
               },
             },
-          )
-          .then((res) => {
-            console.log(res);
-            let medi_ids = res.data.medicine_id;
-            console.log('medicines API', medi_ids);
-            console.log('schedules-commons API token, ', token);
-            axios
-              .post(
-                'https://yag-olim-test-prod.herokuapp.com/schedules-commons',
-                {
-                  schedules_common: {
-                    title: this.state.alarmTitle,
-                    memo: this.state.alarmMemo,
-                    startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
-                    enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
-                    cycle: this.state.alarmInterval,
-                    time: `${this.state.selectedHour}:${this.state.selectedMinute}`,
-                  },
-                },
-                {
-                  headers: {
-                    Authorization: token,
-                  },
-                },
-              )
-              .then((res) => {
-                let schedules_common_id = res.data.results['new_schedules_common_id'];
-                let time = res.data.results['time'];
-                let startdate = res.data.results['startdate'];
-                let endtdate = res.data.results['enddate'];
-                let cycle = res.data.results['cycle'];
-                console.log('schedules date API', schedules_common_id, time, medi_ids);
-                axios
-                  .post(
-                    'https://yag-olim-test-prod.herokuapp.com/schedules-commons/schedules-dates',
-                    {
-                      schedules_common: {
-                        medicines_id: medi_ids,
-                        schedules_common_id: schedules_common_id,
-                        time: time,
-                        startdate: startdate,
-                        enddate: endtdate,
-                        cycle: cycle,
-                      },
-                    },
-                    {
-                      headers: {
-                        Authorization: token,
-                      },
-                    },
-                  )
-                  .then(() => {
-                    console.log('schedules common, schedules date API', token);
-                    axios
-                      .post(
-                        'https://yag-olim-test-prod.herokuapp.com/medicines/schedules-medicines',
-                        {
-                          schedules_common_medicines: {
-                            medicines_id: medi_ids,
-                            schedules_common_id: schedules_common_id,
-                          },
-                        },
-                        {
-                          headers: {
-                            Authorization: token,
-                          },
-                        },
-                      )
-                      .then(() => {
-                        console.log('schedules medicines, medicines API');
-                        axios
-                          .post(
-                            'https://yag-olim-test-prod.herokuapp.com/medicines/users-medicines',
-                            {
-                              medicines: {
-                                medicines_id: medi_ids,
-                              },
-                            },
-                            {
-                              headers: {
-                                Authorization: token,
-                              },
-                            },
-                          )
-                          .then(() => {
-                            console.log('medicines, user medicines API');
-                            this.setState({
-                              alarmTitle: '',
-                              alarmMemo: '',
-                              startYear: moment().format().substring(0, 4),
-                              startMonth: moment().format().substring(5, 7),
-                              startDate: moment().format().substring(8, 10),
-                              startDay: moment().format('dddd'),
-                              endYear: moment().format().substring(0, 4),
-                              endMonth: moment().format().substring(5, 7),
-                              endDate: moment().format().substring(8, 10),
-                              endDay: moment().format('dddd'),
-                              showTime: [],
-                              alarmInterval: 0,
-                              selectedHour: '',
-                              selectedMinute: '',
-                              alarmMedicine: [],
-                            });
-                            alarmMedicineGetParam = [];
-                            this.props.navigation.navigate('Calendar');
-                          })
-                          .catch((err) => console.log(err));
-                      })
-                      .catch((err) => console.log(err));
-                  })
-                  .catch((err) => console.log(err));
-              })
-              .catch((err) => console.log(err));
-          })
-          .catch((err) => console.error(err));
+          ],
+          { cancelable: false },
+        );
+      });
+  };
+
+  postScheduleCommon = () => {
+    return axios
+      .post(
+        'https://yag-olim-test-prod.herokuapp.com/schedules-commons',
+        {
+          schedules_common: {
+            title: this.state.alarmTitle,
+            memo: this.state.alarmMemo,
+            startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
+            enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
+            cycle: this.state.alarmInterval,
+          },
+        },
+        {
+          headers: {
+            Authorization: this.state.token,
+          },
+        },
+      )
+      .then((res) => {
+        this.setState({ schedules_common_id: res.data.results['new_schedules_common_id'] });
       })
-      .catch((err) => console.error(err));
+      .catch((e) => {
+        console.log('error schedules common');
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: async () => {
+                await this.postScheduleCommon();
+              },
+            },
+          ],
+          { cancelable: false },
+        );
+      });
+  };
+
+  postScheduleDate = () => {
+    return axios
+      .post(
+        'https://yag-olim-test-prod.herokuapp.com/schedules-commons/schedules-dates',
+        {
+          schedules_common: {
+            schedules_common_id: Number(this.state.schedules_common_id),
+            time: `${this.state.selectedHour}:${this.state.selectedMinute}`,
+            startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
+            enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
+            cycle: Number(this.state.alarmInterval),
+          },
+        },
+        {
+          headers: {
+            Authorization: this.state.token,
+          },
+        },
+      )
+      .catch((e) => {
+        console.log('error postScheduleDate');
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: () => this.postScheduleDate(),
+            },
+          ],
+          { cancelable: false },
+        );
+      });
+  };
+
+  postMediSchedId = () => {
+    return axios
+      .post(
+        'https://yag-olim-test-prod.herokuapp.com/medicines/schedules-medicines',
+        {
+          schedules_common_medicines: {
+            medicines_id: this.state.medi_ids,
+            schedules_common_id: Number(this.state.schedules_common_id),
+          },
+        },
+        {
+          headers: {
+            Authorization: this.state.token,
+          },
+        },
+      )
+      .catch((e) => {
+        console.log('error postMediSchedId');
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: () => this.postMediSchedId(),
+            },
+          ],
+          { cancelable: false },
+        );
+      });
+  };
+
+  postMediUId = () => {
+    return axios
+      .post(
+        'https://yag-olim-test-prod.herokuapp.com/medicines/users-medicines',
+        {
+          medicines: {
+            medicines_id: this.state.medi_ids,
+          },
+        },
+        {
+          headers: {
+            Authorization: this.state.token,
+          },
+        },
+      )
+      .catch((e) => {
+        console.log('error postMediUId');
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: () => this.postMediUId(),
+            },
+          ],
+          { cancelable: false },
+        );
+      });
+  };
+
+  postMeSCeUsId = () => {
+    return axios
+      .all([this.postScheduleDate(), this.postMediSchedId(), this.postMediUId()])
+      .then(async () => {
+        await this.setState({
+          alarmTitle: '',
+          alarmMemo: '',
+          startYear: moment().format().substring(0, 4),
+          startMonth: moment().format().substring(5, 7),
+          startDate: moment().format().substring(8, 10),
+          startDay: moment().format('dddd'),
+          endYear: moment().format().substring(0, 4),
+          endMonth: moment().format().substring(5, 7),
+          endDate: moment().format().substring(8, 10),
+          endDay: moment().format('dddd'),
+          showTime: [],
+          alarmInterval: 0,
+          selectedHour: '',
+          selectedMinute: '',
+          alarmMedicine: [],
+        });
+      });
+  };
+
+  postSchedules = async () => {
+    await this.get_token();
+    await this.postMedi();
+    await this.postScheduleCommon();
+    await this.postMeSCeUsId();
+    await this.props.navigation.navigate('Calendar');
   };
 
   render() {
