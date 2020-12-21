@@ -178,6 +178,7 @@ export default class Mypage extends React.Component {
               개인정보 수정
             </Text>
           </View>
+          <Text>수정할 정보를 입력하지 않으실 경우 기존의 정보로 유지됩니다.</Text>
         </View>
         <ScrollView>
           {/* -- 이름 입력 뷰 -- */}
