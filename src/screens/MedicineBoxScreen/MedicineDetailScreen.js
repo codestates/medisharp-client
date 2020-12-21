@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
@@ -31,77 +32,91 @@ export default class MedicineDetailScreen extends React.Component {
       MedicineCapacity: '',
       MedicineValidity: '',
       isLoading: true,
+      token: '',
     };
-    async function get_token() {
+    const get_token = async () => {
       const token = await getItem();
-      return token;
-    }
-    get_token()
-      .then((token) => {
-        axios({
-          method: 'get',
-          url: 'http://127.0.0.1:5000/medicines/name',
-          headers: {
-            Authorization: token,
-          },
-          params: {
-            id: this.state.item['id'],
-            name: this.state.item['name'],
-            camera: this.state.item['camera'],
-          },
-        })
-          .then((data) => {
-            let { name, effect, capacity, validity } = data.data.results[0];
-            if (Array.isArray(capacity)) {
-              capacity = capacity.join('\n');
-            }
-            if (Array.isArray(validity)) {
-              validity = validity.join('\n');
-            }
-            this.setState({
-              MedicineName: name,
-              MedicineEffect: effect, //camera인식된 약은 array형태, 직접입력한 약은 string
-              MedicineCapacity: capacity, //camera인식된 약은 array형태, 직접입력한 약은 string
-              MedicineValidity: validity,
-              isLoading: false,
-            });
-          })
-          .catch((err) => {
-            console.error(err);
-          });
+      this.setState({ token: token });
+    };
+
+    const getMediDetail = () => {
+      axios({
+        method: 'get',
+        url: 'https://yag-olim-test-prod.herokuapp.com/medicines/name',
+        headers: {
+          Authorization: this.state.token,
+        },
+        params: {
+          id: this.state.item['id'],
+          name: this.state.item['name'],
+          camera: this.state.item['camera'],
+        },
       })
-      .catch((err) => {
-        console.error(err);
-      });
+        .then((data) => {
+          let { name, effect, capacity, validity } = data.data.results[0];
+          if (Array.isArray(capacity)) {
+            capacity = capacity.join('\n');
+          }
+          if (Array.isArray(validity)) {
+            validity = validity.join('\n');
+          }
+          this.setState({
+            MedicineName: name,
+            MedicineEffect: effect, //camera인식된 약은 array형태, 직접입력한 약은 string
+            MedicineCapacity: capacity, //camera인식된 약은 array형태, 직접입력한 약은 string
+            MedicineValidity: validity,
+            isLoading: false,
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+          Alert.alert(
+            '에러가 발생했습니다!',
+            '다시 시도해주세요',
+            [
+              {
+                text: '다시시도하기',
+                onPress: () => getMediDetail(),
+              },
+            ],
+            { cancelable: false },
+          );
+        });
+    };
+
+    get_token().then(() => {
+      getMediDetail();
+    });
   }
 
   deletemymedicine = () => {
-    async function get_token() {
-      const token = await getItem();
-      return token;
-    }
-    get_token()
-      .then((token) => {
-        axios({
-          method: 'delete',
-          url: 'http://127.0.0.1:5000/medicines',
-          headers: {
-            Authorization: token,
-          },
-          params: {
-            id: this.state.item['id'],
-          },
-        })
-          .then((data) => {
-            //삭제 후 다시 약 현황 page로 navigate되면서 API요청
-            this.props.navigation.navigate('MedicineBox');
-          })
-          .catch((err) => {
-            console.error(err);
-          });
+    axios({
+      method: 'delete',
+      url: 'https://yag-olim-test-prod.herokuapp.com/medicines',
+      headers: {
+        Authorization: this.state.token,
+      },
+      params: {
+        id: this.state.item['id'],
+      },
+    })
+      .then((data) => {
+        //삭제 후 다시 약 현황 page로 navigate되면서 API요청
+        this.props.navigation.navigate('MedicineBox');
       })
       .catch((err) => {
         console.error(err);
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: () => this.deletemymedicine(),
+            },
+          ],
+          { cancelable: false },
+        );
       });
   };
 
