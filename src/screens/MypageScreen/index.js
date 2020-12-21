@@ -130,7 +130,7 @@ export default class Mypage extends React.Component {
                 color: '#6a9c90',
               }}
             >
-              이름
+              이메일
             </Text>
             <Text style={styles.placeholderText}>{this.state.useremail}</Text>
           </View>
