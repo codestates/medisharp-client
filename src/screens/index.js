@@ -28,6 +28,7 @@ const window = Dimensions.get('window');
 const MypageStack = createStackNavigator(
   {
     Mypage: MypageScreen,
+    LoginScreen: LoginScreen,
     EditMyinfoScreen: EditMyinfoScreen,
   },
   {

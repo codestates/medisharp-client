@@ -2,10 +2,10 @@ import React from 'react';
 import axios from 'axios';
 import { View, Text, Dimensions, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import { NavigationEvents } from 'react-navigation';
+import { StackActions, NavigationActions, NavigationEvents } from 'react-navigation';
 
 import { useAsyncStorage } from '@react-native-community/async-storage';
-const { getItem } = useAsyncStorage('@yag_olim');
+const { getItem, removeItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
 
@@ -44,6 +44,24 @@ export default class Mypage extends React.Component {
         console.error(err);
       });
   }
+
+  resetAction = StackActions.reset({
+    index: 0,
+    actions: [
+      NavigationActions.navigate({
+        routeName: 'LoginScreen',
+      }),
+    ],
+  });
+
+  logout = async () => {
+    try {
+      await removeItem();
+      this.props.navigation.dispatch(this.resetAction);
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   render() {
     return (
@@ -170,11 +188,7 @@ export default class Mypage extends React.Component {
 
           {/* -- 로그아웃 버튼 -- */}
           <View style={{ alignItems: 'center', marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity
-              onPress={() => {
-                constole.log('로그아웃 마치 내 월급');
-              }}
-            >
+            <TouchableOpacity onPress={this.logout}>
               <View
                 style={{
                   justifyContent: 'center',
