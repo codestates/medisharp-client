@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Dimensions, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Dimensions,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { LocaleConfig } from 'react-native-calendars';
 import axios from 'axios';
@@ -144,7 +152,17 @@ const CalendarMain = ({ navigation }) => {
           setMarkedDates(markedDateResult);
         })
         .catch((err) => {
-          console.error(err);
+          Alert.alert(
+            '에러가 발생했습니다!',
+            '다시 시도해주세요',
+            [
+              {
+                text: '다시시도하기',
+                onPress: () => useEffectForMonth(),
+              },
+            ],
+            { cancelable: false },
+          );
         });
     });
   };
@@ -171,7 +189,17 @@ const CalendarMain = ({ navigation }) => {
           setClickedList(data.data.results);
         })
         .catch((err) => {
-          console.error(err);
+          Alert.alert(
+            '에러가 발생했습니다!',
+            '다시 시도해주세요',
+            [
+              {
+                text: '다시시도하기',
+                onPress: () => useEffectForClicked(),
+              },
+            ],
+            { cancelable: false },
+          );
         });
     });
   };

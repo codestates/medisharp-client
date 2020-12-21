@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TouchableHighlightBase,
+  Alert,
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import axios from 'axios';
@@ -56,7 +57,7 @@ export default class CheckScreen extends React.Component {
     get_token()
       .then((token) => {
         axios
-          .post('http://127.0.0.1:5000/medicines/upload', this.state.form_data, {
+          .post('https://yag-olim-test-prod.herokuapp.com/medicines/upload', this.state.form_data, {
             headers: {
               'content-type': 'multipart/form-data',
               Authorization: token,
@@ -97,10 +98,34 @@ export default class CheckScreen extends React.Component {
               });
             }
           })
-          .catch((err) => console.log(err));
+          .catch((err) => {
+            console.log(err);
+            Alert.alert(
+              '에러가 발생했습니다!',
+              '다시 시도해주세요',
+              [
+                {
+                  text: '다시시도하기',
+                  onPress: () => this.redirectToAlarmScreen(),
+                },
+              ],
+              { cancelable: false },
+            );
+          });
       })
       .catch((err) => {
         console.error(err);
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: () => this.redirectToAlarmScreen(),
+            },
+          ],
+          { cancelable: false },
+        );
       });
   }
 
