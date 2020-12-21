@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from 'axios';
 import {
   View,
   Text,
@@ -10,23 +9,18 @@ import {
   ScrollView,
 } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-
 import { NavigationEvents } from 'react-navigation';
 
 const window = Dimensions.get('window');
 
-export default class SignUpScreen extends React.Component {
-  static navigationOptions = {
-    headerShown: false,
-  };
-
+export default class Mypage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: '',
-      phoneNumber: '',
-      useremail: '',
-      password: '',
+      name: this.props.navigation.getParam('name'),
+      phoneNumber: this.props.navigation.getParam('phoneNumber'),
+      useremail: this.props.navigation.getParam('useremail'),
+      password: this.props.navigation.getParam('password'),
       passwordCheck: '',
       isAvailedName: '',
       isAvailedPhoneNumber: '',
@@ -46,7 +40,7 @@ export default class SignUpScreen extends React.Component {
         });
       } else {
         this.setState({ isAvailedName: '' });
-        this.setState({ name: value });
+        this.setState({ [key]: value });
       }
     }
     if (key === 'phoneNumber') {
@@ -58,32 +52,30 @@ export default class SignUpScreen extends React.Component {
         });
       } else {
         this.setState({ isAvailedPhoneNumber: '' });
-        this.setState({ phoneNumber: value });
+        this.setState({ [key]: value });
       }
     }
     if (key === 'useremail') {
       var emailreg = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
       var useremail = value;
-      this.setState({ useremail: useremail });
-      var check = emailreg.test(useremail);
-      if (useremail.length > 0 && check === false) {
+      this.setState({ [key]: useremail });
+      if (useremail.length > 0 && false === emailreg.test(useremail)) {
         this.setState({ isAvailedEmail: '올바른 이메일 형식이 아닙니다.' });
       } else {
         this.setState({ isAvailedEmail: '' });
         axios({
-          method: 'get',
-          url: 'https://yag-olim-test-prod.herokuapp.com/users/email',
-          params: {
-            email: useremail,
+          method: 'post',
+          url: '',
+          data: {
+            useremail: value,
           },
         })
           .then((res) => {
-            console.log(res.data);
-            if (res.data['status'] === 'OK') {
-              this.setState({ isAvailedEmail: '' });
-              this.setState({ key: useremail });
-            } else {
+            if (res.data !== null) {
               this.setState({ isAvailedEmail: '이미 존재하는 email입니다.' });
+            } else {
+              this.setState({ isAvailedEmail: '' });
+              this.setState({ [key]: useremail });
             }
           })
           .catch((err) => {
@@ -99,41 +91,19 @@ export default class SignUpScreen extends React.Component {
           isAvailedPassword: '비밀번호는 8~16자이어야 하며, 숫자/소문자를 모두 포함해야 합니다.',
         });
       } else {
-        console.log(value);
         this.setState({ isAvailedPassword: '' });
-        this.setState({ password: value });
+        this.setState({ [key]: value });
       }
     }
     if (key === 'passwordCheck') {
       var passwordCheck = value;
-      console.log('value:', value);
-      console.log('this state:', this.state.password);
       if (passwordCheck.length > 0 && this.state.password !== passwordCheck) {
         this.setState({ isAvailedPasswordCheck: '비밀번호가 일치하지 않습니다.' });
       } else {
         this.setState({ isAvailedPasswordCheck: '' });
-        this.setState({ passwordCheck: value });
+        this.setState({ [key]: value });
       }
     }
-  };
-
-  onSignUp = () => {
-    axios
-      .post('https://yag-olim-test-prod.herokuapp.com/users/signup', {
-        users: {
-          email: this.state.useremail,
-          password: this.state.password,
-          full_name: this.state.name,
-          mobile: this.state.phoneNumber,
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-        this.props.navigation.navigate('LoginScreen');
-      })
-      .catch((e) => {
-        console.log(e);
-      });
   };
 
   render() {
@@ -142,7 +112,7 @@ export default class SignUpScreen extends React.Component {
         style={{
           backgroundColor: 'white',
           paddingTop: getStatusBarHeight(),
-          height: window.height,
+          height: window.height * 0.92 - 1,
           paddingLeft: 20,
         }}
       >
@@ -175,7 +145,7 @@ export default class SignUpScreen extends React.Component {
                 paddingBottom: 5,
               }}
             >
-              회원 가입
+              개인정보 수정
             </Text>
           </View>
         </View>
@@ -230,7 +200,7 @@ export default class SignUpScreen extends React.Component {
               onChangeText={(phoneNumberValue) =>
                 this.handleSignUpValue('phoneNumber', phoneNumberValue)
               }
-              defaultValue={this.state.phone}
+              defaultValue={this.state.phoneNumber}
             />
           </View>
           <Text style={styles.nonAvailableText}>{this.state.isAvailedPhoneNumber}</Text>
@@ -252,7 +222,7 @@ export default class SignUpScreen extends React.Component {
               placeholderTextColor={'gray'}
               maxLength={30}
               onChangeText={(useremailValue) => this.handleSignUpValue('useremail', useremailValue)}
-              defaultValue={this.state.eMail}
+              defaultValue={this.state.useremail}
             />
           </View>
           <Text style={styles.nonAvailableText}>{this.state.isAvailedEmail}</Text>
@@ -309,7 +279,7 @@ export default class SignUpScreen extends React.Component {
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
             <TouchableOpacity
               onPress={() => {
-                this.onSignUp();
+                console.log('들어올 때는 마음대로였겠지만 나갈 때는 아니란다!');
               }}
             >
               <View
@@ -323,7 +293,7 @@ export default class SignUpScreen extends React.Component {
                   borderRadius: 20,
                 }}
               >
-                <Text style={{ fontSize: 20, color: 'white' }}>가입하기</Text>
+                <Text style={{ fontSize: 20, color: 'white' }}>변경하기</Text>
               </View>
             </TouchableOpacity>
           </View>

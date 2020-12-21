@@ -23,7 +23,6 @@ const window = Dimensions.get('window');
 export default class MedicineDetailScreen extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       item: this.props.navigation.getParam('MedicineData'),
       MedicineName: '',

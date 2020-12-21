@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 
@@ -40,7 +41,7 @@ export default class FindId extends React.Component {
         });
       } else {
         this.setState({ isAvailedName: '' });
-        this.setState({ [key]: value });
+        this.setState({ name: value });
       }
     }
     if (key === 'phoneNumber') {
@@ -52,10 +53,48 @@ export default class FindId extends React.Component {
         });
       } else {
         this.setState({ isAvailedPhoneNumber: '' });
-        this.setState({ [key]: value });
+        this.setState({ phoneNumber: value });
       }
     }
   };
+
+  createThreeButtonAlert = (mail) => {
+    Alert.alert(
+      '약올림에 등록된 이메일 : ',
+      `${mail}`,
+      [
+        {
+          text: 'OK',
+          onPress: () => this.props.navigation.navigate('LoginScreen'),
+        },
+        {
+          text: '회원가입 할래요',
+          onPress: () => this.props.navigation.navigate('SignUpScreen'),
+        },
+        { text: '다시 찾을래요', onPress: () => console.log('다시 찾을래요') },
+      ],
+      { cancelable: false },
+    );
+  };
+
+  onFindId() {
+    axios({
+      method: 'get',
+      url: 'https://yag-olim-test-prod.herokuapp.com/users/email',
+      params: {
+        full_name: this.state.name,
+        mobile: this.state.phoneNumber,
+      },
+    })
+      .then((data) => {
+        console.log(data.data.email);
+        const userEmail = data.data.email;
+        this.createThreeButtonAlert(userEmail).bind(this);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
 
   render() {
     return (
@@ -160,7 +199,7 @@ export default class FindId extends React.Component {
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
             <TouchableOpacity
               onPress={() => {
-                console.log('아이디를 이자무써!');
+                this.onFindId();
               }}
             >
               <View

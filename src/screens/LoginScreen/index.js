@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import axios from 'axios';
 
 import SocialWebviewModal from './SocialWebviewModal';
 import { useAsyncStorage } from '@react-native-community/async-storage';
@@ -22,11 +23,20 @@ export default class LoginScreen extends Component {
     };
   }
 
+  set = async (data) => {
+    try {
+      console.log('success token');
+      await setItem(data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   read = async () => {
     try {
       const value = await getItem();
       if (value) {
-        //console.log('success');
+        console.log('success');
         console.log(value);
         this.props.navigation.replace('TabNavigator');
       }
@@ -43,13 +53,12 @@ export default class LoginScreen extends Component {
     //await removeItem();
   };
 
-  //일반 로그인을 위해 필요한 부분. 서버는 아직 구현하지 못했지만, 클라는 소셜로그인 API 진행하는 겸사 구현하겠습니다.
   onEmailChange(email) {
-    this.setState({ email });
+    this.setState({ email: email });
   }
 
   onPasswordChange(password) {
-    this.setState({ password });
+    this.setState({ password: password });
   }
 
   //소셜 로그인
@@ -75,23 +84,23 @@ export default class LoginScreen extends Component {
   };
 
   // 일반 로그인
-  // onPressLogin() {
-  //   axios({
-  //     method: 'get',
-  //     url: 'http://localhost:5000/users',
-  //     data: {
-  //       email: this.state.email,
-  //       password: this.state.password,
-  //     },
-  //   }).then((data) => {
-  //     console.log(data);
-  //   });
-  //   //.then(onSuccess)
-  //   //.catch(onFailure);
-  // }
-
   doLogin() {
-    this.props.navigation.replace('TabNavigator');
+    axios
+      .post('https://yag-olim-test-prod.herokuapp.com/users/login', {
+        users: {
+          email: this.state.email,
+          password: this.state.password,
+        },
+      })
+      .then((res) => {
+        console.log(res.data.Authorization);
+        const user_token = res.data.Authorization;
+        this.set(user_token);
+        this.read();
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   }
 
   render() {
@@ -113,7 +122,7 @@ export default class LoginScreen extends Component {
             placeholder={'e-mail'}
             autoCapitalize="none"
             autoCorrect={false}
-            onChangeText={this.onEmailChange}
+            onChangeText={(emailValue) => this.setState({ email: emailValue })}
             underlineColorAndroid="transparent"
             placeholderTextColor="#999"
             style={{
@@ -130,9 +139,8 @@ export default class LoginScreen extends Component {
           <TextInput
             autoCompleteType={'password'}
             placeholder={'password'}
-            keyboardType={'visible-password'}
             secureTextEntry={true}
-            onChangeText={this.onPasswordChange}
+            onChangeText={(passwordValue) => this.setState({ password: passwordValue })}
             underlineColorAndroid="transparent"
             placeholderTextColor="#999"
             style={{

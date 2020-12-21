@@ -23,6 +23,7 @@ const window = Dimensions.get('window');
 
 const MedicineBox = ({ navigation }) => {
   const [myMedicines, setMyMedicines] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     useEffectForMedicines();
@@ -43,6 +44,7 @@ const MedicineBox = ({ navigation }) => {
       })
         .then((data) => {
           setMyMedicines(data.data.results);
+          setIsLoading(false);
         })
         .catch((err) => {
           console.error(err);
@@ -68,9 +70,9 @@ const MedicineBox = ({ navigation }) => {
     setSelfTabSelected(!selfTabSelected);
   };
 
-  console.log('MyMedicine배열길이: ', myMedicines, myMedicines.length);
+  //console.log('MyMedicine배열길이: ', myMedicines, myMedicines.length);
 
-  if (myMedicines.length === 0) {
+  if (isLoading === true) {
     //로딩
     return (
       <View style={styles.loginContainer}>
@@ -158,8 +160,7 @@ const MedicineBox = ({ navigation }) => {
               <View>
                 <TouchableOpacity
                   onPress={() => {
-                    //빈배열로 초기화
-                    setMyMedicines([]);
+                    setIsLoading(true);
                     navigation.navigate('MedicineDetail', { MedicineData: item });
                   }}
                 >
@@ -269,8 +270,7 @@ const MedicineBox = ({ navigation }) => {
               <View>
                 <TouchableOpacity
                   onPress={() => {
-                    //빈배열로 초기화
-                    setMyMedicines([]);
+                    setIsLoading(true);
                     navigation.navigate('MedicineDetail', { MedicineData: item });
                   }}
                 >
