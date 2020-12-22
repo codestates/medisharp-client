@@ -17,6 +17,69 @@ export default class CheckScreen extends React.Component {
     this.state = {};
   }
 
+  deleteWholeSchedules = () => {
+    console.log('전체 삭제하기 눌려따!');
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios
+        .delete(
+          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+          {
+            schedules_common: {
+              schedules_common_id: this.state.schedules_common_id,
+            },
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
+        .then((res) => {
+          console.log('전체 알람 일정 삭제 완료: ', res.data.message);
+          this.props.navigation.navigate('Calendar'); //삭제 후 calendarpage로 리다이렉트
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
+  };
+
+  deleteClickedSchedules = () => {
+    console.log('해당 날짜 알람 삭제하기 눌려따!');
+    async function get_token() {
+      const token = await getItem();
+      return token;
+    }
+    get_token().then((token) => {
+      axios
+        .delete(
+          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+          {
+            schedules_common: {
+              schedules_common_id: this.state.schedules_common_id,
+              date: this.state.clickedDate,
+            },
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
+        .then((res) => {
+          console.log('해당 날짜 알람 삭제 완료: ', res.data.message);
+          this.props.navigation.navigate('Calendar'); //삭제 후 calendarpage로 리다이렉트
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
+  };
+
   render() {
     return (
       <View
@@ -79,7 +142,7 @@ export default class CheckScreen extends React.Component {
           >
             <TouchableOpacity
               onPress={() => {
-                console.log('이 알람만 삭제되었다!');
+                this.deleteClickedSchedules;
               }}
               style={{
                 marginTop: 10,
@@ -100,7 +163,7 @@ export default class CheckScreen extends React.Component {
 
             <TouchableOpacity
               onPress={() => {
-                console.log('모든 알람이 삭제되었다!');
+                this.deleteWholeSchedules;
               }}
               style={{
                 marginTop: 10,
