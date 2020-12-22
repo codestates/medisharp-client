@@ -21,7 +21,7 @@ export default class LoadingScreen extends Component {
       .then((token) => {
         axios({
           method: 'get',
-          url: 'https://hj-medisharp.herokuapp.com/users/isloading',
+          url: 'http://127.0.0.1:5000/users/isloading',
         })
           .then(() => {
             if (token) {

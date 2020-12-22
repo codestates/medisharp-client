@@ -40,7 +40,7 @@ export default class MedicineDetailScreen extends React.Component {
       .then((token) => {
         axios({
           method: 'get',
-          url: 'https://hj-medisharp.herokuapp.com/medicines/name',
+          url: 'http://127.0.0.1:5000/medicines/name',
           headers: {
             Authorization: token,
           },
@@ -84,7 +84,7 @@ export default class MedicineDetailScreen extends React.Component {
       .then((token) => {
         axios({
           method: 'delete',
-          url: 'https://hj-medisharp.herokuapp.com/medicines',
+          url: 'http://127.0.0.1:5000/medicines',
           headers: {
             Authorization: token,
           },
