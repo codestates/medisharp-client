@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { WebView } from 'react-native-webview';
+import { View, Image, StyleSheet, SafeAreaView } from 'react-native';
 
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { setItem } = useAsyncStorage('@yag_olim');
@@ -46,6 +47,7 @@ export default class LoginScreen extends Component {
         //ref={this._refWebView}
         originWhitelist={['*']}
         injectedJavaScript={this.INJECTED_JAVASCRIPT}
+        useWebKit={true}
         source={this.props.source}
         javaScriptEnabled={true}
         onMessage={this._handleMessage}

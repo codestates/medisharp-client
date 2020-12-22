@@ -30,14 +30,14 @@ export default class LoadingScreen extends Component {
   };
 
   async componentDidMount() {
-    //await removeItem();
-    await this.read();
-    if (this.state.isAuthorized === true) {
-      this.props.navigation.replace('TabNavigator');
-    } else {
-      this.props.navigation.replace('LoginScreen');
-    }
-    //this.props.navigation.replace('LoginScreen');
+    await removeItem();
+    // await this.read();
+    // if (this.state.isAuthorized === true) {
+    //   this.props.navigation.replace('TabNavigator');
+    // } else {
+    //   this.props.navigation.replace('LoginScreen');
+    // }
+    this.props.navigation.replace('LoginScreen');
   }
 
   render() {
