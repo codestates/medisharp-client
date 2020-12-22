@@ -61,7 +61,7 @@ const CalendarMain = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/schedules-dates/check/month',
+        url: 'https://yag-olim-test-stage2.herokuapp.com/schedules-dates/check/month',
         headers: {
           Authorization: token,
         },
@@ -176,7 +176,7 @@ const CalendarMain = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
+        url: `https://yag-olim-test-stage2.herokuapp.com/schedules-dates/schedules-commons/alarm`,
         headers: {
           Authorization: token,
         },

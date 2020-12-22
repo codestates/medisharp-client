@@ -32,7 +32,7 @@ export default class CheckScreen extends React.Component {
       .then((token) => {
         axios({
           method: 'delete',
-          url: 'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+          url: 'hhttps://yag-olim-test-stage2.herokuapp.com/schedules-commons/schedules-dates',
           headers: {
             Authorization: token,
           },
@@ -84,7 +84,7 @@ export default class CheckScreen extends React.Component {
       .then((token) => {
         axios({
           method: 'delete',
-          url: 'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+          url: 'hhttps://yag-olim-test-stage2.herokuapp.com/schedules-commons/schedules-dates',
           headers: {
             Authorization: token,
           },
