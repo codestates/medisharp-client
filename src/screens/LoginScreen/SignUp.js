@@ -72,7 +72,7 @@ export default class SignUpScreen extends React.Component {
         this.setState({ isAvailedEmail: '' });
         axios({
           method: 'get',
-          url: 'https://yag-olim-test-prod.herokuapp.com/users/email',
+          url: 'https://hj-medisharp.herokuapp.com/users/email',
           params: {
             email: useremail,
           },
@@ -119,7 +119,7 @@ export default class SignUpScreen extends React.Component {
 
   onSignUp = () => {
     axios
-      .post('https://yag-olim-test-prod.herokuapp.com/users/signup', {
+      .post('https://hj-medisharp.herokuapp.com/users/signup', {
         users: {
           email: this.state.useremail,
           password: this.state.password,

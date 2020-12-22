@@ -148,7 +148,7 @@ export default class AlarmScreen extends React.Component {
         console.log('medicines API token, ', token);
         axios
           .post(
-            'https://yag-olim-test-prod.herokuapp.com/medicines',
+            'https://hj-medisharp.herokuapp.com/medicines',
             { medicine: this.state.alarmMedicine },
             {
               headers: {
@@ -163,7 +163,7 @@ export default class AlarmScreen extends React.Component {
             console.log('schedules-commons API token, ', token);
             axios
               .post(
-                'https://yag-olim-test-prod.herokuapp.com/schedules-commons',
+                'https://hj-medisharp.herokuapp.com/schedules-commons',
                 {
                   schedules_common: {
                     title: this.state.alarmTitle,
@@ -189,7 +189,7 @@ export default class AlarmScreen extends React.Component {
                 console.log('schedules date API', schedules_common_id, time, medi_ids);
                 axios
                   .post(
-                    'https://yag-olim-test-prod.herokuapp.com/schedules-commons/schedules-dates',
+                    'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
                     {
                       schedules_common: {
                         medicines_id: medi_ids,
@@ -210,7 +210,7 @@ export default class AlarmScreen extends React.Component {
                     console.log('schedules common, schedules date API', token);
                     axios
                       .post(
-                        'https://yag-olim-test-prod.herokuapp.com/medicines/schedules-medicines',
+                        'https://hj-medisharp.herokuapp.com/medicines/schedules-medicines',
                         {
                           schedules_common_medicines: {
                             medicines_id: medi_ids,
@@ -227,7 +227,7 @@ export default class AlarmScreen extends React.Component {
                         console.log('schedules medicines, medicines API');
                         axios
                           .post(
-                            'https://yag-olim-test-prod.herokuapp.com/medicines/users-medicines',
+                            'https://hj-medisharp.herokuapp.com/medicines/users-medicines',
                             {
                               medicines: {
                                 medicines_id: medi_ids,

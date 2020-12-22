@@ -64,7 +64,7 @@ export default class AlarmUpdateScreen extends React.Component {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://yag-olim-test-prod.herokuapp.com/schedules-commons',
+        url: 'https://hj-medisharp.herokuapp.com/schedules-commons',
         headers: {
           Authorization: token,
         },
@@ -94,7 +94,7 @@ export default class AlarmUpdateScreen extends React.Component {
 
           axios({
             method: 'get',
-            url: 'https://yag-olim-test-prod.herokuapp.com/medicines',
+            url: 'https://hj-medisharp.herokuapp.com/medicines',
             headers: {
               Authorization: token,
             },
@@ -127,7 +127,7 @@ export default class AlarmUpdateScreen extends React.Component {
       .then((token) => {
         axios
           .post(
-            'https://yag-olim-test-prod.herokuapp.com/medicines',
+            'https://hj-medisharp.herokuapp.com/medicines',
             { medicine: this.state.medicines },
             {
               headers: {
@@ -142,7 +142,7 @@ export default class AlarmUpdateScreen extends React.Component {
             schedules_common_id = this.state.schedules_common_id;
             axios
               .patch(
-                'https://yag-olim-test-prod.herokuapp.com/schedules-commons',
+                'https://hj-medisharp.herokuapp.com/schedules-commons',
                 {
                   schedules_common: {
                     schedules_common_id: schedules_common_id,
@@ -168,7 +168,7 @@ export default class AlarmUpdateScreen extends React.Component {
                 console.log('cycle:', cycle, typeof cycle);
                 axios
                   .patch(
-                    'https://yag-olim-test-prod.herokuapp.com/schedules-commons/schedules-dates',
+                    'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
                     {
                       schedules_common: {
                         medicines_id: medi_ids,
@@ -189,7 +189,7 @@ export default class AlarmUpdateScreen extends React.Component {
                     console.log('schedules common, schedules date API');
                     axios
                       .post(
-                        'https://yag-olim-test-prod.herokuapp.com/medicines/schedules-medicines',
+                        'https://hj-medisharp.herokuapp.com/medicines/schedules-medicines',
                         {
                           schedules_common_medicines: {
                             medicines_id: medi_ids,
@@ -206,7 +206,7 @@ export default class AlarmUpdateScreen extends React.Component {
                         console.log('schedules medicines, medicines API');
                         axios
                           .post(
-                            'https://yag-olim-test-prod.herokuapp.com/medicines/users-medicines',
+                            'https://hj-medisharp.herokuapp.com/medicines/users-medicines',
                             {
                               medicines: {
                                 medicines_id: medi_ids,
@@ -243,7 +243,7 @@ export default class AlarmUpdateScreen extends React.Component {
     get_token().then((token) => {
       axios
         .patch(
-          'https://yag-olim-test-prod.herokuapp.com/schedules-dates/check',
+          'https://hj-medisharp.herokuapp.com/schedules-dates/check',
           {
             schedules_common: {
               schedules_common_id: this.state.schedules_common_id,

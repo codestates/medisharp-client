@@ -80,7 +80,7 @@ export default class FindId extends React.Component {
   onFindId() {
     axios({
       method: 'get',
-      url: 'https://yag-olim-test-prod.herokuapp.com/users/email',
+      url: 'https://hj-medisharp.herokuapp.com/users/email',
       params: {
         full_name: this.state.name,
         mobile: this.state.phoneNumber,

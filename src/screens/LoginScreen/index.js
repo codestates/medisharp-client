@@ -65,7 +65,7 @@ export default class LoginScreen extends Component {
   onPressSocial = async (social) => {
     this.setState({
       socialModalVisible: !this.state.socialModalVisible,
-      source: `https://yag-olim-test-prod.herokuapp.com/users/oauth/${social}`,
+      source: `https://hj-medisharp.herokuapp.com/users/oauth/${social}`,
     });
   };
 
@@ -86,7 +86,7 @@ export default class LoginScreen extends Component {
   // 일반 로그인
   doLogin() {
     axios
-      .post('https://yag-olim-test-prod.herokuapp.com/users/login', {
+      .post('https://hj-medisharp.herokuapp.com/users/login', {
         users: {
           email: this.state.email,
           password: this.state.password,

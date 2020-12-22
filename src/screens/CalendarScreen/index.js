@@ -53,7 +53,7 @@ const CalendarMain = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://yag-olim-test-prod.herokuapp.com/schedules-dates/check/month',
+        url: 'https://hj-medisharp.herokuapp.com/schedules-dates/check/month',
         headers: {
           Authorization: token,
         },
@@ -158,7 +158,7 @@ const CalendarMain = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: `https://yag-olim-test-prod.herokuapp.com/schedules-dates/schedules-commons/alarm`,
+        url: `https://hj-medisharp.herokuapp.com/schedules-dates/schedules-commons/alarm`,
         //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,

@@ -74,7 +74,7 @@ export default class FindPw extends React.Component {
   onFindPw() {
     axios({
       method: 'get',
-      url: 'https://yag-olim-test-prod.herokuapp.com/users/id',
+      url: 'https://hj-medisharp.herokuapp.com/users/id',
       params: {
         email: this.state.useremail,
       },
@@ -83,7 +83,7 @@ export default class FindPw extends React.Component {
         console.log(data.data.results);
         let res_edit = data.data.results;
         axios
-          .patch('https://yag-olim-test-prod.herokuapp.com/users/password', {
+          .patch('https://hj-medisharp.herokuapp.com/users/password', {
             users: {
               id: res_edit['id'],
               password: res_edit['password'],

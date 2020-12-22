@@ -53,7 +53,7 @@ export default class CheckScreen extends React.Component {
     }
     get_token().then((token) => {
       axios
-        .post('https://yag-olim-test-stage2.herokuapp.com/medicines/upload', this.state.form_data, {
+        .post('https://hj-medisharp.herokuapp.com/medicines/upload', this.state.form_data, {
           headers: {
             'content-type': 'multipart/form-data',
             Authorization: token,
