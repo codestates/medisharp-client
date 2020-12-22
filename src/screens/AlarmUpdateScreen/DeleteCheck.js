@@ -5,6 +5,9 @@ import axios from 'axios';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { NavigationEvents } from 'react-navigation';
 
+import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-storage';
+const { getItem } = useAsyncStorage('@yag_olim');
+
 const window = Dimensions.get('window');
 
 export default class CheckScreen extends React.Component {
@@ -14,70 +17,71 @@ export default class CheckScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      schedules_common_id: this.props.navigation.getParam('schedules_common_id'),
+      clickedDate: this.props.navigation.getParam('clickedDate'),
+    };
   }
 
   deleteWholeSchedules = () => {
-    console.log('전체 삭제하기 눌려따!');
     async function get_token() {
       const token = await getItem();
       return token;
     }
-    get_token().then((token) => {
-      axios
-        .delete(
-          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
-          {
-            schedules_common: {
-              schedules_common_id: this.state.schedules_common_id,
-            },
+    get_token()
+      .then((token) => {
+        axios({
+          method: 'delete',
+          url: 'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+          headers: {
+            Authorization: token,
           },
-          {
-            headers: {
-              Authorization: token,
-            },
+          params: {
+            schedules_common_id: this.state.schedules_common_id,
           },
-        )
-        .then((res) => {
-          console.log('전체 알람 일정 삭제 완료: ', res.data.message);
-          this.props.navigation.navigate('Calendar'); //삭제 후 calendarpage로 리다이렉트
         })
-        .catch((err) => {
-          console.error(err);
-        });
-    });
+          .then((res) => {
+            console.log('전체 알람 일정 삭제 완료: ', res.data.message);
+            this.props.navigation.navigate('Calendar'); //삭제 후 calendarpage로 리다이렉트
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   deleteClickedSchedules = () => {
-    console.log('해당 날짜 알람 삭제하기 눌려따!');
     async function get_token() {
       const token = await getItem();
       return token;
     }
-    get_token().then((token) => {
-      axios
-        .delete(
-          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
-          {
-            schedules_common: {
-              schedules_common_id: this.state.schedules_common_id,
-              date: this.state.clickedDate,
-            },
+    get_token()
+      .then((token) => {
+        axios({
+          method: 'delete',
+          url: 'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
+          headers: {
+            Authorization: token,
           },
-          {
-            headers: {
-              Authorization: token,
-            },
+          params: {
+            schedules_common_id: this.state.schedules_common_id,
+            date: this.state.clickedDate,
           },
-        )
-        .then((res) => {
-          console.log('해당 날짜 알람 삭제 완료: ', res.data.message);
-          this.props.navigation.navigate('Calendar'); //삭제 후 calendarpage로 리다이렉트
         })
-        .catch((err) => {
-          console.error(err);
-        });
-    });
+          .then((res) => {
+            console.log('해당 날짜 알람 삭제 완료: ', res.data.message);
+            this.props.navigation.navigate('Calendar'); //삭제 후 calendarpage로 리다이렉트
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   render() {
@@ -141,9 +145,7 @@ export default class CheckScreen extends React.Component {
             }}
           >
             <TouchableOpacity
-              onPress={() => {
-                this.deleteClickedSchedules;
-              }}
+              onPress={this.deleteClickedSchedules}
               style={{
                 marginTop: 10,
                 width: window.width * 0.42,
@@ -162,9 +164,7 @@ export default class CheckScreen extends React.Component {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => {
-                this.deleteWholeSchedules;
-              }}
+              onPress={this.deleteWholeSchedules}
               style={{
                 marginTop: 10,
                 width: window.width * 0.42,

@@ -756,7 +756,10 @@ export default class AlarmUpdateScreen extends React.Component {
             {/* -- 삭제하기 분기페이지로 슝! -- */}
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('DeleteCheck');
+                this.props.navigation.navigate('DeleteCheck', {
+                  schedules_common_id: this.state.schedules_common_id,
+                  clickedDate: this.state.clickedDate,
+                });
               }}
             >
               <View
