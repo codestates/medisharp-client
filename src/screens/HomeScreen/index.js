@@ -1,31 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
-import { View, Text, Dimensions, FlatList, StyleSheet, ScrollView, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  Dimensions,
+  FlatList,
+  StyleSheet,
+  ScrollView,
+  Button,
+  Platform,
+} from 'react-native';
 import CountdownTimer from '../../components/CountdownTimer';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-
+import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
+import * as Permissions from 'expo-permissions';
 import Alarm from '../../components/Alarm';
 import { useAsyncStorage } from '@react-native-community/async-storage';
-
 import { NavigationEvents } from 'react-navigation';
 const { getItem } = useAsyncStorage('@yag_olim');
-
 const window = Dimensions.get('window');
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 const HomeScreen = ({ navigation }) => {
   const [fakeGetTodayChecked, setfakeGetTodayChecked] = useState([]);
   const [alarmList, setTodayAlarm] = useState([]);
+  const [expoPushToken, setExpoPushToken] = useState('');
   const useEffectForToday = () => {
     async function get_token() {
       const token = await getItem();
       return token;
     }
-
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/schedules-dates/check/today',
+        url: 'https://hj-medisharp.herokuapp.com/schedules-dates/check/today',
+        //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,
         },
@@ -39,23 +56,12 @@ const HomeScreen = ({ navigation }) => {
         })
         .catch((err) => {
           console.error(err);
-          Alert.alert(
-            '에러가 발생했습니다!',
-            '다시 시도해주세요',
-            [
-              {
-                text: '다시시도하기',
-                onPress: () => useEffectForToday(),
-              },
-            ],
-            { cancelable: false },
-          );
         });
-
       get_token().then((token) => {
         axios({
           method: 'get',
-          url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
+          url: `https://hj-medisharp.herokuapp.com/schedules-dates/schedules-commons/alarm`,
+          //https://yag-ollim.herokuapp.com/ -> 배포용 주소
           headers: {
             Authorization: token,
           },
@@ -68,26 +74,17 @@ const HomeScreen = ({ navigation }) => {
           })
           .catch((err) => {
             console.error(err);
-            Alert.alert(
-              '에러가 발생했습니다!',
-              '다시 시도해주세요',
-              [
-                {
-                  text: '다시시도하기',
-                  onPress: () => useEffectForToday(),
-                },
-              ],
-              { cancelable: false },
-            );
           });
       });
     });
   };
-
   useEffect(() => {
     useEffectForToday();
   }, []);
 
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
   const totalCount = fakeGetTodayChecked.length;
   const checkCounting = function () {
     let cnt = 0;
@@ -97,7 +94,6 @@ const HomeScreen = ({ navigation }) => {
     return cnt;
   };
   const checkCount = checkCounting();
-
   return (
     <View
       style={{
@@ -230,6 +226,18 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
+async function registerForPushNotificationsAsync() {
+  if (Constants.isDevice) {
+    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+    console.log('status: ', status);
+    if (status !== 'granted') {
+      alert('설정에서 push 알람 권한을 허용해주세요.');
+    }
+  } else {
+    alert('푸쉬알람은 모바일 기기에서만 가능합니다.');
+  }
+  return;
+}
 const styles = StyleSheet.create({
   HomeAlarmList: {
     flex: 1,
@@ -270,5 +278,4 @@ const styles = StyleSheet.create({
     color: '#313131',
   },
 });
-
 export default HomeScreen;
