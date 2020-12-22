@@ -80,7 +80,7 @@ export default class FindId extends React.Component {
   onFindId() {
     axios({
       method: 'get',
-      url: 'https://yag-olim-test-prod.herokuapp.com/users/email',
+      url: 'http://127.0.0.1:5000/users/email',
       params: {
         full_name: this.state.name,
         mobile: this.state.phoneNumber,
@@ -93,6 +93,17 @@ export default class FindId extends React.Component {
       })
       .catch((e) => {
         console.log(e);
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: () => this.onFindId(),
+            },
+          ],
+          { cancelable: false },
+        );
       });
   }
 

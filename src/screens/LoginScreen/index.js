@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import axios from 'axios';
 
 import SocialWebviewModal from './SocialWebviewModal';
@@ -65,7 +65,7 @@ export default class LoginScreen extends Component {
   onPressSocial = async (social) => {
     this.setState({
       socialModalVisible: !this.state.socialModalVisible,
-      source: `https://yag-olim-test-prod.herokuapp.com/users/oauth/${social}`,
+      source: `http://127.0.0.1:5000/users/oauth/${social}`,
     });
   };
 
@@ -86,7 +86,7 @@ export default class LoginScreen extends Component {
   // 일반 로그인
   doLogin() {
     axios
-      .post('https://yag-olim-test-prod.herokuapp.com/users/login', {
+      .post('http://127.0.0.1:5000/users/login', {
         users: {
           email: this.state.email,
           password: this.state.password,
@@ -100,6 +100,17 @@ export default class LoginScreen extends Component {
       })
       .catch((e) => {
         console.log(e);
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: () => this.doLogin(),
+            },
+          ],
+          { cancelable: false },
+        );
       });
   }
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
-import { View, Text, Dimensions, FlatList, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Dimensions, FlatList, StyleSheet, ScrollView, Alert } from 'react-native';
 import CountdownTimer from '../../components/CountdownTimer';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 
@@ -26,7 +26,6 @@ const HomeScreen = ({ navigation }) => {
       axios({
         method: 'get',
         url: 'http://127.0.0.1:5000/schedules-dates/check/today',
-        //https://yag-ollim.herokuapp.com/ -> 배포용 주소
         headers: {
           Authorization: token,
         },
@@ -40,13 +39,23 @@ const HomeScreen = ({ navigation }) => {
         })
         .catch((err) => {
           console.error(err);
+          Alert.alert(
+            '에러가 발생했습니다!',
+            '다시 시도해주세요',
+            [
+              {
+                text: '다시시도하기',
+                onPress: () => useEffectForToday(),
+              },
+            ],
+            { cancelable: false },
+          );
         });
 
       get_token().then((token) => {
         axios({
           method: 'get',
           url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
-          //https://yag-ollim.herokuapp.com/ -> 배포용 주소
           headers: {
             Authorization: token,
           },
@@ -59,6 +68,17 @@ const HomeScreen = ({ navigation }) => {
           })
           .catch((err) => {
             console.error(err);
+            Alert.alert(
+              '에러가 발생했습니다!',
+              '다시 시도해주세요',
+              [
+                {
+                  text: '다시시도하기',
+                  onPress: () => useEffectForToday(),
+                },
+              ],
+              { cancelable: false },
+            );
           });
       });
     });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
@@ -280,7 +280,7 @@ export default class CameraScreen extends React.Component {
     get_token()
       .then((token) => {
         axios
-          .post('https://yag-olim-test-stage2.herokuapp.com/medicines/image', form_data, {
+          .post('http://127.0.0.1:5000/medicines/image', form_data, {
             headers: {
               'content-type': 'multipart/form-data',
               Authorization: token,
@@ -296,10 +296,34 @@ export default class CameraScreen extends React.Component {
               clickedDate: this.state.clickedDate,
             });
           })
-          .catch((err) => console.log(err));
+          .catch((err) => {
+            console.log(err);
+            Alert.alert(
+              '에러가 발생했습니다!',
+              '다시 시도해주세요',
+              [
+                {
+                  text: '다시시도하기',
+                  onPress: () => this.handleSubmit(),
+                },
+              ],
+              { cancelable: false },
+            );
+          });
       })
       .catch((err) => {
         console.error(err);
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: () => this.handleSubmit(),
+            },
+          ],
+          { cancelable: false },
+        );
       });
   };
 

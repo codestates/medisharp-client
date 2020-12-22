@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Image,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import axios from 'axios';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
@@ -48,6 +49,17 @@ const MedicineBox = ({ navigation }) => {
         })
         .catch((err) => {
           console.error(err);
+          Alert.alert(
+            '에러가 발생했습니다!',
+            '다시 시도해주세요',
+            [
+              {
+                text: '다시시도하기',
+                onPress: () => useEffectForMedicines(),
+              },
+            ],
+            { cancelable: false },
+          );
         });
     });
   };

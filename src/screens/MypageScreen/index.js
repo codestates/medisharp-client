@@ -1,6 +1,14 @@
 import React from 'react';
 import axios from 'axios';
-import { View, Text, Dimensions, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { StackActions, NavigationActions, NavigationEvents } from 'react-navigation';
 
@@ -15,34 +23,46 @@ export default class Mypage extends React.Component {
     this.state = {
       name: '',
       useremail: '',
+      token: '',
     };
-    async function get_token() {
+    const get_token = async () => {
       const token = await getItem();
-      return token;
-    }
-    get_token()
-      .then((token) => {
-        axios({
-          method: 'get',
-          url: 'http://127.0.0.1:5000/users', //https://hj-medisharp.herokuapp.com/users',
-          headers: {
-            Authorization: token,
-          },
-        })
-          .then((data) => {
-            let { email, full_name } = data.data.results;
-            this.setState({
-              name: full_name,
-              useremail: email,
-            });
-          })
-          .catch((err) => {
-            console.error(err);
-          });
+      this.setState({ token: token });
+    };
+    const getUserInfo = () => {
+      axios({
+        method: 'get',
+        url: 'http://127.0.0.1:5000/users',
+        headers: {
+          Authorization: this.state.token,
+        },
       })
-      .catch((err) => {
-        console.error(err);
-      });
+        .then((data) => {
+          let { email, full_name } = data.data.results;
+          this.setState({
+            name: full_name,
+            useremail: email,
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+          Alert.alert(
+            '에러가 발생했습니다!',
+            '다시 시도해주세요',
+            [
+              {
+                text: '다시시도하기',
+                onPress: () => getUserInfo(),
+              },
+            ],
+            { cancelable: false },
+          );
+        });
+    };
+
+    get_token().then(() => {
+      getUserInfo();
+    });
   }
 
   resetAction = StackActions.reset({
@@ -60,6 +80,17 @@ export default class Mypage extends React.Component {
       this.props.navigation.dispatch(this.resetAction);
     } catch (e) {
       console.log(e);
+      Alert.alert(
+        '에러가 발생했습니다!',
+        '다시 시도해주세요',
+        [
+          {
+            text: '다시시도하기',
+            onPress: () => this.logout(),
+          },
+        ],
+        { cancelable: false },
+      );
     }
   };
 

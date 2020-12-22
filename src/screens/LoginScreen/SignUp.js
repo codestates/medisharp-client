@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 
@@ -35,6 +36,39 @@ export default class SignUpScreen extends React.Component {
       isAvailedPasswordCheck: '',
     };
   }
+
+  checkEmail = (email) => {
+    axios({
+      method: 'get',
+      url: 'http://127.0.0.1:5000/users/email',
+      params: {
+        email: useremail,
+      },
+    })
+      .then((res) => {
+        console.log(res.data);
+        if (res.data['status'] === 'OK') {
+          this.setState({ isAvailedEmail: '' });
+          this.setState({ key: email });
+        } else {
+          this.setState({ isAvailedEmail: '이미 존재하는 email입니다.' });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: () => this.checkEmail(),
+            },
+          ],
+          { cancelable: false },
+        );
+      });
+  };
 
   handleSignUpValue = (key, value) => {
     if (key === 'name') {
@@ -70,25 +104,7 @@ export default class SignUpScreen extends React.Component {
         this.setState({ isAvailedEmail: '올바른 이메일 형식이 아닙니다.' });
       } else {
         this.setState({ isAvailedEmail: '' });
-        axios({
-          method: 'get',
-          url: 'https://yag-olim-test-prod.herokuapp.com/users/email',
-          params: {
-            email: useremail,
-          },
-        })
-          .then((res) => {
-            console.log(res.data);
-            if (res.data['status'] === 'OK') {
-              this.setState({ isAvailedEmail: '' });
-              this.setState({ key: useremail });
-            } else {
-              this.setState({ isAvailedEmail: '이미 존재하는 email입니다.' });
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          });
+        this.checkEmail(useremail);
       }
     }
     if (key === 'password') {
@@ -119,7 +135,7 @@ export default class SignUpScreen extends React.Component {
 
   onSignUp = () => {
     axios
-      .post('https://yag-olim-test-prod.herokuapp.com/users/signup', {
+      .post('http://127.0.0.1:5000/users/signup', {
         users: {
           email: this.state.useremail,
           password: this.state.password,
@@ -133,6 +149,17 @@ export default class SignUpScreen extends React.Component {
       })
       .catch((e) => {
         console.log(e);
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: () => this.onSignUp(),
+            },
+          ],
+          { cancelable: false },
+        );
       });
   };
 

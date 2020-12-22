@@ -1,6 +1,6 @@
 import React, { Component, useEffect, useState } from 'react';
 import react from 'react';
-import { View, Text, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import axios from 'axios';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { NavigationEvents } from 'react-navigation';
@@ -46,10 +46,32 @@ export default class CheckScreen extends React.Component {
           })
           .catch((err) => {
             console.error(err);
+            Alert.alert(
+              '에러가 발생했습니다!',
+              '다시 시도해주세요',
+              [
+                {
+                  text: '다시시도하기',
+                  onPress: () => this.deleteWholeSchedules(),
+                },
+              ],
+              { cancelable: false },
+            );
           });
       })
       .catch((err) => {
         console.error(err);
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: () => this.deleteWholeSchedules(),
+            },
+          ],
+          { cancelable: false },
+        );
       });
   };
 
@@ -62,7 +84,7 @@ export default class CheckScreen extends React.Component {
       .then((token) => {
         axios({
           method: 'delete',
-          url: 'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
+          url: 'http://127.0.0.1:5000/schedules-commons/schedules-dates',
           headers: {
             Authorization: token,
           },
@@ -77,10 +99,32 @@ export default class CheckScreen extends React.Component {
           })
           .catch((err) => {
             console.error(err);
+            Alert.alert(
+              '에러가 발생했습니다!',
+              '다시 시도해주세요',
+              [
+                {
+                  text: '다시시도하기',
+                  onPress: () => this.deleteClickedSchedules(),
+                },
+              ],
+              { cancelable: false },
+            );
           });
       })
       .catch((err) => {
         console.error(err);
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: () => this.deleteClickedSchedules(),
+            },
+          ],
+          { cancelable: false },
+        );
       });
   };
 
@@ -94,12 +138,6 @@ export default class CheckScreen extends React.Component {
           paddingLeft: 20,
         }}
       >
-        <NavigationEvents
-          onDidFocus={(payload) => {
-            console.log('deleteCheckScreen onDidFocus Done');
-          }}
-        />
-
         <Text
           style={{
             marginTop: 30,
@@ -145,7 +183,7 @@ export default class CheckScreen extends React.Component {
             }}
           >
             <TouchableOpacity
-              onPress={this.deleteClickedSchedules}
+              onPress={this.deleteClickedSchedules()}
               style={{
                 marginTop: 10,
                 width: window.width * 0.42,
@@ -164,7 +202,7 @@ export default class CheckScreen extends React.Component {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={this.deleteWholeSchedules}
+              onPress={this.deleteWholeSchedules()}
               style={{
                 marginTop: 10,
                 width: window.width * 0.42,

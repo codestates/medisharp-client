@@ -74,7 +74,7 @@ export default class FindPw extends React.Component {
   onFindPw() {
     axios({
       method: 'get',
-      url: 'https://yag-olim-test-prod.herokuapp.com/users/id',
+      url: 'http://127.0.0.1:5000/users/id',
       params: {
         email: this.state.useremail,
       },
@@ -83,7 +83,7 @@ export default class FindPw extends React.Component {
         console.log(data.data.results);
         let res_edit = data.data.results;
         axios
-          .patch('https://yag-olim-test-prod.herokuapp.com/users/password', {
+          .patch('http://127.0.0.1:5000/users/password', {
             users: {
               id: res_edit['id'],
               password: res_edit['password'],
@@ -110,10 +110,32 @@ export default class FindPw extends React.Component {
           })
           .catch((e) => {
             console.log(e);
+            Alert.alert(
+              '에러가 발생했습니다!',
+              '다시 시도해주세요',
+              [
+                {
+                  text: '다시시도하기',
+                  onPress: () => this.onFindPw(),
+                },
+              ],
+              { cancelable: false },
+            );
           });
       })
       .catch((e) => {
         console.log(e);
+        Alert.alert(
+          '에러가 발생했습니다!',
+          '다시 시도해주세요',
+          [
+            {
+              text: '다시시도하기',
+              onPress: () => this.onFindPw(),
+            },
+          ],
+          { cancelable: false },
+        );
       });
   }
 

@@ -105,7 +105,7 @@ export default class Mypage extends React.Component {
           );
           axios({
             method: 'patch',
-            url: 'http://127.0.0.1:5000/users', //'https://hj-medisharp.herokuapp.com/users',
+            url: 'http://127.0.0.1:5000/users',
             headers: {
               Authorization: token,
             },
@@ -125,10 +125,32 @@ export default class Mypage extends React.Component {
             })
             .catch((err) => {
               console.error(err);
+              Alert.alert(
+                '에러가 발생했습니다!',
+                '다시 시도해주세요',
+                [
+                  {
+                    text: '다시시도하기',
+                    onPress: () => this.editUserInfo(),
+                  },
+                ],
+                { cancelable: false },
+              );
             });
         })
         .catch((err) => {
           console.error(err);
+          Alert.alert(
+            '에러가 발생했습니다!',
+            '다시 시도해주세요',
+            [
+              {
+                text: '다시시도하기',
+                onPress: () => this.editUserInfo(),
+              },
+            ],
+            { cancelable: false },
+          );
         });
     } else {
       //유효조건을 하나라도 만족하지 않으면 입력 확인해달라는 alert
