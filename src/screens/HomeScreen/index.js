@@ -25,8 +25,7 @@ const HomeScreen = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://yag-olim-test-prod.herokuapp.com/schedules-dates/check/today',
-        //https://yag-ollim.herokuapp.com/ -> 배포용 주소
+        url: 'http://127.0.0.1:5000/schedules-dates/check/today',
         headers: {
           Authorization: token,
         },
@@ -56,8 +55,7 @@ const HomeScreen = ({ navigation }) => {
       get_token().then((token) => {
         axios({
           method: 'get',
-          url: `https://yag-olim-test-prod.herokuapp.com/schedules-dates/schedules-commons/alarm`,
-          //https://yag-ollim.herokuapp.com/ -> 배포용 주소
+          url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
           headers: {
             Authorization: token,
           },

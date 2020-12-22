@@ -58,6 +58,8 @@ export default class AlarmUpdateScreen extends React.Component {
       alarmInterval: 0,
       schedules_common_id: null,
       token: '',
+      medi_ids: [],
+      scheduleUpdate: false,
     };
     const getToken = async () => {
       const token = await getItem();
@@ -66,7 +68,7 @@ export default class AlarmUpdateScreen extends React.Component {
     const getSchedules = async () => {
       axios({
         method: 'get',
-        url: 'https://yag-olim-test-prod.herokuapp.com/schedules-commons',
+        url: 'http://127.0.0.1:5000/schedules-commons',
         headers: {
           Authorization: this.state.token,
         },
@@ -96,7 +98,7 @@ export default class AlarmUpdateScreen extends React.Component {
 
           axios({
             method: 'get',
-            url: 'https://yag-olim-test-prod.herokuapp.com/medicines',
+            url: 'http://127.0.0.1:5000/medicines',
             headers: {
               Authorization: this.state.token,
             },
@@ -149,41 +151,48 @@ export default class AlarmUpdateScreen extends React.Component {
   }
 
   postMedi = () => {
-    return axios
-      .post(
-        'https://yag-olim-test-prod.herokuapp.com/medicines',
-        { medicine: this.state.medicines },
-        {
-          headers: {
-            Authorization: this.state.token,
-          },
-        },
-      )
-      .then((res) => {
-        this.setState({ medi_ids: res.data['medicine_id'] });
-      })
-      .catch((e) => {
-        console.log('error postmedi');
-        Alert.alert(
-          '에러가 발생했습니다!',
-          '다시 시도해주세요',
-          [
-            {
-              text: '다시시도하기',
-              onPress: async () => {
-                await this.postMedi();
-              },
+    return (
+      axios
+        .post(
+          'http://127.0.0.1:5000/medicines',
+          { medicine: this.state.medicines },
+          {
+            headers: {
+              Authorization: this.state.token,
             },
-          ],
-          { cancelable: false },
-        );
-      });
+          },
+        )
+        // .then((res) => {
+        //   this.setState({ medi_ids: res.data['medicine_id'] });
+        // })
+        .catch((e) => {
+          console.log('error postmedi');
+          Alert.alert(
+            '에러가 발생했습니다!',
+            '다시 시도해주세요',
+            [
+              {
+                text: '다시시도하기',
+                onPress: async () => {
+                  if (this.state.medi_ids === []) {
+                    await this.postMedi();
+                    await this.editMeSCeUsId();
+                  } else if (this.state.medi_ids !== []) {
+                    await this.editMeSCeUsId();
+                  }
+                },
+              },
+            ],
+            { cancelable: false },
+          );
+        })
+    );
   };
 
   editScheduleCommon = () => {
     return axios
       .patch(
-        'https://yag-olim-test-prod.herokuapp.com/schedules-commons',
+        'http://127.0.0.1:5000/schedules-commons',
         {
           schedules_common: {
             schedules_common_id: this.state.schedules_common_id,
@@ -201,6 +210,7 @@ export default class AlarmUpdateScreen extends React.Component {
       )
       .then((res) => {
         console.log('success');
+        this.setState({ scheduleUpdate: true });
       })
       .catch((e) => {
         console.log('error schedules common');
@@ -211,43 +221,15 @@ export default class AlarmUpdateScreen extends React.Component {
             {
               text: '다시시도하기',
               onPress: async () => {
-                await this.editScheduleCommon();
+                if (this.state.scheduleUpdate === false) {
+                  await this.editScheduleCommon();
+                  await this.editScheduleDate();
+                  await this.editMeSCeUsId();
+                } else if (this.state.scheduleUpdate === false) {
+                  await this.editScheduleDate();
+                  await this.editMeSCeUsId();
+                }
               },
-            },
-          ],
-          { cancelable: false },
-        );
-      });
-  };
-
-  editScheduleDate = () => {
-    return axios
-      .patch(
-        'https://yag-olim-test-prod.herokuapp.com/schedules-commons/schedules-dates',
-        {
-          schedules_common: {
-            schedules_common_id: this.state.schedules_common_id,
-            startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
-            enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
-            cycle: Number(this.state.alarmInterval),
-            time: `${this.state.selectedHour}:${this.state.selectedMinute}`,
-          },
-        },
-        {
-          headers: {
-            Authorization: this.state.token,
-          },
-        },
-      )
-      .catch((e) => {
-        console.log('error editScheduleDate');
-        Alert.alert(
-          '에러가 발생했습니다!',
-          '다시 시도해주세요',
-          [
-            {
-              text: '다시시도하기',
-              onPress: () => this.editScheduleDate(),
             },
           ],
           { cancelable: false },
@@ -258,7 +240,7 @@ export default class AlarmUpdateScreen extends React.Component {
   postMediSchedId = () => {
     return axios
       .post(
-        'https://yag-olim-test-prod.herokuapp.com/medicines/schedules-medicines',
+        'http://127.0.0.1:5000/medicines/schedules-medicines',
         {
           schedules_common_medicines: {
             medicines_id: this.state.medi_ids,
@@ -290,7 +272,7 @@ export default class AlarmUpdateScreen extends React.Component {
   postMediUId = () => {
     return axios
       .post(
-        'https://yag-olim-test-prod.herokuapp.com/medicines/users-medicines',
+        'http://127.0.0.1:5000/medicines/users-medicines',
         {
           medicines: {
             medicines_id: this.state.medi_ids,
@@ -318,25 +300,76 @@ export default class AlarmUpdateScreen extends React.Component {
       });
   };
 
+  postMediEditSchedules = () => {
+    return axios.all([this.postMedi(), this.editScheduleCommon()]).then(
+      axios.spread(async (medires, schedulesres) => {
+        await this.setState({
+          medi_ids: medires.data['medicine_id'],
+        });
+      }),
+    );
+  };
+
+  editScheduleDate = () => {
+    if (this.state.scheduleUpdate === true) {
+      return axios
+        .patch(
+          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+          {
+            schedules_common: {
+              schedules_common_id: this.state.schedules_common_id,
+              startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
+              enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
+              cycle: Number(this.state.alarmInterval),
+              time: `${this.state.selectedHour}:${this.state.selectedMinute}`,
+            },
+          },
+          {
+            headers: {
+              Authorization: this.state.token,
+            },
+          },
+        )
+        .catch((e) => {
+          console.log('error editScheduleDate');
+          Alert.alert(
+            '에러가 발생했습니다!',
+            '다시 시도해주세요',
+            [
+              {
+                text: '다시시도하기',
+                onPress: () => this.editScheduleDate(),
+              },
+            ],
+            { cancelable: false },
+          );
+        });
+    }
+  };
+
   editMeSCeUsId = () => {
-    return axios
-      .all([this.editScheduleDate(), this.postMediSchedId(), this.postMediUId()])
-      .then(async () => {
-        console.log('success');
-      });
+    if (this.state.medi_ids.lenth !== [] && this.state.scheduleUpdate === true) {
+      return axios
+        .all([this.editScheduleDate(), this.postMediSchedId(), this.postMediUId()])
+        .then(async () => {
+          console.log('success');
+          await this.props.navigation.navigate('Calendar');
+        });
+    } else if (this.state.medi_ids === [] && this.state.scheduleUpdate === false) {
+      this.postMediEditSchedules();
+    }
   };
 
   patchSChedules = async () => {
-    await this.postMedi();
-    await this.editScheduleCommon();
+    await this.postMediEditSchedules();
+    await this.editScheduleDate();
     await this.editMeSCeUsId();
-    await this.props.navigation.navigate('Calendar');
   };
 
   patchCheck = () => {
     axios
       .patch(
-        'https://yag-olim-test-prod.herokuapp.com/schedules-dates/check',
+        'http://127.0.0.1:5000/schedules-dates/check',
         {
           schedules_common: {
             schedules_common_id: this.state.schedules_common_id,
@@ -608,7 +641,7 @@ export default class AlarmUpdateScreen extends React.Component {
                             for (let i = 0; i < this.state.medicines.length; i++) {
                               console.log('this.state.medicines[i] =>', this.state.medicines[i]);
                               console.log('item =>', item);
-                              if (item !== this.state.medicines[i]) {
+                              if (item['name'] !== this.state.medicines[i]['name']) {
                                 filteredMedicine.push(this.state.medicines[i]);
                               } else {
                               }

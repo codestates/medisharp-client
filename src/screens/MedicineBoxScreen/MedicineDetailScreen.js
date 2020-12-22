@@ -43,7 +43,7 @@ export default class MedicineDetailScreen extends React.Component {
       console.log(this.state.item);
       axios({
         method: 'get',
-        url: 'https://yag-olim-test-prod.herokuapp.com/medicines/name',
+        url: 'http://127.0.0.1:5000/medicines/name',
         headers: {
           Authorization: this.state.token,
         },
@@ -93,7 +93,7 @@ export default class MedicineDetailScreen extends React.Component {
   deletemymedicine = () => {
     axios({
       method: 'delete',
-      url: 'https://yag-olim-test-prod.herokuapp.com/medicines',
+      url: 'http://127.0.0.1:5000/medicines',
       headers: {
         Authorization: this.state.token,
       },

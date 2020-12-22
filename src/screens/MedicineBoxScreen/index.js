@@ -38,7 +38,7 @@ const MedicineBox = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://yag-olim-test-prod.herokuapp.com/medicines',
+        url: 'http://127.0.0.1:5000/medicines',
         headers: {
           Authorization: token,
         },

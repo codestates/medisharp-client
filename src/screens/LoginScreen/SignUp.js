@@ -40,7 +40,7 @@ export default class SignUpScreen extends React.Component {
   checkEmail = (email) => {
     axios({
       method: 'get',
-      url: 'https://yag-olim-test-prod.herokuapp.com/users/email',
+      url: 'http://127.0.0.1:5000/users/email',
       params: {
         email: useremail,
       },
@@ -135,7 +135,7 @@ export default class SignUpScreen extends React.Component {
 
   onSignUp = () => {
     axios
-      .post('https://yag-olim-test-prod.herokuapp.com/users/signup', {
+      .post('http://127.0.0.1:5000/users/signup', {
         users: {
           email: this.state.useremail,
           password: this.state.password,

@@ -105,7 +105,7 @@ export default class Mypage extends React.Component {
           );
           axios({
             method: 'patch',
-            url: 'https://yag-olim-test-prod.herokuapp.com/users', //'https://hj-medisharp.herokuapp.com/users',
+            url: 'http://127.0.0.1:5000/users',
             headers: {
               Authorization: token,
             },

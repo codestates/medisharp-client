@@ -84,7 +84,7 @@ export default class CheckScreen extends React.Component {
       .then((token) => {
         axios({
           method: 'delete',
-          url: 'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
+          url: 'http://127.0.0.1:5000/schedules-commons/schedules-dates',
           headers: {
             Authorization: token,
           },
@@ -138,12 +138,6 @@ export default class CheckScreen extends React.Component {
           paddingLeft: 20,
         }}
       >
-        <NavigationEvents
-          onDidFocus={(payload) => {
-            console.log('deleteCheckScreen onDidFocus Done');
-          }}
-        />
-
         <Text
           style={{
             marginTop: 30,
@@ -189,7 +183,7 @@ export default class CheckScreen extends React.Component {
             }}
           >
             <TouchableOpacity
-              onPress={this.deleteClickedSchedules}
+              onPress={this.deleteClickedSchedules()}
               style={{
                 marginTop: 10,
                 width: window.width * 0.42,
@@ -208,7 +202,7 @@ export default class CheckScreen extends React.Component {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={this.deleteWholeSchedules}
+              onPress={this.deleteWholeSchedules()}
               style={{
                 marginTop: 10,
                 width: window.width * 0.42,

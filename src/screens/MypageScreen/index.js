@@ -32,7 +32,7 @@ export default class Mypage extends React.Component {
     const getUserInfo = () => {
       axios({
         method: 'get',
-        url: 'https://yag-olim-test-prod.herokuapp.com/users', //https://hj-medisharp.herokuapp.com/users',
+        url: 'http://127.0.0.1:5000/users',
         headers: {
           Authorization: this.state.token,
         },
@@ -80,6 +80,17 @@ export default class Mypage extends React.Component {
       this.props.navigation.dispatch(this.resetAction);
     } catch (e) {
       console.log(e);
+      Alert.alert(
+        '에러가 발생했습니다!',
+        '다시 시도해주세요',
+        [
+          {
+            text: '다시시도하기',
+            onPress: () => this.logout(),
+          },
+        ],
+        { cancelable: false },
+      );
     }
   };
 
