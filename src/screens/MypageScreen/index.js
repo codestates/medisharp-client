@@ -52,7 +52,7 @@ export default class Mypage extends React.Component {
             [
               {
                 text: '다시시도하기',
-                onPress: () => this.getUserInfo(),
+                onPress: () => getUserInfo(),
               },
             ],
             { cancelable: false },

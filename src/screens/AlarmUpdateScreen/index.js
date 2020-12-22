@@ -340,7 +340,7 @@ export default class AlarmUpdateScreen extends React.Component {
         {
           schedules_common: {
             schedules_common_id: this.state.schedules_common_id,
-            clickedDate: this.state.clickedDate,
+            clickdate: this.state.clickedDate,
           },
         },
         {
@@ -444,10 +444,12 @@ export default class AlarmUpdateScreen extends React.Component {
 
   checkChangeTrue = () => {
     this.setState({ check: true });
+    this.patchCheck();
   };
 
   checkChangeFalse = () => {
     this.setState({ check: false });
+    this.patchCheck();
   };
 
   onPressStartDate = () => {
@@ -934,7 +936,7 @@ export default class AlarmUpdateScreen extends React.Component {
             {/* -- 삭제하기 분기페이지로 슝! -- */}
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('DeleteCheck');
+                this.props.navigation.navigate('DeleteCheck');
               }}
             >
               <View

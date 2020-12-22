@@ -40,6 +40,7 @@ export default class MedicineDetailScreen extends React.Component {
     };
 
     const getMediDetail = () => {
+      console.log(this.state.item);
       axios({
         method: 'get',
         url: 'https://yag-olim-test-prod.herokuapp.com/medicines/name',

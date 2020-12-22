@@ -55,7 +55,7 @@ const MedicineBox = ({ navigation }) => {
             [
               {
                 text: '다시시도하기',
-                onPress: () => this.useEffectForMedicines(),
+                onPress: () => useEffectForMedicines(),
               },
             ],
             { cancelable: false },
