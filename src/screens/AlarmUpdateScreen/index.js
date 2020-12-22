@@ -370,78 +370,6 @@ export default class AlarmUpdateScreen extends React.Component {
       });
   };
 
-  deleteWholeSchedules = () => {
-    console.log('전체 삭제하기 눌려따!');
-    axios
-      .delete(
-        'https://yag-olim-test-prod.herokuapp.com/schedules-commons/schedules-dates',
-        {
-          schedules_common: {
-            schedules_common_id: this.state.schedules_common_id,
-          },
-        },
-        {
-          headers: {
-            Authorization: this.state.token,
-          },
-        },
-      )
-      .then((res) => {
-        console.log('전체 알람 일정 삭제 완료: ', res.data.message);
-        this.props.navigation.navigate('Calendar'); //삭제 후 calendarpage로 리다이렉트
-      })
-      .catch((e) => {
-        console.log('error deleteWholeSchedules');
-        Alert.alert(
-          '에러가 발생했습니다!',
-          '다시 시도해주세요',
-          [
-            {
-              text: '다시시도하기',
-              onPress: () => this.deleteWholeSchedules(),
-            },
-          ],
-          { cancelable: false },
-        );
-      });
-  };
-
-  deleteClickedSchedules = () => {
-    console.log('해당 날짜 알람 삭제하기 눌려따!');
-    axios
-      .delete(
-        'https://yag-olim-test-prod.herokuapp.com/schedules-commons/schedules-dates',
-        {
-          schedules_common: {
-            schedules_common_id: this.state.schedules_common_id,
-            date: this.state.clickedDate,
-          },
-        },
-        {
-          headers: {
-            Authorization: token,
-          },
-        },
-      )
-      .then((res) => {
-        console.log('해당 날짜 알람 삭제 완료: ', res.data.message);
-        this.props.navigation.navigate('Calendar'); //삭제 후 calendarpage로 리다이렉트
-      })
-      .catch((err) => {
-        Alert.alert(
-          '에러가 발생했습니다!',
-          '다시 시도해주세요',
-          [
-            {
-              text: '다시시도하기',
-              onPress: () => this.deleteClickedSchedules(),
-            },
-          ],
-          { cancelable: false },
-        );
-      });
-  };
-
   checkChangeTrue = () => {
     this.setState({ check: true });
     this.patchCheck();
@@ -936,7 +864,10 @@ export default class AlarmUpdateScreen extends React.Component {
             {/* -- 삭제하기 분기페이지로 슝! -- */}
             <TouchableOpacity
               onPress={() => {
-                this.props.navigation.navigate('DeleteCheck');
+                this.props.navigation.navigate('DeleteCheck', {
+                  schedules_common_id: this.state.schedules_common_id,
+                  clickedDate: this.state.clickedDate,
+                });
               }}
             >
               <View
@@ -950,40 +881,9 @@ export default class AlarmUpdateScreen extends React.Component {
                   borderRadius: 20,
                 }}
               >
-                <Text style={{ fontSize: 20, color: 'white' }}>해당 날짜의 알람만 삭제하기</Text>
+                <Text style={{ fontSize: 20, color: 'white' }}>삭제하기</Text>
               </View>
             </TouchableOpacity>
-
-            {/* <TouchableOpacity onPress={this.deleteWholeSchedules}>
-              <View
-                style={{
-                  justifyContent: 'center',
-                  marginTop: 10,
-                  alignItems: 'center',
-                  width: window.width * 0.7,
-                  height: window.height * 0.075,
-                  backgroundColor: '#9a6464',
-                  borderRadius: 20,
-                }}
-              >
-                <Text style={{ fontSize: 20, color: 'white' }}>알람일정 전체 삭제하기</Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={this.deleteClickedSchedules}>
-              <View
-                style={{
-                  justifyContent: 'center',
-                  marginTop: 10,
-                  alignItems: 'center',
-                  width: window.width * 0.7,
-                  height: window.height * 0.075,
-                  backgroundColor: '#9a6464',
-                  borderRadius: 20,
-                }}
-              >
-                <Text style={{ fontSize: 20, color: 'white' }}>해당 날짜의 알람만 삭제하기</Text>
-              </View>
-            </TouchableOpacity> */}
           </View>
         </ScrollView>
       </View>
