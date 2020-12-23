@@ -75,7 +75,7 @@ export default class AlarmUpdateScreen extends React.Component {
     const getSchedules = async () => {
       axios({
         method: 'get',
-        url: 'https://yag-olim-test-prod.herokuapp.com/schedules-commons',
+        url: 'http://127.0.0.1:5000/schedules-commons',
         headers: {
           Authorization: this.state.token,
         },
@@ -106,7 +106,7 @@ export default class AlarmUpdateScreen extends React.Component {
 
           axios({
             method: 'get',
-            url: 'https://yag-olim-test-prod.herokuapp.com/medicines',
+            url: 'http://127.0.0.1:5000/medicines',
             headers: {
               Authorization: this.state.token,
             },
@@ -209,7 +209,7 @@ export default class AlarmUpdateScreen extends React.Component {
     if (this.state.mediupload === false) {
       return axios
         .post(
-          'https://yag-olim-test-prod.herokuapp.com/medicines',
+          'http://127.0.0.1:5000/medicines',
           { medicine: this.state.medicines },
           {
             headers: {
@@ -246,7 +246,7 @@ export default class AlarmUpdateScreen extends React.Component {
     if (this.state.scheduleUpdate === false) {
       return axios
         .patch(
-          'https://yag-olim-test-prod.herokuapp.com/schedules-commons',
+          'http://127.0.0.1:5000/schedules-commons',
           {
             schedules_common: {
               schedules_common_id: this.state.schedules_common_id,
@@ -290,7 +290,7 @@ export default class AlarmUpdateScreen extends React.Component {
   postMediSchedId = () => {
     return axios
       .post(
-        'https://yag-olim-test-prod.herokuapp.com/medicines/schedules-medicines',
+        'http://127.0.0.1:5000/medicines/schedules-medicines',
         {
           schedules_common_medicines: {
             medicines_id: this.state.medi_ids,
@@ -322,7 +322,7 @@ export default class AlarmUpdateScreen extends React.Component {
   postMediUId = () => {
     return axios
       .post(
-        'https://yag-olim-test-prod.herokuapp.com/medicines/users-medicines',
+        'http://127.0.0.1:5000/medicines/users-medicines',
         {
           medicines: {
             medicines_id: this.state.medi_ids,
@@ -364,7 +364,7 @@ export default class AlarmUpdateScreen extends React.Component {
     if (this.state.scheduleUpdate === true) {
       return axios
         .patch(
-          'https://yag-olim-test-prod.herokuapp.com/schedules-commons/schedules-dates',
+          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
           {
             schedules_common: {
               schedules_common_id: this.state.schedules_common_id,
@@ -427,7 +427,7 @@ export default class AlarmUpdateScreen extends React.Component {
   patchCheck = () => {
     axios
       .patch(
-        'https://yag-olim-test-prod.herokuapp.com/schedules-dates/check',
+        'http://127.0.0.1:5000/schedules-dates/check',
         {
           schedules_common: {
             schedules_common_id: this.state.schedules_common_id,
