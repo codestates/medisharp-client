@@ -399,7 +399,7 @@ export default class AlarmScreen extends React.Component {
         lightColor: '#FF231F7C',
       });
       let curr = this.state.startD;
-      let push = [];
+      let pushArr = [];
       while (curr <= this.state.endD) {
         let trigger = new Date(curr);
         trigger.setHours(Number(this.state.selectedHour));
@@ -414,10 +414,10 @@ export default class AlarmScreen extends React.Component {
           },
           trigger,
         });
-        push.push(pushSched);
+        pushArr.push(pushSched);
         curr = moment(curr).add(Number(this.state.alarmInterval), 'd').toDate();
       }
-      await this.setState({ pushArr: push });
+      await this.setState({ pushArr: pushArr });
     }
   };
 
