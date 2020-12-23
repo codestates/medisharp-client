@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import {
@@ -21,6 +21,16 @@ import { useAsyncStorage } from '@react-native-community/async-storage';
 import { NavigationEvents } from 'react-navigation';
 const { getItem } = useAsyncStorage('@yag_olim');
 const window = Dimensions.get('window');
+const answer = [{ result: '타이레놀', detail: '약먹을 시간이야' }];
+
+//푸쉬 설정해줄때
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -41,8 +51,7 @@ const HomeScreen = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://hj-medisharp.herokuapp.com/schedules-dates/check/today',
-        //https://yag-ollim.herokuapp.com/ -> 배포용 주소
+        url: 'http://127.0.0.1:5000/schedules-dates/check/today',
         headers: {
           Authorization: token,
         },
@@ -60,8 +69,7 @@ const HomeScreen = ({ navigation }) => {
       get_token().then((token) => {
         axios({
           method: 'get',
-          url: `https://hj-medisharp.herokuapp.com/schedules-dates/schedules-commons/alarm`,
-          //https://yag-ollim.herokuapp.com/ -> 배포용 주소
+          url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
           headers: {
             Authorization: token,
           },

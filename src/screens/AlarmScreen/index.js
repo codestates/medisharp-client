@@ -73,6 +73,9 @@ export default class AlarmScreen extends React.Component {
       token: '',
       medi_ids: [],
       schedules_common_id: null,
+      pushArr: [],
+      startD: null,
+      endD: null,
     };
   }
 
@@ -99,6 +102,7 @@ export default class AlarmScreen extends React.Component {
     const startDate = selectedDate || this.state.date;
 
     this.setState({ date: startDate });
+    this.setState({ startD: startDate });
     console.log(startDate);
 
     const startDateToShowYear = startDate.getFullYear();
@@ -115,6 +119,7 @@ export default class AlarmScreen extends React.Component {
     this.setState({ endDatePickerShow: !this.state.endDatePickerShow });
     const endDate = selectedDate || this.state.date;
     this.setState({ date: endDate });
+    this.setState({ endD: endDate });
 
     const endDateToShowYear = endDate.getFullYear();
     const endDateToShowMonth = endDate.getMonth();
@@ -194,7 +199,7 @@ export default class AlarmScreen extends React.Component {
     return (
       axios
         .post(
-          'http://127.0.0.1:5000/schedules-commons',
+          'http:127.0.0.1:5000/schedules-commons',
           {
             schedules_common: {
               title: this.state.alarmTitle,
@@ -242,7 +247,7 @@ export default class AlarmScreen extends React.Component {
   postMediSchedId = () => {
     return axios
       .post(
-        'http://127.0.0.1:5000/medicines/schedules-medicines',
+        'http:127.0.0.1:5000/medicines/schedules-medicines',
         {
           schedules_common_medicines: {
             medicines_id: this.state.medi_ids,
@@ -274,7 +279,7 @@ export default class AlarmScreen extends React.Component {
   postMediUId = () => {
     return axios
       .post(
-        'http://127.0.0.1:5000/medicines/users-medicines',
+        'http:127.0.0.1:5000/medicines/users-medicines',
         {
           medicines: {
             medicines_id: this.state.medi_ids,
@@ -314,10 +319,10 @@ export default class AlarmScreen extends React.Component {
   };
 
   postScheduleDate = () => {
-    if (this.state.schedules_common_id !== 0 || null) {
+    if ((this.state.schedules_common_id !== 0 || null) && this.state.push !== []) {
       return axios
         .post(
-          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+          'http:127.0.0.1:5000/schedules-commons/schedules-dates',
           {
             schedules_common: {
               schedules_common_id: Number(this.state.schedules_common_id),
@@ -325,6 +330,7 @@ export default class AlarmScreen extends React.Component {
               startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
               enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
               cycle: Number(this.state.alarmInterval),
+              pushArr: this.state.pushArr,
             },
           },
           {
@@ -384,24 +390,34 @@ export default class AlarmScreen extends React.Component {
     await this.postMeSCeUsId();
   };
 
-  push = async () => {
+  postPush = async () => {
     if (Platform.OS === 'android') {
-      Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
+      Notifications.setNotificationChannelAsync('medi', {
+        name: 'medi',
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#FF231F7C',
       });
-      Notifications.scheduleNotificationAsync({
-        content: {
-          title: '약먹을 시간입니다~!!! 📬',
-          body: '오늘 먹을 약은 타이레놀',
-          sound: 'email-sound.wav', // <- for Android below 8.0
-        },
-        trigger: {
-          seconds: 10,
-        },
-      });
+      let curr = this.state.startD;
+      let pushArr = [];
+      while (curr <= this.state.endD) {
+        let trigger = new Date(curr);
+        trigger.setHours(Number(this.state.selectedHour));
+        trigger.setMinutes(Number(this.state.selectedMinute));
+        trigger.setSeconds(0);
+        console.log('trigger:', trigger);
+        const pushSched = await Notifications.scheduleNotificationAsync({
+          content: {
+            title: '약먹을 시간입니다~!!! 📬',
+            body: '오늘 먹을 약은 타이레놀',
+            sound: 'email-sound.wav', // <- for Android below 8.0
+          },
+          trigger,
+        });
+        pushArr.push(pushSched);
+        curr = moment(curr).add(Number(this.state.alarmInterval), 'd').toDate();
+      }
+      await this.setState({ pushArr: pushArr });
     }
   };
 
@@ -748,7 +764,12 @@ export default class AlarmScreen extends React.Component {
 
           {/* -- 확인 버튼 -- */}
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity onPress={/*this.postSchedules*/ this.push}>
+            <TouchableOpacity
+              onPress={async () => {
+                await this.postPush();
+                await this.postSchedules();
+              }}
+            >
               <View
                 style={{
                   justifyContent: 'center',

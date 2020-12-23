@@ -23,20 +23,20 @@ export default class LoadingScreen extends Component {
           method: 'get',
           url: 'http://127.0.0.1:5000/users/isloading',
         })
-          .then(() => {
-            if (token) {
-              this.props.navigation.replace('TabNavigator');
-            } else {
-              this.props.navigation.replace('LoginScreen');
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          });
+      .then((token) => {
+        if (token) {
+          this.props.navigation.replace('TabNavigator');
+        } else {
+          this.props.navigation.replace('LoginScreen');
+        }
       })
       .catch((err) => {
         console.error(err);
       });
+    // })
+    // .catch((err) => {
+    //   console.error(err);
+    // });
   }
 
   render() {
