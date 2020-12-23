@@ -4,6 +4,7 @@ import { View, Text, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import axios from 'axios';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { NavigationEvents } from 'react-navigation';
+import * as Notifications from 'expo-notifications';
 
 import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
@@ -20,8 +21,26 @@ export default class CheckScreen extends React.Component {
     this.state = {
       schedules_common_id: this.props.navigation.getParam('schedules_common_id'),
       clickedDate: this.props.navigation.getParam('clickedDate'),
+      pushArr: this.props.navigation.getParam('pushArr'),
+      push: this.props.navigation.getParam('push'),
     };
   }
+
+  deleteWholePush = async () => {
+    if (Platform.OS === 'android') {
+      console.log('다 삭제할꺼지롱');
+      for (let i = 0; i < this.state.pushArr.length; i++) {
+        await Notifications.cancelScheduledNotificationAsync(this.state.pushArr[i]);
+      }
+    }
+  };
+
+  deleteClickedPush = async () => {
+    if (Platform.OS === 'android') {
+      console.log('이거만 삭제할꺼지롱');
+      await Notifications.cancelScheduledNotificationAsync(this.state.push);
+    }
+  };
 
   deleteWholeSchedules = () => {
     async function get_token() {
@@ -32,7 +51,7 @@ export default class CheckScreen extends React.Component {
       .then((token) => {
         axios({
           method: 'delete',
-          url: 'hhttps://yag-olim-test-stage2.herokuapp.com/schedules-commons/schedules-dates',
+          url: 'http://127.0.0.1:5000/schedules-commons/schedules-dates',
           headers: {
             Authorization: token,
           },
@@ -84,7 +103,7 @@ export default class CheckScreen extends React.Component {
       .then((token) => {
         axios({
           method: 'delete',
-          url: 'hhttps://yag-olim-test-stage2.herokuapp.com/schedules-commons/schedules-dates',
+          url: 'hhttp://127.0.0.1:5000/schedules-commons/schedules-dates',
           headers: {
             Authorization: token,
           },
@@ -183,7 +202,10 @@ export default class CheckScreen extends React.Component {
             }}
           >
             <TouchableOpacity
-              onPress={this.deleteClickedSchedules()}
+              onPress={async () => {
+                await this.deleteClickedPush();
+                await this.deleteClickedSchedules();
+              }}
               style={{
                 marginTop: 10,
                 width: window.width * 0.42,
@@ -202,7 +224,10 @@ export default class CheckScreen extends React.Component {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={this.deleteWholeSchedules()}
+              onPress={async () => {
+                await this.deleteWholePush();
+                await this.deleteWholeSchedules();
+              }}
               style={{
                 marginTop: 10,
                 width: window.width * 0.42,
