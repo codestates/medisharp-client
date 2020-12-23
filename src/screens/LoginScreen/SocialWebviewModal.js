@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import Modal from 'react-native-modal';
 import SocialWebview from './SocialWebview';
@@ -12,7 +13,20 @@ const SocialWebviewModal = (props) => {
       visible={props.visible}
       style={styles.container}
     >
-      <SocialWebview source={{ uri: props.source }} closeSocialModal={props.closeSocialModal} />
+      <Icon
+        onPress={() => {
+          props.closeSocialModal();
+        }}
+        name="times-circle"
+        size={30}
+        color={'#9a6464'}
+        style={{
+          marginLeft: 5,
+        }}
+      />
+      {props.visible ? (
+        <SocialWebview source={{ uri: props.source }} closeSocialModal={props.closeSocialModal} />
+      ) : null}
     </Modal>
   );
 };
