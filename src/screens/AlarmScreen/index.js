@@ -74,8 +74,8 @@ export default class AlarmScreen extends React.Component {
       medi_ids: [],
       schedules_common_id: null,
       pushArr: [],
-      startD: null,
-      endD: null,
+      mediupload: false,
+      schedulescomupload: false,
     };
   }
 
@@ -102,8 +102,6 @@ export default class AlarmScreen extends React.Component {
     const startDate = selectedDate || this.state.date;
 
     this.setState({ date: startDate });
-    this.setState({ startD: startDate });
-    console.log(startDate);
 
     const startDateToShowYear = startDate.getFullYear();
     const startDateToShowMonth = startDate.getMonth();
@@ -119,7 +117,6 @@ export default class AlarmScreen extends React.Component {
     this.setState({ endDatePickerShow: !this.state.endDatePickerShow });
     const endDate = selectedDate || this.state.date;
     this.setState({ date: endDate });
-    this.setState({ endD: endDate });
 
     const endDateToShowYear = endDate.getFullYear();
     const endDateToShowMonth = endDate.getMonth();
@@ -157,10 +154,10 @@ export default class AlarmScreen extends React.Component {
   };
 
   postMedi = () => {
-    return (
-      axios
+    if (this.state.mediupload === false) {
+      return axios
         .post(
-          'http://127.0.0.1:5000/medicines',
+          'https://yag-olim-test-prod.herokuapp.com/medicines',
           { medicine: this.state.alarmMedicine },
           {
             headers: {
@@ -168,9 +165,11 @@ export default class AlarmScreen extends React.Component {
             },
           },
         )
-        // .then((res) => {
-        //   this.setState({ medi_ids: res.data['medicine_id'] });
-        // })
+        .then((res) => {
+          this.setState({ mediupload: true, medi_ids: res.data['medicine_id'] });
+          console.log('약등록 성공', this.state.mediupload);
+          console.log('약등록 성공', this.state.medi_ids);
+        })
         .catch((e) => {
           console.log('error postmedi');
           Alert.alert(
@@ -180,26 +179,22 @@ export default class AlarmScreen extends React.Component {
               {
                 text: '다시시도하기',
                 onPress: async () => {
-                  if (this.state.medi_ids === []) {
-                    await this.postMedi();
-                    await this.postMeSCeUsId();
-                  } else if (this.state.medi_ids !== []) {
-                    await this.postMeSCeUsId();
-                  }
+                  await this.postMedi();
+                  await this.postMeSceUsId();
                 },
               },
             ],
             { cancelable: false },
           );
-        })
-    );
+        });
+    }
   };
 
   postScheduleCommon = () => {
-    return (
-      axios
+    if (this.state.schedulescomupload === false) {
+      return axios
         .post(
-          'http:127.0.0.1:5000/schedules-commons',
+          'https://yag-olim-test-prod.herokuapp.com/schedules-commons',
           {
             schedules_common: {
               title: this.state.alarmTitle,
@@ -215,9 +210,14 @@ export default class AlarmScreen extends React.Component {
             },
           },
         )
-        // .then((res) => {
-        //   this.setState({ schedules_common_id: res.data.results['new_schedules_common_id'] });
-        // })
+        .then((res) => {
+          this.setState({
+            schedulescomupload: true,
+            schedules_common_id: res.data.results['new_schedules_common_id'],
+          });
+          console.log('스케줄등록 성공', this.state.schedulescomupload);
+          console.log('스케줄등록 성공', this.state.schedules_common_id);
+        })
         .catch((e) => {
           console.log('error schedules common');
           Alert.alert(
@@ -227,27 +227,22 @@ export default class AlarmScreen extends React.Component {
               {
                 text: '다시시도하기',
                 onPress: async () => {
-                  if (this.state.schedules_common_id === 0 || null) {
-                    await this.postScheduleCommon();
-                    await this.postScheduleDate();
-                    await this.postMeSCeUsId();
-                  } else if (this.state.schedules_common_id !== 0 || null) {
-                    await this.postScheduleDate();
-                    await this.postMeSCeUsId();
-                  }
+                  await this.postScheduleCommon();
+                  await this.postScheduleDate();
+                  await this.postMeSceUsId();
                 },
               },
             ],
             { cancelable: false },
           );
-        })
-    );
+        });
+    }
   };
 
   postMediSchedId = () => {
     return axios
       .post(
-        'http:127.0.0.1:5000/medicines/schedules-medicines',
+        'https://yag-olim-test-prod.herokuapp.com/medicines/schedules-medicines',
         {
           schedules_common_medicines: {
             medicines_id: this.state.medi_ids,
@@ -279,7 +274,7 @@ export default class AlarmScreen extends React.Component {
   postMediUId = () => {
     return axios
       .post(
-        'http:127.0.0.1:5000/medicines/users-medicines',
+        'https://yag-olim-test-prod.herokuapp.com/medicines/users-medicines',
         {
           medicines: {
             medicines_id: this.state.medi_ids,
@@ -310,19 +305,19 @@ export default class AlarmScreen extends React.Component {
   postMediSchedules = () => {
     return axios.all([this.postMedi(), this.postScheduleCommon()]).then(
       axios.spread(async (medires, schedulesres) => {
-        await this.setState({
-          medi_ids: medires.data['medicine_id'],
-          schedules_common_id: schedulesres.data.results['new_schedules_common_id'],
-        });
+        // await this.setState({
+        //   medi_ids: medires.data['medicine_id'],
+        //   schedules_common_id: schedulesres.data.results['new_schedules_common_id'],
+        // });
       }),
     );
   };
 
   postScheduleDate = () => {
-    if ((this.state.schedules_common_id !== 0 || null) && this.state.push !== []) {
+    if (this.state.schedulescomupload === true && this.state.pushArr !== []) {
       return axios
         .post(
-          'http:127.0.0.1:5000/schedules-commons/schedules-dates',
+          'https://yag-olim-test-prod.herokuapp.com/schedules-commons/schedules-dates',
           {
             schedules_common: {
               schedules_common_id: Number(this.state.schedules_common_id),
@@ -356,8 +351,8 @@ export default class AlarmScreen extends React.Component {
     }
   };
 
-  postMeSCeUsId = () => {
-    if (this.state.medi_ids !== [] && (this.state.schedules_common_id !== null || 0)) {
+  postMeSceUsId = async () => {
+    if (this.state.mediupload === true && this.state.schedulescomupload === true) {
       return axios.all([this.postMediSchedId(), this.postMediUId()]).then(async () => {
         await this.setState({
           alarmTitle: '',
@@ -378,7 +373,14 @@ export default class AlarmScreen extends React.Component {
         });
         await this.props.navigation.navigate('Calendar');
       });
-    } else if (this.state.medi_ids === [] && (this.state.schedules_common_id === null || 0)) {
+    } else if (this.state.mediupload === false && this.state.schedulescomupload === true) {
+      await this.postMedi();
+      await this.postMeSceUsId();
+    } else if (this.state.mediupload === true && this.state.schedulescomupload === false) {
+      await this.postScheduleCommon();
+      await this.postScheduleDate();
+      await this.postMeSceUsId;
+    } else if (this.state.mediupload === false && this.state.schedulescomupload === false) {
       this.postSchedules();
     }
   };
@@ -387,7 +389,7 @@ export default class AlarmScreen extends React.Component {
     await this.get_token();
     await this.postMediSchedules();
     await this.postScheduleDate();
-    await this.postMeSCeUsId();
+    await this.postMeSceUsId();
   };
 
   postPush = async () => {
@@ -398,9 +400,16 @@ export default class AlarmScreen extends React.Component {
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#FF231F7C',
       });
-      let curr = this.state.startD;
+      let startD = moment(
+        `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
+      ).toDate();
+      let endD = moment(
+        `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
+      ).toDate();
+      let curr = startD;
       let pushArr = [];
-      while (curr <= this.state.endD) {
+      console.log(curr);
+      while (curr <= endD) {
         let trigger = new Date(curr);
         trigger.setHours(Number(this.state.selectedHour));
         trigger.setMinutes(Number(this.state.selectedMinute));
@@ -408,8 +417,8 @@ export default class AlarmScreen extends React.Component {
         console.log('trigger:', trigger);
         const pushSched = await Notifications.scheduleNotificationAsync({
           content: {
-            title: '약먹을 시간입니다~!!! 📬',
-            body: '오늘 먹을 약은 타이레놀',
+            title: `약 챙겨먹을 시간입니다~!!!💊`,
+            body: `등록하신 ${this.state.alarmMemo} 일정이에요!`,
             sound: 'email-sound.wav', // <- for Android below 8.0
           },
           trigger,
