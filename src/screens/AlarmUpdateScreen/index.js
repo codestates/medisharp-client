@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'moment/locale/ko';
 import moment from 'moment';
+import 'moment-timezone';
 import {
   View,
   Text,
@@ -16,6 +17,7 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { NavigationEvents } from 'react-navigation';
+import * as Notifications from 'expo-notifications';
 import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-storage';
 
 import { getStatusBarHeight } from 'react-native-status-bar-height';
@@ -42,6 +44,8 @@ export default class AlarmUpdateScreen extends React.Component {
       weekName: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
       totalStartDate: '',
       totalEndDate: '',
+      afterStartD: '',
+      afterEndD: '',
       startYear: '',
       startMonth: '',
       startDate: '',
@@ -60,6 +64,10 @@ export default class AlarmUpdateScreen extends React.Component {
       token: '',
       medi_ids: [],
       scheduleUpdate: false,
+      pushArr: [],
+      push: this.props.navigation.getParam('item')[0]['push'],
+      startD: null,
+      endD: null,
     };
     const getToken = async () => {
       const token = await getItem();
@@ -68,7 +76,7 @@ export default class AlarmUpdateScreen extends React.Component {
     const getSchedules = async () => {
       axios({
         method: 'get',
-        url: 'https://yag-olim-test-stage2.herokuapp.com/schedules-commons',
+        url: 'http://127.0.0.1:5000/schedules-commons',
         headers: {
           Authorization: this.state.token,
         },
@@ -94,11 +102,12 @@ export default class AlarmUpdateScreen extends React.Component {
             showTime: [data.data.results[0]['time']],
             schedules_common_id: data.data.results[0]['schedules_common_id'],
             alarmMemo: data.data.results[0]['memo'],
+            pushArr: data.data.results[0]['push_list'],
           });
 
           axios({
             method: 'get',
-            url: 'https://yag-olim-test-stage2.herokuapp.com/medicines',
+            url: 'http://127.0.0.1:5000/medicines',
             headers: {
               Authorization: this.state.token,
             },
@@ -150,11 +159,52 @@ export default class AlarmUpdateScreen extends React.Component {
     });
   }
 
+  cancelPush = async () => {
+    if (Platform.OS === 'android') {
+      console.log('삭제할꺼지롱');
+      for (let i = 0; i < this.state.pushArr.length; i++) {
+        await Notifications.cancelScheduledNotificationAsync(this.state.pushArr[i]);
+      }
+    }
+  };
+
+  editPush = async () => {
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('medi', {
+        name: 'medi',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+      let curr = this.state.startD;
+      let pushArr = [];
+      while (curr <= this.state.endD) {
+        let trigger = new Date(curr);
+        trigger.setHours(Number(this.state.selectedHour));
+        trigger.setMinutes(Number(this.state.selectedMinute));
+        trigger.setSeconds(0);
+        console.log('trigger:', trigger);
+        const push = await Notifications.scheduleNotificationAsync({
+          content: {
+            title: '약먹을 시간입니다~!!! 📬',
+            body: '오늘 먹을 약은 타이레놀',
+            sound: 'email-sound.wav', // <- for Android below 8.0
+          },
+          trigger,
+        });
+        pushArr.push(push);
+        curr = moment(curr).add(Number(this.state.alarmInterval), 'd').toDate();
+      }
+      await this.setState({ pushArr: pushArr });
+      console.log(this.state.pushArr);
+    }
+  };
+
   postMedi = () => {
     return (
       axios
         .post(
-          'https://yag-olim-test-stage2.herokuapp.com/medicines',
+          'http://127.0.0.1:5000/medicines',
           { medicine: this.state.medicines },
           {
             headers: {
@@ -192,7 +242,7 @@ export default class AlarmUpdateScreen extends React.Component {
   editScheduleCommon = () => {
     return axios
       .patch(
-        'https://yag-olim-test-stage2.herokuapp.com/schedules-commons',
+        'http://127.0.0.1:5000/schedules-commons',
         {
           schedules_common: {
             schedules_common_id: this.state.schedules_common_id,
@@ -240,7 +290,7 @@ export default class AlarmUpdateScreen extends React.Component {
   postMediSchedId = () => {
     return axios
       .post(
-        'https://yag-olim-test-stage2.herokuapp.com/medicines/schedules-medicines',
+        'http://127.0.0.1:5000/medicines/schedules-medicines',
         {
           schedules_common_medicines: {
             medicines_id: this.state.medi_ids,
@@ -272,7 +322,7 @@ export default class AlarmUpdateScreen extends React.Component {
   postMediUId = () => {
     return axios
       .post(
-        'https://yag-olim-test-stage2.herokuapp.com/medicines/users-medicines',
+        'http://127.0.0.1:5000/medicines/users-medicines',
         {
           medicines: {
             medicines_id: this.state.medi_ids,
@@ -311,10 +361,10 @@ export default class AlarmUpdateScreen extends React.Component {
   };
 
   editScheduleDate = () => {
-    if (this.state.scheduleUpdate === true) {
+    if (this.state.scheduleUpdate === true && this.state.trigger !== []) {
       return axios
         .patch(
-          'https://yag-olim-test-stage2.herokuapp.com/schedules-commons/schedules-dates',
+          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
           {
             schedules_common: {
               schedules_common_id: this.state.schedules_common_id,
@@ -322,6 +372,7 @@ export default class AlarmUpdateScreen extends React.Component {
               enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
               cycle: Number(this.state.alarmInterval),
               time: `${this.state.selectedHour}:${this.state.selectedMinute}`,
+              pushArr: this.state.pushArr,
             },
           },
           {
@@ -369,7 +420,7 @@ export default class AlarmUpdateScreen extends React.Component {
   patchCheck = () => {
     axios
       .patch(
-        'https://yag-olim-test-stage2.herokuapp.com/schedules-dates/check',
+        'http://127.0.0.1:5000/schedules-dates/check',
         {
           schedules_common: {
             schedules_common_id: this.state.schedules_common_id,
@@ -425,6 +476,7 @@ export default class AlarmUpdateScreen extends React.Component {
     const startDate = selectedDate || this.state.date;
 
     this.setState({ date: startDate });
+    this.setState({ startD: startDate });
 
     const startDateToShowYear = startDate.getFullYear();
     const startDateToShowMonth = startDate.getMonth();
@@ -441,6 +493,7 @@ export default class AlarmUpdateScreen extends React.Component {
     this.setState({ endDatePickerShow: !this.state.endDatePickerShow });
     const endDate = selectedDate || this.state.date;
     this.setState({ date: endDate });
+    this.setState({ endD: endDate });
 
     const endDateToShowYear = endDate.getFullYear();
     const endDateToShowMonth = endDate.getMonth();
@@ -878,7 +931,13 @@ export default class AlarmUpdateScreen extends React.Component {
 
           {/* -- 하단 버튼 -- */}
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity onPress={this.patchSChedules}>
+            <TouchableOpacity
+              onPress={async () => {
+                await this.cancelPush();
+                await this.editPush();
+                await this.patchSChedules();
+              }}
+            >
               <View
                 style={{
                   justifyContent: 'center',
@@ -900,6 +959,8 @@ export default class AlarmUpdateScreen extends React.Component {
                 this.props.navigation.navigate('DeleteCheck', {
                   schedules_common_id: this.state.schedules_common_id,
                   clickedDate: this.state.clickedDate,
+                  pushArr: this.state.pushArr,
+                  push: this.state.push,
                 });
               }}
             >
