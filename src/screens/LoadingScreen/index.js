@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import moment from 'moment';
-import { Text, View, Image, StyleSheet } from 'react-native';
+import { Text, View, Image, StyleSheet, Alert } from 'react-native';
 
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem, removeItem } = useAsyncStorage('@yag_olim');
@@ -13,6 +13,10 @@ export default class LoadingScreen extends Component {
 
   constructor(props) {
     super(props);
+    this.restart();
+  }
+
+  restart = () => {
     async function get_token() {
       const token = await getItem();
       return token;
@@ -23,21 +27,27 @@ export default class LoadingScreen extends Component {
           method: 'get',
           url: 'http://127.0.0.1:5000/users/isloading',
         })
-      .then((token) => {
-        if (token) {
-          this.props.navigation.replace('TabNavigator');
-        } else {
-          this.props.navigation.replace('LoginScreen');
-        }
+          .then(() => {
+            if (token) {
+              this.props.navigation.replace('TabNavigator');
+            } else {
+              this.props.navigation.replace('LoginScreen');
+            }
+          })
+          .catch((err) => {
+            //503에러 또는 500에러인 경우
+            Alert.alert(
+              '네트워크에 문제가 발생하였습니다.',
+              '다시 시도해주세요',
+              [{ text: '다시 시도', onPress: () => this.restart() }],
+              { cancelable: true },
+            );
+          });
       })
       .catch((err) => {
         console.error(err);
       });
-    // })
-    // .catch((err) => {
-    //   console.error(err);
-    // });
-  }
+  };
 
   render() {
     return (
