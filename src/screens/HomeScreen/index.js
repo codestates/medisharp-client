@@ -32,18 +32,17 @@ Notifications.setNotificationHandler({
   }),
 });
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 const HomeScreen = ({ navigation }) => {
   const [fakeGetTodayChecked, setfakeGetTodayChecked] = useState([]);
   const [alarmList, setTodayAlarm] = useState([]);
-
   const [expoPushToken, setExpoPushToken] = useState('');
-
-  //푸쉬 설정
-  const [notification, setNotification] = useState(false);
-
-  // const notificationListener = useRef();
-  // const responseListener = useRef();
-
   const useEffectForToday = () => {
     async function get_token() {
       const token = await getItem();
@@ -52,8 +51,7 @@ const HomeScreen = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://hj-medisharp.herokuapp.com/schedules-dates/check/today',
-        //https://yag-ollim.herokuapp.com/ -> 배포용 주소
+        url: 'http://127.0.0.1:5000/schedules-dates/check/today',
         headers: {
           Authorization: token,
         },
@@ -71,8 +69,7 @@ const HomeScreen = ({ navigation }) => {
       get_token().then((token) => {
         axios({
           method: 'get',
-          url: `https://hj-medisharp.herokuapp.com/schedules-dates/schedules-commons/alarm`,
-          //https://yag-ollim.herokuapp.com/ -> 배포용 주소
+          url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
           headers: {
             Authorization: token,
           },
@@ -93,22 +90,9 @@ const HomeScreen = ({ navigation }) => {
     useEffectForToday();
   }, []);
 
-  //useEffect for push notification
   useEffect(() => {
-    registerForPushNotificationsAsync().then((token) => setExpoPushToken(token)); //이게 내 push token (ExpoPushToken)
-    // This listener is fired whenever a notification is received while the app is foregrounded
-    // notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
-    //   setNotification(notification);
-  });
-  // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
-  //   responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-  //     console.log(response);
-  //   });
-  //   return () => {
-  //     Notifications.removeNotificationSubscription(notificationListener);
-  //     Notifications.removeNotificationSubscription(responseListener);
-  //   };
-  // }, []);
+    registerForPushNotificationsAsync();
+  }, []);
   const totalCount = fakeGetTodayChecked.length;
   const checkCounting = function () {
     let cnt = 0;
@@ -126,15 +110,6 @@ const HomeScreen = ({ navigation }) => {
         paddingTop: getStatusBarHeight(),
       }}
     >
-      {/* 나중에 지워야 할 부분 */}
-      <Text>Your expo push token: {expoPushToken}</Text>
-      <Button
-        title="Press to Send Notification"
-        onPress={async () => {
-          await sendPushNotification(expoPushToken);
-        }}
-      />
-      {/* 여기까지 */}
       <NavigationEvents
         onDidFocus={(payload) => {
           useEffectForToday();
@@ -258,90 +233,18 @@ const HomeScreen = ({ navigation }) => {
     </View>
   );
 };
-//일단 클릭하면 Push 알람을 주는 코드로 짠 다음
-//우리가 원래 해야 할 것은 알람시간이 딱 되면 push 알람을 주도록 해야한다. (이때 event가 발생하도록)
-async function sendPushNotification(expoPushToken) {
-  console.log('sendPushNotifications가 클릭됨!!');
-  const message = {
-    to: expoPushToken,
-    sound: 'default',
-    title: '{약 이름}먹을 시간입니다~!',
-    body: '{약 memo}',
-    data: { data: 'goes here' },
-  };
-  await fetch('https://exp.host/--/api/v2/push/send', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Accept-encoding': 'gzip, deflate',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message),
-  });
-}
+
 async function registerForPushNotificationsAsync() {
-  let token;
   if (Constants.isDevice) {
-    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
+    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+    console.log('status: ', status);
+    if (status !== 'granted') {
       alert('설정에서 push 알람 권한을 허용해주세요.');
-      return;
     }
-    token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log('받아온 token: ', token);
-    //여기서 Push token저장을 위한 서버 요청필요
-    async function get_token() {
-      push_token = (await Notifications.getExpoPushTokenAsync()).data;
-      console.log('push token: ', push_token);
-      const token = await getItem();
-      return token;
-    }
-    // get_token().then((token) => {
-    //   axios
-    //     .patch(
-    //       'https://hj-medisharp.herokuapp.com/users/push',
-    //       { token: push_token },
-    //       {
-    //         headers: {
-    //           Authorization: token,
-    //         },
-    //       },
-    //     )
-    //     .then((data) => {
-    //       console.log('token등록 완료');
-    //     })
-    //     .catch((err) => {
-    //       console.error(err);
-    //     });
-    // }); //push token저장 완료
   } else {
-    alert('설정에서 push 알람 권한을 허용해주세요.');
+    alert('푸쉬알람은 모바일 기기에서만 가능합니다.');
   }
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-    Notifications.scheduleNotificationAsync({
-      content: {
-        title: '약먹을 시간입니다~!!! 📬',
-        body: '오늘 먹을 약은 타이레놀',
-        sound: 'email-sound.wav', // <- for Android below 8.0
-      },
-      trigger: {
-        seconds: 5,
-        // channelId: 'new-emails', // <- for Android 8.0+, see definition above
-      },
-    });
-  }
-  return token;
+  return;
 }
 const styles = StyleSheet.create({
   HomeAlarmList: {
