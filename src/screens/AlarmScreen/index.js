@@ -20,6 +20,9 @@ import CameraScreen from '../CameraScreen';
 import CameraNoticeScreen from '../CameraNoticeScreen';
 import { createStackNavigator } from 'react-navigation-stack';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
+import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
+import * as Permissions from 'expo-permissions';
 
 import { NavigationEvents } from 'react-navigation';
 
@@ -70,6 +73,9 @@ export default class AlarmScreen extends React.Component {
       token: '',
       medi_ids: [],
       schedules_common_id: null,
+      pushArr: [],
+      startD: null,
+      endD: null,
     };
   }
 
@@ -96,6 +102,7 @@ export default class AlarmScreen extends React.Component {
     const startDate = selectedDate || this.state.date;
 
     this.setState({ date: startDate });
+    this.setState({ startD: startDate });
     console.log(startDate);
 
     const startDateToShowYear = startDate.getFullYear();
@@ -112,6 +119,7 @@ export default class AlarmScreen extends React.Component {
     this.setState({ endDatePickerShow: !this.state.endDatePickerShow });
     const endDate = selectedDate || this.state.date;
     this.setState({ date: endDate });
+    this.setState({ endD: endDate });
 
     const endDateToShowYear = endDate.getFullYear();
     const endDateToShowMonth = endDate.getMonth();
@@ -152,7 +160,7 @@ export default class AlarmScreen extends React.Component {
     return (
       axios
         .post(
-          'https://yag-olim-test-stage2.herokuapp.com0/medicines',
+          'http://127.0.0.1:5000/medicines',
           { medicine: this.state.alarmMedicine },
           {
             headers: {
@@ -191,7 +199,7 @@ export default class AlarmScreen extends React.Component {
     return (
       axios
         .post(
-          'https://yag-olim-test-stage2.herokuapp.com/schedules-commons',
+          'http:127.0.0.1:5000/schedules-commons',
           {
             schedules_common: {
               title: this.state.alarmTitle,
@@ -239,7 +247,7 @@ export default class AlarmScreen extends React.Component {
   postMediSchedId = () => {
     return axios
       .post(
-        'https://yag-olim-test-stage2.herokuapp.com/medicines/schedules-medicines',
+        'http:127.0.0.1:5000/medicines/schedules-medicines',
         {
           schedules_common_medicines: {
             medicines_id: this.state.medi_ids,
@@ -271,7 +279,7 @@ export default class AlarmScreen extends React.Component {
   postMediUId = () => {
     return axios
       .post(
-        'https://yag-olim-test-stage2.herokuapp.com/medicines/users-medicines',
+        'http:127.0.0.1:5000/medicines/users-medicines',
         {
           medicines: {
             medicines_id: this.state.medi_ids,
@@ -311,10 +319,10 @@ export default class AlarmScreen extends React.Component {
   };
 
   postScheduleDate = () => {
-    if (this.state.schedules_common_id !== 0 || null) {
+    if ((this.state.schedules_common_id !== 0 || null) && this.state.push !== []) {
       return axios
         .post(
-          'https://yag-olim-test-stage2.herokuapp.com/schedules-commons/schedules-dates',
+          'http:127.0.0.1:5000/schedules-commons/schedules-dates',
           {
             schedules_common: {
               schedules_common_id: Number(this.state.schedules_common_id),
@@ -322,6 +330,7 @@ export default class AlarmScreen extends React.Component {
               startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
               enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
               cycle: Number(this.state.alarmInterval),
+              pushArr: this.state.pushArr,
             },
           },
           {
@@ -379,6 +388,37 @@ export default class AlarmScreen extends React.Component {
     await this.postMediSchedules();
     await this.postScheduleDate();
     await this.postMeSCeUsId();
+  };
+
+  postPush = async () => {
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('medi', {
+        name: 'medi',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+      let curr = this.state.startD;
+      let push = [];
+      while (curr <= this.state.endD) {
+        let trigger = new Date(curr);
+        trigger.setHours(Number(this.state.selectedHour));
+        trigger.setMinutes(Number(this.state.selectedMinute));
+        trigger.setSeconds(0);
+        console.log('trigger:', trigger);
+        const pushSched = await Notifications.scheduleNotificationAsync({
+          content: {
+            title: '약먹을 시간입니다~!!! 📬',
+            body: '오늘 먹을 약은 타이레놀',
+            sound: 'email-sound.wav', // <- for Android below 8.0
+          },
+          trigger,
+        });
+        push.push(pushSched);
+        curr = moment(curr).add(Number(this.state.alarmInterval), 'd').toDate();
+      }
+      await this.setState({ pushArr: push });
+    }
   };
 
   render() {
@@ -724,7 +764,12 @@ export default class AlarmScreen extends React.Component {
 
           {/* -- 확인 버튼 -- */}
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity onPress={this.postSchedules}>
+            <TouchableOpacity
+              onPress={async () => {
+                await this.postPush();
+                await this.postSchedules();
+              }}
+            >
               <View
                 style={{
                   justifyContent: 'center',
