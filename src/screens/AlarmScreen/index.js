@@ -20,6 +20,9 @@ import CameraScreen from '../CameraScreen';
 import CameraNoticeScreen from '../CameraNoticeScreen';
 import { createStackNavigator } from 'react-navigation-stack';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
+import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
+import * as Permissions from 'expo-permissions';
 
 import { NavigationEvents } from 'react-navigation';
 
@@ -381,6 +384,27 @@ export default class AlarmScreen extends React.Component {
     await this.postMeSCeUsId();
   };
 
+  push = async () => {
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: '약먹을 시간입니다~!!! 📬',
+          body: '오늘 먹을 약은 타이레놀',
+          sound: 'email-sound.wav', // <- for Android below 8.0
+        },
+        trigger: {
+          seconds: 10,
+        },
+      });
+    }
+  };
+
   render() {
     return (
       <View
@@ -724,7 +748,7 @@ export default class AlarmScreen extends React.Component {
 
           {/* -- 확인 버튼 -- */}
           <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity onPress={this.postSchedules}>
+            <TouchableOpacity onPress={/*this.postSchedules*/ this.push}>
               <View
                 style={{
                   justifyContent: 'center',

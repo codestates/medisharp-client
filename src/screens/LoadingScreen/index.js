@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import axios from 'axios';
+import moment from 'moment';
+import { Text, View, Image, StyleSheet } from 'react-native';
 
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem, removeItem } = useAsyncStorage('@yag_olim');
@@ -11,33 +13,30 @@ export default class LoadingScreen extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      isAuthorized: false,
-    };
-  }
-
-  read = async () => {
-    try {
-      const value = await getItem();
-      if (value) {
-        console.log('success');
-        this.setState({ isAuthorized: true });
-        console.log(value);
-      }
-    } catch (e) {
-      console.log(e);
+    async function get_token() {
+      const token = await getItem();
+      return token;
     }
-  };
-
-  async componentDidMount() {
-    await removeItem();
-    // await this.read();
-    // if (this.state.isAuthorized === true) {
-    //   this.props.navigation.replace('TabNavigator');
-    // } else {
-    //   this.props.navigation.replace('LoginScreen');
-    // }
-    this.props.navigation.replace('LoginScreen');
+    get_token()
+      .then((token) => {
+        axios({
+          method: 'get',
+          url: 'http://127.0.0.1:5000/users/isloading',
+        })
+          .then(() => {
+            if (token) {
+              this.props.navigation.replace('TabNavigator');
+            } else {
+              this.props.navigation.replace('LoginScreen');
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
   render() {
@@ -45,12 +44,22 @@ export default class LoadingScreen extends Component {
       <View style={styles.loginContainer}>
         <Image
           style={{
-            top: '20%',
+            top: '40%',
             width: 310 * 0.85,
             height: 111 * 0.85,
           }}
           source={require('../../img/loginMain.png')}
         />
+        <Text
+          style={{
+            color: '#649A8D',
+            fontSize: 11,
+            alignItems: 'center',
+            top: '80%',
+          }}
+        >
+          Medisharp
+        </Text>
       </View>
     );
   }
