@@ -17,22 +17,22 @@ export default class LoadingScreen extends Component {
       const token = await getItem();
       return token;
     }
-    get_token()
-      .then((token) => {
-        axios({
-          method: 'get',
-          url: 'http://127.0.0.1:5000/users/isloading',
-        })
-      .then((token) => {
-        if (token) {
-          this.props.navigation.replace('TabNavigator');
-        } else {
-          this.props.navigation.replace('LoginScreen');
-        }
+    get_token().then((token) => {
+      axios({
+        method: 'get',
+        url: 'http://127.0.0.1:5000/users/isloading',
       })
-      .catch((err) => {
-        console.error(err);
-      });
+        .then((token) => {
+          if (token) {
+            this.props.navigation.replace('TabNavigator');
+          } else {
+            this.props.navigation.replace('LoginScreen');
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
     // })
     // .catch((err) => {
     //   console.error(err);

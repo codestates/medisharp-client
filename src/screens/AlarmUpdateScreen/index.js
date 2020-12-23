@@ -64,10 +64,9 @@ export default class AlarmUpdateScreen extends React.Component {
       token: '',
       medi_ids: [],
       scheduleUpdate: false,
+      mediupload: false,
       pushArr: [],
       push: this.props.navigation.getParam('item')[0]['push'],
-      startD: null,
-      endD: null,
     };
     const getToken = async () => {
       const token = await getItem();
@@ -129,7 +128,7 @@ export default class AlarmUpdateScreen extends React.Component {
                   {
                     text: '다시시도하기',
                     onPress: async () => {
-                      await this.getSchedules();
+                      await getSchedules();
                     },
                   },
                 ],
@@ -145,7 +144,7 @@ export default class AlarmUpdateScreen extends React.Component {
               {
                 text: '다시시도하기',
                 onPress: async () => {
-                  await this.getSchedules();
+                  await getSchedules();
                 },
               },
             ],
@@ -176,9 +175,15 @@ export default class AlarmUpdateScreen extends React.Component {
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#FF231F7C',
       });
-      let curr = this.state.startD;
+      let startD = moment(
+        `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
+      ).toDate();
+      let endD = moment(
+        `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
+      ).toDate();
+      let curr = startD;
       let pushArr = [];
-      while (curr <= this.state.endD) {
+      while (curr <= endD) {
         let trigger = new Date(curr);
         trigger.setHours(Number(this.state.selectedHour));
         trigger.setMinutes(Number(this.state.selectedMinute));
@@ -186,8 +191,8 @@ export default class AlarmUpdateScreen extends React.Component {
         console.log('trigger:', trigger);
         const push = await Notifications.scheduleNotificationAsync({
           content: {
-            title: '약먹을 시간입니다~!!! 📬',
-            body: '오늘 먹을 약은 타이레놀',
+            title: `약 챙겨먹을 시간입니다~!!!💊`,
+            body: `등록하신 ${this.state.alarmMemo} 일정이에요!`,
             sound: 'email-sound.wav', // <- for Android below 8.0
           },
           trigger,
@@ -201,8 +206,8 @@ export default class AlarmUpdateScreen extends React.Component {
   };
 
   postMedi = () => {
-    return (
-      axios
+    if (this.state.mediupload === false) {
+      return axios
         .post(
           'http://127.0.0.1:5000/medicines',
           { medicine: this.state.medicines },
@@ -212,9 +217,11 @@ export default class AlarmUpdateScreen extends React.Component {
             },
           },
         )
-        // .then((res) => {
-        //   this.setState({ medi_ids: res.data['medicine_id'] });
-        // })
+        .then((res) => {
+          this.setState({ mediupload: true, medi_ids: res.data['medicine_id'] });
+          console.log('약등록 성공', this.state.mediupload);
+          console.log('약등록 성공', this.state.medi_ids);
+        })
         .catch((e) => {
           console.log('error postmedi');
           Alert.alert(
@@ -224,67 +231,60 @@ export default class AlarmUpdateScreen extends React.Component {
               {
                 text: '다시시도하기',
                 onPress: async () => {
-                  if (this.state.medi_ids === []) {
-                    await this.postMedi();
-                    await this.editMeSCeUsId();
-                  } else if (this.state.medi_ids !== []) {
-                    await this.editMeSCeUsId();
-                  }
+                  await this.postMedi();
+                  await this.editMeSceUsId();
                 },
               },
             ],
             { cancelable: false },
           );
-        })
-    );
+        });
+    }
   };
 
   editScheduleCommon = () => {
-    return axios
-      .patch(
-        'http://127.0.0.1:5000/schedules-commons',
-        {
-          schedules_common: {
-            schedules_common_id: this.state.schedules_common_id,
-            memo: this.state.alarmMemo,
-            startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
-            enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
-            cycle: this.state.alarmInterval,
+    if (this.state.scheduleUpdate === false) {
+      return axios
+        .patch(
+          'http://127.0.0.1:5000/schedules-commons',
+          {
+            schedules_common: {
+              schedules_common_id: this.state.schedules_common_id,
+              memo: this.state.alarmMemo,
+              startdate: `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
+              enddate: `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
+              cycle: this.state.alarmInterval,
+            },
           },
-        },
-        {
-          headers: {
-            Authorization: this.state.token,
+          {
+            headers: {
+              Authorization: this.state.token,
+            },
           },
-        },
-      )
-      .then((res) => {
-        console.log('success');
-        this.setState({ scheduleUpdate: true });
-      })
-      .catch((e) => {
-        console.log('error schedules common');
-        Alert.alert(
-          '에러가 발생했습니다!',
-          '다시 시도해주세요',
-          [
-            {
-              text: '다시시도하기',
-              onPress: async () => {
-                if (this.state.scheduleUpdate === false) {
+        )
+        .then((res) => {
+          console.log('success');
+          this.setState({ scheduleUpdate: true });
+        })
+        .catch((e) => {
+          console.log('error schedules common');
+          Alert.alert(
+            '에러가 발생했습니다!',
+            '다시 시도해주세요',
+            [
+              {
+                text: '다시시도하기',
+                onPress: async () => {
                   await this.editScheduleCommon();
                   await this.editScheduleDate();
-                  await this.editMeSCeUsId();
-                } else if (this.state.scheduleUpdate === false) {
-                  await this.editScheduleDate();
-                  await this.editMeSCeUsId();
-                }
+                  await this.editMeSceUsId();
+                },
               },
-            },
-          ],
-          { cancelable: false },
-        );
-      });
+            ],
+            { cancelable: false },
+          );
+        });
+    }
   };
 
   postMediSchedId = () => {
@@ -353,15 +353,15 @@ export default class AlarmUpdateScreen extends React.Component {
   postMediEditSchedules = () => {
     return axios.all([this.postMedi(), this.editScheduleCommon()]).then(
       axios.spread(async (medires, schedulesres) => {
-        await this.setState({
-          medi_ids: medires.data['medicine_id'],
-        });
+        // await this.setState({
+        //   medi_ids: medires.data['medicine_id'],
+        // });
       }),
     );
   };
 
   editScheduleDate = () => {
-    if (this.state.scheduleUpdate === true && this.state.trigger !== []) {
+    if (this.state.scheduleUpdate === true) {
       return axios
         .patch(
           'http://127.0.0.1:5000/schedules-commons/schedules-dates',
@@ -398,23 +398,30 @@ export default class AlarmUpdateScreen extends React.Component {
     }
   };
 
-  editMeSCeUsId = () => {
-    if (this.state.medi_ids.lenth !== [] && this.state.scheduleUpdate === true) {
+  editMeSceUsId = async () => {
+    if (this.state.mediupload === true && this.state.scheduleUpdate === true) {
       return axios
         .all([this.editScheduleDate(), this.postMediSchedId(), this.postMediUId()])
         .then(async () => {
           console.log('success');
           await this.props.navigation.navigate('Calendar');
         });
-    } else if (this.state.medi_ids === [] && this.state.scheduleUpdate === false) {
-      this.postMediEditSchedules();
+    } else if (this.state.mediupload === false && this.state.scheduleUpdate === true) {
+      await this.postMedi();
+      await this.editMeSceUsId();
+    } else if (this.state.mediupload === true && this.state.scheduleUpdate === false) {
+      await this.editScheduleCommon();
+      await this.editScheduleDate();
+      await this.editMeSceUsId();
+    } else if (this.state.mediupload === false && this.state.scheduleUpdate === false) {
+      this.patchSChedules();
     }
   };
 
   patchSChedules = async () => {
     await this.postMediEditSchedules();
     await this.editScheduleDate();
-    await this.editMeSCeUsId();
+    await this.editMeSceUsId();
   };
 
   patchCheck = () => {
@@ -476,7 +483,6 @@ export default class AlarmUpdateScreen extends React.Component {
     const startDate = selectedDate || this.state.date;
 
     this.setState({ date: startDate });
-    this.setState({ startD: startDate });
 
     const startDateToShowYear = startDate.getFullYear();
     const startDateToShowMonth = startDate.getMonth();
@@ -493,7 +499,6 @@ export default class AlarmUpdateScreen extends React.Component {
     this.setState({ endDatePickerShow: !this.state.endDatePickerShow });
     const endDate = selectedDate || this.state.date;
     this.setState({ date: endDate });
-    this.setState({ endD: endDate });
 
     const endDateToShowYear = endDate.getFullYear();
     const endDateToShowMonth = endDate.getMonth();

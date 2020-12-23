@@ -42,7 +42,7 @@ export default class SignUpScreen extends React.Component {
       method: 'get',
       url: 'http://127.0.0.1:5000/users/email',
       params: {
-        email: useremail,
+        email: email,
       },
     })
       .then((res) => {
@@ -56,17 +56,6 @@ export default class SignUpScreen extends React.Component {
       })
       .catch((err) => {
         console.error(err);
-        Alert.alert(
-          '에러가 발생했습니다!',
-          '다시 시도해주세요',
-          [
-            {
-              text: '다시시도하기',
-              onPress: () => this.checkEmail(),
-            },
-          ],
-          { cancelable: false },
-        );
       });
   };
 
