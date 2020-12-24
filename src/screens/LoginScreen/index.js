@@ -65,7 +65,7 @@ export default class LoginScreen extends Component {
   onPressSocial = async (social) => {
     this.setState({
       socialModalVisible: !this.state.socialModalVisible,
-      source: `https://yag-olim-test-prod.herokuapp.com/users/oauth/${social}`,
+      source: `http://127.0.0.1:5000/users/oauth/${social}`,
     });
   };
 

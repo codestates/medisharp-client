@@ -10,6 +10,7 @@ import {
   ScrollView,
   Button,
   Platform,
+  Alert,
 } from 'react-native';
 import CountdownTimer from '../../components/CountdownTimer';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
@@ -65,6 +66,17 @@ const HomeScreen = ({ navigation }) => {
         })
         .catch((err) => {
           console.error(err);
+          Alert.alert(
+            '에러가 발생했습니다!',
+            '다시 시도해주세요',
+            [
+              {
+                text: '다시시도하기',
+                onPress: () => useEffectForToday(),
+              },
+            ],
+            { cancelable: false },
+          );
         });
       get_token().then((token) => {
         axios({
@@ -82,6 +94,17 @@ const HomeScreen = ({ navigation }) => {
           })
           .catch((err) => {
             console.error(err);
+            Alert.alert(
+              '에러가 발생했습니다!',
+              '다시 시도해주세요',
+              [
+                {
+                  text: '다시시도하기',
+                  onPress: () => useEffectForToday(),
+                },
+              ],
+              { cancelable: false },
+            );
           });
       });
     });

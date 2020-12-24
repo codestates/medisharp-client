@@ -65,11 +65,11 @@ export default class FindId extends React.Component {
       [
         {
           text: 'OK',
-          onPress: () => this.props.navigation.navigate('LoginScreen'),
+          onPress: () => this.props.navigation.replace('LoginScreen'),
         },
         {
           text: '회원가입 할래요',
-          onPress: () => this.props.navigation.navigate('SignUpScreen'),
+          onPress: () => this.props.navigation.replace('SignUpScreen'),
         },
         { text: '다시 찾을래요', onPress: () => console.log('다시 찾을래요') },
       ],
@@ -88,8 +88,8 @@ export default class FindId extends React.Component {
     })
       .then((data) => {
         console.log(data.data.email);
-        const userEmail = data.data.email;
-        this.createThreeButtonAlert(userEmail).bind(this);
+        const userEmail = data.data.email[0];
+        this.createThreeButtonAlert(userEmail);
       })
       .catch((e) => {
         console.log(e);
