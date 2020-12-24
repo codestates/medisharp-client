@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
-import { View, Text, Dimensions, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, FlatList, Alert } from 'react-native';
 import CountdownTimer from '../../components/CountdownTimer';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import Constants from 'expo-constants';
@@ -10,7 +10,9 @@ import * as Permissions from 'expo-permissions';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 import { NavigationEvents } from 'react-navigation';
 const { getItem } = useAsyncStorage('@yag_olim');
+
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 //푸쉬 설정해줄때
 Notifications.setNotificationHandler({
@@ -29,7 +31,7 @@ Notifications.setNotificationHandler({
   }),
 });
 const HomeScreen = ({ navigation }) => {
-  const [fakeGetTodayChecked, setfakeGetTodayChecked] = useState([]);
+  const [GetTodayChecked, setGetTodayChecked] = useState([]);
   const [alarmList, setTodayAlarm] = useState([]);
   const [expoPushToken, setExpoPushToken] = useState('');
   const useEffectForToday = () => {
@@ -50,7 +52,7 @@ const HomeScreen = ({ navigation }) => {
         },
       })
         .then((data) => {
-          setfakeGetTodayChecked(data.data.results);
+          setGetTodayChecked(data.data.results);
         })
         .catch((err) => {
           console.error(err);
@@ -104,57 +106,54 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     registerForPushNotificationsAsync();
   }, []);
-  const totalCount = fakeGetTodayChecked.length;
+  const totalCount = GetTodayChecked.length;
   const checkCounting = function () {
     let cnt = 0;
-    fakeGetTodayChecked.forEach(function (el) {
+    GetTodayChecked.forEach(function (el) {
       cnt += el.check ? 1 : 0;
     });
     return cnt;
   };
   const checkCount = checkCounting();
-  return (
-    <View
-      style={{
-        height: window.height,
-        backgroundColor: 'white',
-        paddingTop: getStatusBarHeight(),
-      }}
-    >
-      <NavigationEvents
-        onDidFocus={(payload) => {
-          useEffectForToday();
-        }}
-      />
+  if (alarmList.length > 0) {
+    return (
       <View
         style={{
-          paddingLeft: 20,
-          height: window.height * 0.92 - 1,
-          backgroundColor: 'white',
+          backgroundColor: '#fafafa',
+          height: window.height,
         }}
       >
-        <Text
-          style={{
-            marginTop: 30,
-            fontSize: 24,
-            fontWeight: '300',
+        <NavigationEvents
+          onDidFocus={(payload) => {
+            useEffectForToday();
           }}
-        >
-          약올림
-        </Text>
+        />
+        {/* -- title -- */}
         <View
           style={{
-            borderBottomStyle: 'solid',
-            borderBottomWidth: 5,
-            borderBottomColor: '#6a9c90',
-            alignSelf: 'flex-start',
+            backgroundColor: '#76a991',
+            width: '100%',
+            height: window.height * 0.38,
+            borderBottomRightRadius: 50,
+            borderBottomLeftRadius: 50,
+            paddingTop: getStatusBarHeight() + window.height * 0.06,
+            paddingLeft: 25,
           }}
         >
           <Text
             style={{
-              alignSelf: 'center',
+              fontSize: 34,
+              fontWeight: '200',
+              color: 'white',
+            }}
+          >
+            약올림
+          </Text>
+          <Text
+            style={{
+              color: 'white',
               marginTop: 5,
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: 'bold',
               paddingBottom: 5,
             }}
@@ -162,87 +161,177 @@ const HomeScreen = ({ navigation }) => {
             오늘도 잘 챙겨먹고 있나요?
           </Text>
         </View>
-        <Text
-          style={{
-            width: window.width * 0.85,
-            marginTop: 10,
-            marginBottom: 10,
-          }}
-        >
-          {'지난 7일 간 총 ' + totalCount + '회 중 ' + checkCount + '회 복용하셨군요 :)'}
-        </Text>
+
+        {/* -- status -- */}
         <View
           style={{
-            borderColor: '#6a9c90',
-            borderStyle: 'solid',
-            borderWidth: 10,
-            width: window.height * 0.3,
-            height: window.height * 0.3,
-            marginLeft: -20,
-            marginTop: 10,
-            marginBottom: 10,
-            borderRadius: window.height * 0.3,
-            alignSelf: 'center',
-            justifyContent: 'center',
+            borderRadius: 30,
+            backgroundColor: 'white',
+            elevation: 5,
             alignItems: 'center',
-            textAlign: 'center',
+            justifyContent: 'center',
+            position: 'absolute',
+            top: '28%',
+            marginLeft: 20,
+            width: window.width * 0.9,
+            height: window.height * 0.24,
           }}
         >
-          {/* <CountdownTimer upcomingAlarm={fakeGetAlarmList[1]} /> */}
+          <Text style={{ textAlign: 'center', fontSize: 20, fontWeight: 'bold', color: '#76a991' }}>
+            {'7일 간 ' + totalCount + '회 중 ' + checkCount + '회 복용하셨어요.'}
+            {'\n'}
+          </Text>
           <CountdownTimer upcomingAlarm={alarmList} />
         </View>
-        <View>
-          <Text style={{ fontSize: 18, fontWeight: '300', marginBottom: 10, marginTop: 10 }}>
-            오늘의 알람
-          </Text>
-          {/* <FlatList
-            horizontal={true}
-            style={styles.HomeAlarmList}
-            keyExtractor={(item) => item.toString()}
-            data={fakeAlarmListArry}
-            ListHeaderComponentStyle={true}
-            renderItem={({ item }) => <Alarm alarm={item} />}
-          ></FlatList> */}
+
+        {/* -- todayAlarm -- */}
+        <View
+          style={{
+            position: 'absolute',
+            bottom: window.height * 0.1,
+            width: window.width,
+            height: window.height * 0.35,
+          }}
+        >
+          <View style={{ width: window.width - 20, flexDirection: 'row' }}>
+            <Text
+              style={{
+                flex: 1,
+                fontSize: 16,
+                fontWeight: '200',
+                padding: 10,
+                paddingLeft: 20,
+                color: '#76a991',
+              }}
+            >
+              오늘의 알람
+            </Text>
+            <Text
+              style={{
+                flex: 1,
+                fontSize: 14,
+                textAlign: 'right',
+                paddingTop: 17,
+                fontWeight: '200',
+                color: '#76a991',
+              }}
+            >
+              + 더 보기
+            </Text>
+          </View>
           <View
             style={{
-              backgroundColor: '#D7E4E1',
-              borderTopLeftRadius: 30,
-              borderBottomLeftRadius: 30,
-              height: window.height * 0.25,
-              paddingLeft: 15,
+              height: window.height * 0.3,
             }}
           >
-            <ScrollView horizontal={true}>
-              <View style={styles.HomeAlarmList}>
-                {alarmList.map((item, index) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.HomeAlarm,
-                      index === 0 && { color: 'white', backgroundColor: '#6a9c90' },
-                    ]}
-                  >
-                    <Text style={[styles.firstItemInAlarm, index === 0 && { color: 'white' }]}>
-                      {item['title']}
-                    </Text>
-                    <Text style={[styles.secondItemInAlarm, index === 0 && { color: 'white' }]}>
-                      {item['memo']}
-                    </Text>
-                    <Text style={[styles.thirdItemInAlarm, index === 0 && { color: 'white' }]}>
-                      {item['cycle']}일 마다
-                    </Text>
-                    <Text style={[styles.fourthItemInAlarm, index === 0 && { color: 'white' }]}>
-                      {item['time']}
-                    </Text>
+            <FlatList
+              horizontal={true}
+              keyExtractor={(item) => item}
+              data={alarmList}
+              renderItem={({ item }) => (
+                <View style={styles.HomeAlarm}>
+                  <Text numberOfLines={1} style={styles.firstItemInAlarm}>
+                    {item['title']}
+                  </Text>
+                  <Text numberOfLines={3} style={styles.secondItemInAlarm}>
+                    {item['memo']}
+                  </Text>
+                  <View style={{ flexDirection: 'row', paddingTop: 25 }}>
+                    <Text style={styles.thirdItemInAlarm}>{item['cycle']}일 마다</Text>
+                    <Text style={styles.fourthItemInAlarm}>{item['time']}</Text>
                   </View>
-                ))}
-              </View>
-            </ScrollView>
+                </View>
+              )}
+            />
           </View>
         </View>
       </View>
-    </View>
-  );
+    );
+  } else {
+    return (
+      <View
+        style={{
+          backgroundColor: '#fafafa',
+          height: window.height,
+        }}
+      >
+        <NavigationEvents
+          onDidFocus={(payload) => {
+            useEffectForToday();
+          }}
+        />
+        {/* -- title -- */}
+        <View
+          style={{
+            backgroundColor: '#76a991',
+            width: '100%',
+            height: window.height * 0.38,
+            borderBottomRightRadius: 50,
+            borderBottomLeftRadius: 50,
+            paddingTop: getStatusBarHeight() + window.height * 0.06,
+            paddingLeft: 25,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 34,
+              fontWeight: '200',
+              color: 'white',
+            }}
+          >
+            약올림
+          </Text>
+          <Text
+            style={{
+              color: 'white',
+              marginTop: 5,
+              fontSize: 24,
+              fontWeight: 'bold',
+              paddingBottom: 5,
+            }}
+          >
+            오늘도 잘 챙겨먹고 있나요?
+          </Text>
+        </View>
+
+        {/* -- status -- */}
+        <View
+          style={{
+            borderRadius: 30,
+            backgroundColor: 'white',
+            elevation: 5,
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'absolute',
+            top: '28%',
+            marginLeft: 20,
+            width: window.width * 0.9,
+            height: window.height * 0.24,
+          }}
+        >
+          <Text style={{ textAlign: 'center', fontSize: 20, fontWeight: 'bold', color: '#76a991' }}>
+            {'7일 간 ' + totalCount + '회 중 ' + checkCount + '회 복용하셨어요.'}
+          </Text>
+        </View>
+        <View
+          style={{
+            borderRadius: 30,
+            backgroundColor: 'white',
+            elevation: 5,
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'absolute',
+            top: '55%',
+            marginLeft: 20,
+            width: window.width * 0.9,
+            height: window.height * 0.24,
+          }}
+        >
+          <CountdownTimer upcomingAlarm={alarmList} />
+        </View>
+      </View>
+    );
+  }
 };
 
 async function registerForPushNotificationsAsync() {
@@ -258,43 +347,41 @@ async function registerForPushNotificationsAsync() {
   return;
 }
 const styles = StyleSheet.create({
-  HomeAlarmList: {
-    flex: 1,
-    flexDirection: 'row',
-  },
   HomeAlarm: {
-    padding: 10,
-    paddingTop: 20,
-    width: window.height * 0.2,
-    height: window.height * 0.2,
+    padding: 20,
+    width: window.height * 0.26,
+    height: window.height * 0.26,
     borderRadius: 30,
-    backgroundColor: '#e9efee',
+    backgroundColor: 'white',
     margin: 15,
-    marginLeft: 0,
-    shadowColor: '#313131',
-    shadowOffset: {
-      width: 5,
-      height: 5,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
+    marginTop: 0,
     elevation: 10,
   },
-  firstItemInAlarm: { fontSize: 20, fontWeight: '600', color: '#313131' },
-  secondItemInAlarm: { marginTop: 10, marginBottom: 10, fontWeight: '400', color: '#313131' },
+  firstItemInAlarm: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#76a991',
+    width: window.height * 0.22,
+  },
+  secondItemInAlarm: {
+    marginTop: 20,
+    fontSize: 16,
+    marginBottom: 10,
+    fontWeight: '200',
+    color: '#626262',
+  },
   thirdItemInAlarm: {
-    position: 'absolute',
-    left: 15,
-    bottom: 20,
-    fontWeight: '400',
-    color: '#313131',
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '200',
+    color: '#626262',
   },
   fourthItemInAlarm: {
-    position: 'absolute',
-    bottom: 20,
-    right: 10,
-    fontWeight: '400',
-    color: '#313131',
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '200',
+    color: '#626262',
+    textAlign: 'right',
   },
 });
 export default HomeScreen;

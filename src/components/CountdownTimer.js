@@ -55,31 +55,34 @@ class CountdownTimer extends React.Component {
 
     if (hours === 0 && minutes === 0 && seconds === 0) {
       return (
-        <View>
-          <Text>약 복용하실 시간입니다~</Text>
+        <View style={{ alignItems: 'center' }}>
+          <Text style={{ textAlign: 'center', fontSize: 20, fontWeight: '200' }}>
+            약 복용하실 시간입니다~
+          </Text>
         </View>
       );
     } else if (!hours && !minutes && hours !== 0 && minutes !== 0) {
       return (
-        <View>
-          <Text>오늘은 더이상 복용할 약이 없습니다. 내일도 오늘 같기를!</Text>
+        <View style={{ alignItems: 'center' }}>
+          <Text style={{ textAlign: 'center', fontSize: 20, fontWeight: '200', lineHeight: 30 }}>
+            오늘은 더이상 복용할 약이 없습니다.{'\n'} 내일도 오늘 같기를!
+          </Text>
         </View>
       );
     } else {
       return (
-        <View>
-          <Text>다음 알람까지</Text>
-          <View className="countdown-wrapper">
+        <View style={{ alignItems: 'center' }}>
+          <Text style={{ fontSize: 20, fontWeight: '200' }}>다음 복용까지</Text>
+          <View style={{ alignItems: 'center' }} className="countdown-wrapper">
             {
-              <Text className="countdown-item">
-                {hours}
-                시간
+              <Text
+                style={{ fontSize: 20, fontWeight: '200', lineHeight: 30 }}
+                className="countdown-item"
+              >
+                {hours}시간 {minutes}분 {seconds}초 남았어요.
               </Text>
             }
-            {<Text className="countdown-item">{minutes}분</Text>}
-            {<Text className="countdown-item">{seconds}초</Text>}
           </View>
-          <Text>남았습니다.</Text>
         </View>
       );
     }
