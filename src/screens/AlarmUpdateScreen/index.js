@@ -455,8 +455,9 @@ export default class AlarmUpdateScreen extends React.Component {
         },
       )
       .then((res) => {
-        const changedCheck = res.data.results['check'];
-        this.setState({ check: changedCheck });
+        // const changedCheck = res.data.results['check'];
+        this.props.navigation.navigate('Calendar');
+        // this.setState({ check: changedCheck });
         console.log('patch check API');
       })
       .catch((e) => {
