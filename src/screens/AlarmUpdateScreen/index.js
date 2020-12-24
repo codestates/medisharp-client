@@ -86,15 +86,19 @@ export default class AlarmUpdateScreen extends React.Component {
           let enddate = data.data.results[0]['enddate'].split('-');
           let hour = data.data.results[0]['time'].split(':')[0];
           let minute = data.data.results[0]['time'].split(':')[1];
+          const startDayValue = new Date(data.data.results[0]['startdate']).getDay();
+          const endDayValue = new Date(data.data.results[0]['enddate']).getDay();
           this.setState({
             totalStartDate: data.data.results[0]['startdate'],
             totalEndDate: data.data.results[0]['enddate'],
             startYear: startdate[0],
             startMonth: startdate[1],
             startDate: startdate[2],
+            startDay: this.state.weekName[startDayValue],
             endYear: enddate[0],
             endMonth: enddate[1],
             endDate: enddate[2],
+            endDay: this.state.weekName[endDayValue],
             alarmInterval: data.data.results[0]['cycle'],
             selectedHour: hour,
             selectedMinute: minute,
@@ -479,36 +483,40 @@ export default class AlarmUpdateScreen extends React.Component {
   };
 
   onChangeStartDate = (event, selectedDate) => {
-    this.setState({ startDatePickerShow: !this.state.startDatePickerShow });
+    console.log('onChangeStartDate selectedDate: ', selectedDate);
     const startDate = selectedDate || this.state.date;
-
-    this.setState({ date: startDate });
-
     const startDateToShowYear = startDate.getFullYear();
     const startDateToShowMonth = startDate.getMonth();
     const startDateToShowDate = startDate.getDate();
     const startDateToShowDay = this.state.weekName[startDate.getDay()];
 
-    this.setState({ startYear: startDateToShowYear });
-    this.setState({ startMonth: startDateToShowMonth + 1 });
-    this.setState({ startDate: startDateToShowDate });
-    this.setState({ startDay: startDateToShowDay });
+    this.setState({
+      startDatePickerShow: !this.state.startDatePickerShow,
+      date: startDate,
+      startD: startDate,
+      startYear: startDateToShowYear,
+      startMonth: startDateToShowMonth + 1,
+      startDate: startDateToShowDate,
+      startDay: startDateToShowDay,
+    });
   };
 
   onChangeEndDate = (event, selectedDate) => {
-    this.setState({ endDatePickerShow: !this.state.endDatePickerShow });
     const endDate = selectedDate || this.state.date;
-    this.setState({ date: endDate });
-
     const endDateToShowYear = endDate.getFullYear();
     const endDateToShowMonth = endDate.getMonth();
     const endDateToShowDate = endDate.getDate();
     const endDateToShowDay = this.state.weekName[endDate.getDay()];
-
-    this.setState({ endYear: endDateToShowYear });
-    this.setState({ endMonth: endDateToShowMonth + 1 });
-    this.setState({ endDate: endDateToShowDate });
-    this.setState({ endDay: endDateToShowDay });
+    this.setState({
+      endDatePickerShow: !this.state.endDatePickerShow,
+      date: endDate,
+      endD: endDate,
+      endYear: endDateToShowYear,
+      endYear: endDateToShowYear,
+      endMonth: endDateToShowMonth + 1,
+      endDate: endDateToShowDate,
+      endDay: endDateToShowDay,
+    });
   };
 
   onPressTime = () => {
@@ -521,11 +529,10 @@ export default class AlarmUpdateScreen extends React.Component {
     const selectedHourInPicker = selectedTime.toString().substring(16, 18);
     const selectedMinuteInPicker = selectedTime.toString().substring(19, 21);
 
-    this.setState({ selectedHour: selectedHourInPicker });
-    this.setState({ selectedMinute: selectedMinuteInPicker });
-
     this.setState({
-      showTime: [selectedHourInPicker + '시' + ' ' + selectedMinuteInPicker + '분'],
+      selectedHour: selectedHourInPicker,
+      selectedMinute: selectedMinuteInPicker,
+      showTime: [selectedHourInPicker + ':' + selectedMinuteInPicker],
     });
   };
 
@@ -543,8 +550,10 @@ export default class AlarmUpdateScreen extends React.Component {
           onDidFocus={(payload) => {
             const startDayValue = new Date(this.state.totalStartDate).getDay();
             const endDayValue = new Date(this.state.totalEndDate).getDay();
-            this.setState({ startDay: this.state.weekName[startDayValue] });
-            this.setState({ endDay: this.state.weekName[endDayValue] });
+            this.setState({
+              startDay: this.state.weekName[startDayValue],
+              endDay: this.state.weekName[endDayValue],
+            });
             const resultArr = this.state.medicines;
             let alarmMedicineGetParam = this.props.navigation.getParam('alarmMedicine');
             alarmMedicineGetParam === undefined
