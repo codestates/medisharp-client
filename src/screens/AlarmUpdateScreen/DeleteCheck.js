@@ -1,9 +1,7 @@
-import React, { Component, useEffect, useState } from 'react';
-import react from 'react';
+import React from 'react';
 import { View, Text, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import axios from 'axios';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import { NavigationEvents } from 'react-navigation';
 import * as Notifications from 'expo-notifications';
 
 import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-storage';

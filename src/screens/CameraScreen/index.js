@@ -8,10 +8,8 @@ import axios from 'axios';
 
 import medisharpLogo from '../../img/medisharpLogo.png';
 
-import * as FileSystem from 'expo-file-system';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
-import { NavigationEvents } from 'react-navigation';
 
 const window = Dimensions.get('window');
 

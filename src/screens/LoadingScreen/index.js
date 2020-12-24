@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import moment from 'moment';
 import { Text, View, Image, StyleSheet } from 'react-native';
 
 import { useAsyncStorage } from '@react-native-community/async-storage';

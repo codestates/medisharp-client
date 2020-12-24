@@ -8,8 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
-import { LocaleConfig } from 'react-native-calendars';
+import { Calendar } from 'react-native-calendars';
 import axios from 'axios';
 import moment from 'moment';
 import AntDesign from 'react-native-vector-icons/AntDesign';

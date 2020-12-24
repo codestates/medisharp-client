@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import { NavigationEvents } from 'react-navigation';
 
 import medisharpLogo from '../../img/medisharpLogo.png';
 

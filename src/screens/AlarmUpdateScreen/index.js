@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import axios from 'axios';
 import 'moment/locale/ko';
 import moment from 'moment';
@@ -121,7 +121,6 @@ export default class AlarmUpdateScreen extends React.Component {
             .then((data) => {
               console.log('medi:', data.data.results);
               console.log('schedules_common_id:', this.state.schedules_common_id);
-              //let medicineList = data.data.results.map((el) => el['name']);
               this.setState({ medicines: data.data.results });
             })
             .catch((err) => {
@@ -173,6 +172,10 @@ export default class AlarmUpdateScreen extends React.Component {
 
   editPush = async () => {
     if (Platform.OS === 'android') {
+      console.log(
+        '수정추가할꺼지롱',
+        `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
+      );
       Notifications.setNotificationChannelAsync('medi', {
         name: 'medi',
         importance: Notifications.AndroidImportance.MAX,
@@ -187,6 +190,7 @@ export default class AlarmUpdateScreen extends React.Component {
       ).toDate();
       let curr = startD;
       let pushArr = [];
+      console.log('{{{{{{{{{startD, endD}}}}}}}}}}}: ', startD, endD);
       while (curr <= endD) {
         let trigger = new Date(curr);
         trigger.setHours(Number(this.state.selectedHour));
@@ -206,43 +210,6 @@ export default class AlarmUpdateScreen extends React.Component {
       }
       await this.setState({ pushArr: pushArr });
       console.log(this.state.pushArr);
-    }
-  };
-
-  postMedi = () => {
-    if (this.state.mediupload === false) {
-      return axios
-        .post(
-          'http://127.0.0.1:5000/medicines',
-          { medicine: this.state.medicines },
-          {
-            headers: {
-              Authorization: this.state.token,
-            },
-          },
-        )
-        .then((res) => {
-          this.setState({ mediupload: true, medi_ids: res.data['medicine_id'] });
-          console.log('약등록 성공', this.state.mediupload);
-          console.log('약등록 성공', this.state.medi_ids);
-        })
-        .catch((e) => {
-          console.log('error postmedi');
-          Alert.alert(
-            '에러가 발생했습니다!',
-            '다시 시도해주세요',
-            [
-              {
-                text: '다시시도하기',
-                onPress: async () => {
-                  await this.postMedi();
-                  await this.editMeSceUsId();
-                },
-              },
-            ],
-            { cancelable: false },
-          );
-        });
     }
   };
 
@@ -281,7 +248,6 @@ export default class AlarmUpdateScreen extends React.Component {
                 onPress: async () => {
                   await this.editScheduleCommon();
                   await this.editScheduleDate();
-                  await this.editMeSceUsId();
                 },
               },
             ],
@@ -289,79 +255,6 @@ export default class AlarmUpdateScreen extends React.Component {
           );
         });
     }
-  };
-
-  postMediSchedId = () => {
-    return axios
-      .post(
-        'http://127.0.0.1:5000/medicines/schedules-medicines',
-        {
-          schedules_common_medicines: {
-            medicines_id: this.state.medi_ids,
-            schedules_common_id: this.state.schedules_common_id,
-          },
-        },
-        {
-          headers: {
-            Authorization: this.state.token,
-          },
-        },
-      )
-      .catch((e) => {
-        console.log('error postMediSchedId');
-        Alert.alert(
-          '에러가 발생했습니다!',
-          '다시 시도해주세요',
-          [
-            {
-              text: '다시시도하기',
-              onPress: () => this.postMediSchedId(),
-            },
-          ],
-          { cancelable: false },
-        );
-      });
-  };
-
-  postMediUId = () => {
-    return axios
-      .post(
-        'http://127.0.0.1:5000/medicines/users-medicines',
-        {
-          medicines: {
-            medicines_id: this.state.medi_ids,
-          },
-        },
-        {
-          headers: {
-            Authorization: this.state.token,
-          },
-        },
-      )
-      .catch((e) => {
-        console.log('error postMediUId');
-        Alert.alert(
-          '에러가 발생했습니다!',
-          '다시 시도해주세요',
-          [
-            {
-              text: '다시시도하기',
-              onPress: () => this.postMediUId(),
-            },
-          ],
-          { cancelable: false },
-        );
-      });
-  };
-
-  postMediEditSchedules = () => {
-    return axios.all([this.postMedi(), this.editScheduleCommon()]).then(
-      axios.spread(async (medires, schedulesres) => {
-        // await this.setState({
-        //   medi_ids: medires.data['medicine_id'],
-        // });
-      }),
-    );
   };
 
   editScheduleDate = () => {
@@ -385,6 +278,10 @@ export default class AlarmUpdateScreen extends React.Component {
             },
           },
         )
+        .then(async () => {
+          console.log('알람수정 success');
+          await this.props.navigation.navigate('Calendar');
+        })
         .catch((e) => {
           console.log('error editScheduleDate');
           Alert.alert(
@@ -402,30 +299,9 @@ export default class AlarmUpdateScreen extends React.Component {
     }
   };
 
-  editMeSceUsId = async () => {
-    if (this.state.mediupload === true && this.state.scheduleUpdate === true) {
-      return axios
-        .all([this.editScheduleDate(), this.postMediSchedId(), this.postMediUId()])
-        .then(async () => {
-          console.log('success');
-          await this.props.navigation.navigate('Calendar');
-        });
-    } else if (this.state.mediupload === false && this.state.scheduleUpdate === true) {
-      await this.postMedi();
-      await this.editMeSceUsId();
-    } else if (this.state.mediupload === true && this.state.scheduleUpdate === false) {
-      await this.editScheduleCommon();
-      await this.editScheduleDate();
-      await this.editMeSceUsId();
-    } else if (this.state.mediupload === false && this.state.scheduleUpdate === false) {
-      this.patchSChedules();
-    }
-  };
-
   patchSChedules = async () => {
-    await this.postMediEditSchedules();
+    await this.editScheduleCommon();
     await this.editScheduleDate();
-    await this.editMeSceUsId();
   };
 
   patchCheck = () => {
@@ -445,8 +321,7 @@ export default class AlarmUpdateScreen extends React.Component {
         },
       )
       .then((res) => {
-        const changedCheck = res.data.results['check'];
-        this.setState({ check: changedCheck });
+        this.props.navigation.navigate('Calendar');
         console.log('patch check API');
       })
       .catch((e) => {
@@ -664,20 +539,7 @@ export default class AlarmUpdateScreen extends React.Component {
             <View style={styles.seclectView}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Icon name="pills" size={22} color={'#D6E4E1'} />
-                <Text style={styles.seclectText}>약 올리기</Text>
-                <TouchableOpacity
-                  onPress={() =>
-                    this.props.navigation.navigate('CameraNoticeScreen', {
-                      update: true,
-                      item: this.state.item,
-                      clickedDate: this.state.clickedDate,
-                    })
-                  }
-                >
-                  <Text style={{ fontSize: 16 }}>
-                    사진으로 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />
-                  </Text>
-                </TouchableOpacity>
+                <Text style={styles.seclectText}>등록된 약</Text>
               </View>
             </View>
             <View>
@@ -702,27 +564,6 @@ export default class AlarmUpdateScreen extends React.Component {
                       <Text style={{ fontSize: 18, marginRight: 5 }}>
                         {item.name}
                         {'  '}
-                        <Icon
-                          onPress={() => {
-                            const filteredMedicine = [];
-                            for (let i = 0; i < this.state.medicines.length; i++) {
-                              console.log('this.state.medicines[i] =>', this.state.medicines[i]);
-                              console.log('item =>', item);
-                              if (item['name'] !== this.state.medicines[i]['name']) {
-                                filteredMedicine.push(this.state.medicines[i]);
-                              } else {
-                              }
-                            }
-
-                            this.setState({ medicines: filteredMedicine });
-                          }}
-                          name="times-circle"
-                          size={20}
-                          color={'#9a6464'}
-                          style={{
-                            marginLeft: 5,
-                          }}
-                        />
                       </Text>
                     </View>
                   </View>

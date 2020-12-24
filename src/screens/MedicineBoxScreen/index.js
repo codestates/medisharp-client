@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import { get } from 'react-native/Libraries/Utilities/PixelRatio';
+
 import { NavigationEvents } from 'react-navigation';
 
 import medisharpLogo from '../../img/medisharpLogo.png';

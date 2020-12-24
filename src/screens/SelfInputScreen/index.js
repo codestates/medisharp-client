@@ -1,5 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
-import react from 'react';
+import React from 'react';
 import {
   View,
   Image,
@@ -8,8 +7,6 @@ import {
   TextInput,
   Dimensions,
   TouchableOpacity,
-  ActivityIndicator,
-  TouchableHighlightBase,
   Alert,
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
