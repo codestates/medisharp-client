@@ -52,7 +52,7 @@ const HomeScreen = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/schedules-dates/check/today',
+        url: 'https://hj-medisharp.herokuapp.com/schedules-dates/check/today',
         headers: {
           Authorization: token,
         },
@@ -81,7 +81,7 @@ const HomeScreen = ({ navigation }) => {
       get_token().then((token) => {
         axios({
           method: 'get',
-          url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
+          url: `https://hj-medisharp.herokuapp.com/schedules-dates/schedules-commons/alarm`,
           headers: {
             Authorization: token,
           },

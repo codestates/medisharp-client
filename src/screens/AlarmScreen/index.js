@@ -157,7 +157,7 @@ export default class AlarmScreen extends React.Component {
     if (this.state.mediupload === false) {
       return axios
         .post(
-          'http://127.0.0.1:5000/medicines',
+          'https://hj-medisharp.herokuapp.com/medicines',
           { medicine: this.state.alarmMedicine },
           {
             headers: {
@@ -194,7 +194,7 @@ export default class AlarmScreen extends React.Component {
     if (this.state.schedulescomupload === false) {
       return axios
         .post(
-          'http://127.0.0.1:5000/schedules-commons',
+          'https://hj-medisharp.herokuapp.com/schedules-commons',
           {
             schedules_common: {
               title: this.state.alarmTitle,
@@ -242,7 +242,7 @@ export default class AlarmScreen extends React.Component {
   postMediSchedId = () => {
     return axios
       .post(
-        'http://127.0.0.1:5000/medicines/schedules-medicines',
+        'https://hj-medisharp.herokuapp.com/medicines/schedules-medicines',
         {
           schedules_common_medicines: {
             medicines_id: this.state.medi_ids,
@@ -274,7 +274,7 @@ export default class AlarmScreen extends React.Component {
   postMediUId = () => {
     return axios
       .post(
-        'http://127.0.0.1:5000/medicines/users-medicines',
+        'https://hj-medisharp.herokuapp.com/medicines/users-medicines',
         {
           medicines: {
             medicines_id: this.state.medi_ids,
@@ -317,7 +317,7 @@ export default class AlarmScreen extends React.Component {
     if (this.state.schedulescomupload === true && this.state.pushArr !== []) {
       return axios
         .post(
-          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
+          'https://hj-medisharp.herokuapp.com/schedules-commons/schedules-dates',
           {
             schedules_common: {
               schedules_common_id: Number(this.state.schedules_common_id),

@@ -32,7 +32,7 @@ export default class Mypage extends React.Component {
     const getUserInfo = () => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/users',
+        url: 'https://hj-medisharp.herokuapp.com/users',
         headers: {
           Authorization: this.state.token,
         },

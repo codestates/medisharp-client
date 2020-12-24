@@ -245,7 +245,7 @@ export default class CameraScreen extends React.Component {
     // get_token()
     //   .then((token) => {
     //     axios
-    //       .post('http://127.0.0.1:5000/medicines/image', form_data, {
+    //       .post('https://hj-medisharp.herokuapp.com/medicines/image', form_data, {
     //         headers: {
     //           'content-type': 'multipart/form-data',
     //           Authorization: token,
@@ -280,7 +280,7 @@ export default class CameraScreen extends React.Component {
     get_token()
       .then((token) => {
         axios
-          .post('http://127.0.0.1:5000/medicines/image', form_data, {
+          .post('https://hj-medisharp.herokuapp.com/medicines/image', form_data, {
             headers: {
               'content-type': 'multipart/form-data',
               Authorization: token,

@@ -38,7 +38,7 @@ const MedicineBox = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/medicines',
+        url: 'https://hj-medisharp.herokuapp.com/medicines',
         headers: {
           Authorization: token,
         },
