@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import moment from 'moment';
 import { Text, View, Image, StyleSheet } from 'react-native';
 
 import { useAsyncStorage } from '@react-native-community/async-storage';
@@ -20,7 +19,7 @@ export default class LoadingScreen extends Component {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://hj-medisharp.herokuapp.com/users/isloading',
+        url: 'http://127.0.0.1:5000/users/isloading',
       })
         .then((token) => {
           if (token) {

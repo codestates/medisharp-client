@@ -8,10 +8,8 @@ import axios from 'axios';
 
 import medisharpLogo from '../../img/medisharpLogo.png';
 
-import * as FileSystem from 'expo-file-system';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
-import { NavigationEvents } from 'react-navigation';
 
 const window = Dimensions.get('window');
 
@@ -245,7 +243,7 @@ export default class CameraScreen extends React.Component {
     // get_token()
     //   .then((token) => {
     //     axios
-    //       .post('https://hj-medisharp.herokuapp.com/medicines/image', form_data, {
+    //       .post('http://127.0.0.1:5000/medicines/image', form_data, {
     //         headers: {
     //           'content-type': 'multipart/form-data',
     //           Authorization: token,
@@ -280,7 +278,7 @@ export default class CameraScreen extends React.Component {
     get_token()
       .then((token) => {
         axios
-          .post('https://hj-medisharp.herokuapp.com/medicines/image', form_data, {
+          .post('http://127.0.0.1:5000/medicines/image', form_data, {
             headers: {
               'content-type': 'multipart/form-data',
               Authorization: token,

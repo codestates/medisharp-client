@@ -1,21 +1,9 @@
-import React, { Component, useEffect, useState } from 'react';
-import react from 'react';
-import {
-  View,
-  Image,
-  StyleSheet,
-  Text,
-  Dimensions,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+import React from 'react';
+import { View, Image, Text, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import axios from 'axios';
-import medisharpLogo from '../../img/medisharpLogo.png';
 import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
-import { NavigationEvents } from 'react-navigation';
 
 const window = Dimensions.get('window');
 
@@ -54,7 +42,7 @@ export default class CheckScreen extends React.Component {
     }
     get_token().then((token) => {
       axios
-        .post('https://hj-medisharp.herokuapp.com/medicines/upload', this.state.form_data, {
+        .post('http://127.0.0.1:5000/medicines/upload', this.state.form_data, {
           headers: {
             'content-type': 'multipart/form-data',
             Authorization: token,

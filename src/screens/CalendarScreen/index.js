@@ -8,8 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
-import { LocaleConfig } from 'react-native-calendars';
+import { Calendar } from 'react-native-calendars';
 import axios from 'axios';
 import moment from 'moment';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -61,7 +60,7 @@ const CalendarMain = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://hj-medisharp.herokuapp.com/schedules-dates/check/month',
+        url: 'http://127.0.0.1:5000/schedules-dates/check/month',
         headers: {
           Authorization: token,
         },
@@ -176,7 +175,7 @@ const CalendarMain = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: `https://hj-medisharp.herokuapp.com/schedules-dates/schedules-commons/alarm`,
+        url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
         headers: {
           Authorization: token,
         },

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import { get } from 'react-native/Libraries/Utilities/PixelRatio';
+
 import { NavigationEvents } from 'react-navigation';
 
 import medisharpLogo from '../../img/medisharpLogo.png';
@@ -38,7 +38,7 @@ const MedicineBox = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://hj-medisharp.herokuapp.com/medicines',
+        url: 'http://127.0.0.1:5000/medicines',
         headers: {
           Authorization: token,
         },

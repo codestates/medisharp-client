@@ -1,28 +1,16 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
-import {
-  View,
-  Text,
-  Dimensions,
-  FlatList,
-  StyleSheet,
-  ScrollView,
-  Button,
-  Platform,
-  Alert,
-} from 'react-native';
+import { View, Text, Dimensions, StyleSheet, ScrollView, Alert } from 'react-native';
 import CountdownTimer from '../../components/CountdownTimer';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
-import Alarm from '../../components/Alarm';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 import { NavigationEvents } from 'react-navigation';
 const { getItem } = useAsyncStorage('@yag_olim');
 const window = Dimensions.get('window');
-const answer = [{ result: '타이레놀', detail: '약먹을 시간이야' }];
 
 //푸쉬 설정해줄때
 Notifications.setNotificationHandler({
@@ -52,7 +40,7 @@ const HomeScreen = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'https://hj-medisharp.herokuapp.com/schedules-dates/check/today',
+        url: 'http://127.0.0.1:5000/schedules-dates/check/today',
         headers: {
           Authorization: token,
         },
@@ -81,7 +69,7 @@ const HomeScreen = ({ navigation }) => {
       get_token().then((token) => {
         axios({
           method: 'get',
-          url: `https://hj-medisharp.herokuapp.com/schedules-dates/schedules-commons/alarm`,
+          url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
           headers: {
             Authorization: token,
           },

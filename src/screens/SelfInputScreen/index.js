@@ -1,5 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
-import react from 'react';
+import React from 'react';
 import {
   View,
   Image,
@@ -8,8 +7,6 @@ import {
   TextInput,
   Dimensions,
   TouchableOpacity,
-  ActivityIndicator,
-  TouchableHighlightBase,
   Alert,
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
@@ -57,7 +54,7 @@ export default class CheckScreen extends React.Component {
     get_token()
       .then((token) => {
         axios
-          .post('https://hj-medisharp.herokuapp.com/medicines/upload', this.state.form_data, {
+          .post('http://127.0.0.1:5000/medicines/upload', this.state.form_data, {
             headers: {
               'content-type': 'multipart/form-data',
               Authorization: token,
