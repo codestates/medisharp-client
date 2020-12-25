@@ -13,6 +13,7 @@ import * as FileSystem from 'expo-file-system';
 import axios from 'axios';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 import { ScrollView } from 'react-native-gesture-handler';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
 
 const { getItem } = useAsyncStorage('@yag_olim');
 
@@ -135,36 +136,37 @@ export default class CheckScreen extends React.Component {
           width: window.width - 40,
           marginLeft: 20,
           alignItems: 'center',
-          paddingTop: verticalMargin * 3,
+          marginTop: getStatusBarHeight(),
         }}
       >
-        <Image
-          style={{
-            width: window.width - 40,
-            height: window.width - 40,
-            borderRadius: 50,
-          }}
-          source={{ uri: this.state.getImg }}
-        />
-
-        <Text
-          style={{
-            fontSize: 20,
-            color: '#313131',
-            fontWeight: 'bold',
-            marginTop: '5%',
-            textAlign: 'center',
-          }}
-        >
-          직접 입력하기
-        </Text>
-
         <ScrollView
           style={{
             height: window.height * 0.8,
-            marginTop: verticalMargin,
           }}
         >
+          <Image
+            style={{
+              width: window.width - 40,
+              height: window.width - 40,
+              borderRadius: 50,
+              marginTop: verticalMargin,
+            }}
+            source={{ uri: this.state.getImg }}
+          />
+
+          <Text
+            style={{
+              fontSize: 20,
+              color: '#313131',
+              fontWeight: 'bold',
+              marginTop: '5%',
+              marginBottom: '5%',
+              textAlign: 'center',
+            }}
+          >
+            직접 입력하기
+          </Text>
+
           {/* -- 약 이름 입력 뷰 -- */}
           <View style={styles.textInputBox}>
             <Text style={styles.textInputTitle}>약 이름</Text>
