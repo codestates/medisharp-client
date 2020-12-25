@@ -197,7 +197,7 @@ const TabNavigator = createBottomTabNavigator(
                   height: 100,
                   resizeMode: 'center',
                 }}
-                source={require('../../assets/mypageActive.png')}
+                source={require('../../assets/myPageActive.png')}
               />
             </View>
           );
@@ -211,7 +211,7 @@ const TabNavigator = createBottomTabNavigator(
                   height: 100,
                   resizeMode: 'center',
                 }}
-                source={require('../../assets/mypage.png')}
+                source={require('../../assets/myPage.png')}
               />
             </View>
           );
