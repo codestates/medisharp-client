@@ -22,22 +22,7 @@ const window = Dimensions.get('window');
 let verticalMargin = window.height * 0.02;
 
 const MedicineBox = ({ navigation }) => {
-  const [myMedicines, setMyMedicines] = useState([
-    {
-      id: 1,
-      name: '오메가정',
-      camera: false,
-      image_dir:
-        'https://medisharp.s3.ap-northeast-2.amazonaws.com//4444444-DCC1-451F-B331-458580722917.jpg_L',
-    },
-    {
-      id: 2,
-      name: '타이레놀정500밀리그람',
-      camera: true,
-      image_dir:
-        'https://medisharp.s3.ap-northeast-2.amazonaws.com//5555555-DCC1-451F-B331-458580722917.jpg_L',
-    },
-  ]);
+  const [myMedicines, setMyMedicines] = useState([]);
   // const [isLoading, setIsLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,24 +42,25 @@ const MedicineBox = ({ navigation }) => {
         headers: {
           Authorization: token,
         },
-      }).then((data) => {
-        setMyMedicines(data.data.results);
-        setIsLoading(false);
-      });
-    .catch((err) => {
-      console.error(err);
-      Alert.alert(
-        '에러가 발생했습니다!',
-        '다시 시도해주세요',
-        [
-          {
-            text: '다시시도하기',
-            onPress: () => useEffectForMedicines(),
-          },
-        ],
-        { cancelable: false },
-      );
-    });
+      })
+        .then((data) => {
+          setMyMedicines(data.data.results);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          Alert.alert(
+            '에러가 발생했습니다!',
+            '다시 시도해주세요',
+            [
+              {
+                text: '다시시도하기',
+                onPress: () => useEffectForMedicines(),
+              },
+            ],
+            { cancelable: false },
+          );
+        });
     });
   };
 
@@ -95,7 +81,7 @@ const MedicineBox = ({ navigation }) => {
     setCameraTabSelected(!cameraTabSelected);
     setSelfTabSelected(!selfTabSelected);
   };
-  
+
   if (isLoading === true) {
     //로딩
     return (
@@ -110,6 +96,11 @@ const MedicineBox = ({ navigation }) => {
             alignItems: 'center',
           }}
         >
+          <NavigationEvents
+            onDidFocus={(payload) => {
+              useEffectForMedicines();
+            }}
+          />
           <Image
             style={{
               width: window.width * 0.2,

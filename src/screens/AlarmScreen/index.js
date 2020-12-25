@@ -166,20 +166,20 @@ export default class AlarmScreen extends React.Component {
         })
         .catch((e) => {
           console.log('error postmedi');
-          Alert.alert(
-            '에러가 발생했습니다!',
-            '다시 시도해주세요',
-            [
-              {
-                text: '다시시도하기',
-                onPress: async () => {
-                  await this.postMedi();
-                  await this.postMeSceUsId();
-                },
-              },
-            ],
-            { cancelable: false },
-          );
+          // Alert.alert(
+          //   '에러가 발생했습니다!',
+          //   '다시 시도해주세요',
+          //   [
+          //     {
+          //       text: '다시시도하기',
+          //       onPress: async () => {
+          //         await this.postMedi();
+          //         await this.postMeSceUsId();
+          //       },
+          //     },
+          //   ],
+          //   { cancelable: false },
+          // );
         });
     }
   };
@@ -214,21 +214,21 @@ export default class AlarmScreen extends React.Component {
         })
         .catch((e) => {
           console.log('error schedules common');
-          Alert.alert(
-            '에러가 발생했습니다!',
-            '다시 시도해주세요',
-            [
-              {
-                text: '다시시도하기',
-                onPress: async () => {
-                  await this.postScheduleCommon();
-                  await this.postScheduleDate();
-                  await this.postMeSceUsId();
-                },
-              },
-            ],
-            { cancelable: false },
-          );
+          // Alert.alert(
+          //   '에러가 발생했습니다!',
+          //   '다시 시도해주세요',
+          //   [
+          //     {
+          //       text: '다시시도하기',
+          //       onPress: async () => {
+          //         await this.postScheduleCommon();
+          //         await this.postScheduleDate();
+          //         await this.postMeSceUsId();
+          //       },
+          //     },
+          //   ],
+          //   { cancelable: false },
+          // );
         });
     }
   };
@@ -299,10 +299,12 @@ export default class AlarmScreen extends React.Component {
   postMediSchedules = () => {
     return axios.all([this.postMedi(), this.postScheduleCommon()]).then(
       axios.spread(async (medires, schedulesres) => {
-        // await this.setState({
-        //   medi_ids: medires.data['medicine_id'],
-        //   schedules_common_id: schedulesres.data.results['new_schedules_common_id'],
-        // });
+        await this.setState({
+          // medi_ids: medires.data['medicine_id'],
+          // schedules_common_id: schedulesres.data.results['new_schedules_common_id'],
+          mediupload: true,
+          schedulescomupload: true,
+        });
       }),
     );
   };
@@ -330,17 +332,17 @@ export default class AlarmScreen extends React.Component {
         )
         .catch((e) => {
           console.log('error postScheduleDate');
-          Alert.alert(
-            '에러가 발생했습니다!',
-            '다시 시도해주세요',
-            [
-              {
-                text: '다시시도하기',
-                onPress: () => this.postScheduleDate(),
-              },
-            ],
-            { cancelable: false },
-          );
+          // Alert.alert(
+          //   '에러가 발생했습니다!',
+          //   '다시 시도해주세요',
+          //   [
+          //     {
+          //       text: '다시시도하기',
+          //       onPress: () => this.postScheduleDate(),
+          //     },
+          //   ],
+          //   { cancelable: false },
+          // );
         });
     }
   };
@@ -364,6 +366,9 @@ export default class AlarmScreen extends React.Component {
           selectedHour: '',
           selectedMinute: '',
           alarmMedicine: [],
+          mediupload: false,
+          schedulescomupload: false,
+          pushArr: [],
         });
         await this.props.navigation.navigate('Calendar');
       });
