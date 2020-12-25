@@ -8,6 +8,7 @@ import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-sto
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 export default class CheckScreen extends React.Component {
   static navigationOptions = {
@@ -149,35 +150,37 @@ export default class CheckScreen extends React.Component {
     return (
       <View
         style={{
-          height: window.height * 0.92 - 1,
           backgroundColor: 'white',
-          paddingTop: getStatusBarHeight(),
-          paddingLeft: 20,
+          paddingTop: getStatusBarHeight() + verticalMargin,
+          height: window.height * 0.9,
         }}
       >
-        <Text
-          style={{
-            marginTop: 30,
-            fontSize: 24,
-            fontWeight: '300',
-          }}
-        >
-          알람 수정
-        </Text>
         <View
           style={{
-            borderBottomStyle: 'solid',
-            borderBottomWidth: 5,
-            borderBottomColor: '#6a9c90',
             alignSelf: 'flex-start',
-            marginBottom: window.height * 0.02,
+            backgroundColor: '#76a991',
+            padding: 10,
+            paddingLeft: 25,
+            paddingRight: 25,
+            borderTopRightRadius: 35,
+            borderBottomRightRadius: 35,
+            marginBottom: 10,
           }}
         >
           <Text
             style={{
-              alignSelf: 'center',
+              fontSize: 28,
+              fontWeight: '200',
+              color: 'white',
+            }}
+          >
+            알람 수정
+          </Text>
+          <Text
+            style={{
+              color: 'white',
               marginTop: 5,
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: 'bold',
               paddingBottom: 5,
             }}
@@ -185,18 +188,28 @@ export default class CheckScreen extends React.Component {
             알람 삭제하기
           </Text>
         </View>
-        {/* -- 상단 복용 여부 버튼 -- */}
+
+        {/* -- 삭제 여부 버튼 -- */}
         <View
           style={{
-            width: window.width - 40,
+            alignItems: 'center',
+            height: '40%',
+            width: window.width * 0.7,
+            marginTop: '20%',
+            marginLeft: window.width * 0.15,
+            justifyContent: 'center',
           }}
         >
           <View
             style={{
+              justifyContent: 'center',
               alignItems: 'center',
-              marginTop: '30%',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
+              width: window.width * 0.7,
+              height: window.height * 0.075,
+              borderColor: '#ffaaaa',
+              borderStyle: 'solid',
+              borderWidth: 2,
+              borderRadius: window.height * 0.075,
             }}
           >
             <TouchableOpacity
@@ -204,46 +217,30 @@ export default class CheckScreen extends React.Component {
                 await this.deleteClickedPush();
                 await this.deleteClickedSchedules();
               }}
-              style={{
-                marginTop: 10,
-                width: window.width * 0.42,
-                height: window.width * 0.42,
-                backgroundColor: '#6a9c90',
-                borderRadius: 30,
-                alignContent: 'center',
-                justifyContent: 'center',
-              }}
             >
-              <Text
-                style={{ fontSize: 20, fontWeight: 'bold', color: 'white', textAlign: 'center' }}
-              >
+              <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#ffaaaa' }}>
                 이 알람만 삭제할래요!
               </Text>
             </TouchableOpacity>
-
+          </View>
+          <View
+            style={{
+              justifyContent: 'center',
+              marginTop: verticalMargin * 2,
+              alignItems: 'center',
+              width: window.width * 0.7,
+              height: window.height * 0.075,
+              backgroundColor: '#ffaaaa',
+              borderRadius: window.height * 0.075,
+            }}
+          >
             <TouchableOpacity
               onPress={async () => {
                 await this.deleteWholePush();
                 await this.deleteWholeSchedules();
               }}
-              style={{
-                marginTop: 10,
-                width: window.width * 0.42,
-                height: window.width * 0.42,
-                backgroundColor: '#9a6464',
-                borderRadius: 30,
-                alignContent: 'center',
-                justifyContent: 'center',
-              }}
             >
-              <Text
-                style={{
-                  fontSize: 20,
-                  fontWeight: 'bold',
-                  color: 'white',
-                  textAlign: 'center',
-                }}
-              >
+              <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}>
                 전체 알람을 삭제할래요!
               </Text>
             </TouchableOpacity>

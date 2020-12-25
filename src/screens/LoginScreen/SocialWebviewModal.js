@@ -19,7 +19,7 @@ const SocialWebviewModal = (props) => {
         }}
         name="times-circle"
         size={30}
-        color={'#9a6464'}
+        color={'#ffaaaa'}
         style={{
           marginLeft: 5,
         }}

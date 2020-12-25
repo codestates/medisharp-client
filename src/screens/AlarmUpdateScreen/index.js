@@ -18,13 +18,13 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { NavigationEvents } from 'react-navigation';
 import * as Notifications from 'expo-notifications';
-import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-storage';
-
+import { useAsyncStorage } from '@react-native-community/async-storage';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 export default class AlarmUpdateScreen extends React.Component {
   static navigationOptions = {
@@ -358,7 +358,6 @@ export default class AlarmUpdateScreen extends React.Component {
   };
 
   onChangeStartDate = (event, selectedDate) => {
-    console.log('onChangeStartDate selectedDate: ', selectedDate);
     const startDate = selectedDate || this.state.date;
     const startDateToShowYear = startDate.getFullYear();
     const startDateToShowMonth = startDate.getMonth();
@@ -415,10 +414,9 @@ export default class AlarmUpdateScreen extends React.Component {
     return (
       <View
         style={{
-          height: window.height * 0.92 - 1,
           backgroundColor: 'white',
-          paddingTop: getStatusBarHeight(),
-          paddingLeft: 20,
+          paddingTop: getStatusBarHeight() + verticalMargin,
+          height: window.height * 0.9,
         }}
       >
         <NavigationEvents
@@ -435,113 +433,110 @@ export default class AlarmUpdateScreen extends React.Component {
               ? this.state.medicines
               : resultArr.push(alarmMedicineGetParam);
             this.setState({ medicines: resultArr });
-            console.log('alarmMedicine  =>', this.state.medicines);
-            console.log('resultArr  =>', resultArr);
           }}
         />
-
-        <Text
-          style={{
-            marginTop: 30,
-            fontSize: 24,
-            fontWeight: '300',
-          }}
-        >
-          알람 수정
-        </Text>
         <View
           style={{
-            borderBottomStyle: 'solid',
-            borderBottomWidth: 5,
-            borderBottomColor: '#6a9c90',
             alignSelf: 'flex-start',
-            marginBottom: window.height * 0.02,
+            backgroundColor: '#76a991',
+            padding: 10,
+            paddingLeft: 25,
+            paddingRight: 25,
+            borderTopRightRadius: 35,
+            borderBottomRightRadius: 35,
+            marginBottom: 10,
           }}
         >
           <Text
             style={{
-              alignSelf: 'center',
+              fontSize: 28,
+              fontWeight: '200',
+              color: 'white',
+            }}
+          >
+            알람 수정
+          </Text>
+          <Text
+            style={{
+              color: 'white',
               marginTop: 5,
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: 'bold',
               paddingBottom: 5,
             }}
           >
-            복용 알람 수정하기
+            알람 수정하기
           </Text>
         </View>
-        <ScrollView>
-          {/* -- 상단 복용 여부 버튼 -- */}
+
+        {/* -- 콘텐츠 시작 -- */}
+
+        {/* -- 상단 복용 여부 버튼 -- */}
+        <View
+          style={{
+            width: window.width - 20,
+            marginTop: 0,
+            marginBottom: 10,
+          }}
+        >
           <View
             style={{
-              width: window.width - 40,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingLeft: 20,
             }}
           >
-            <View
-              style={{
-                alignItems: 'center',
-                marginTop: 10,
-                marginBottom: 20,
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}
+            <TouchableOpacity
+              onPress={this.checkChangeTrue}
+              style={this.state.check ? styles.TrueBoxCheckTrue : styles.TrueBoxCheckFalse}
             >
-              <TouchableOpacity
-                onPress={this.checkChangeTrue}
-                style={this.state.check ? styles.TrueBoxCheckTrue : styles.TrueBoxCheckFalse}
+              <Text
+                style={
+                  this.state.check
+                    ? { fontSize: 20, fontWeight: 'bold', color: 'white', textAlign: 'center' }
+                    : {
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        color: '#76a991',
+                        textAlign: 'center',
+                      }
+                }
               >
-                <Text
-                  style={
-                    this.state.check
-                      ? { fontSize: 20, fontWeight: 'bold', color: 'white', textAlign: 'center' }
-                      : {
-                          fontSize: 20,
-                          fontWeight: 'bold',
-                          color: '#6a9c90',
-                          textAlign: 'center',
-                        }
-                  }
-                >
-                  먹었어요!
-                </Text>
-              </TouchableOpacity>
+                먹었어요!
+              </Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={this.checkChangeFalse}
-                style={this.state.check ? styles.FalseBoxCheckFalse : styles.FalseBoxCheckTrue}
+            <TouchableOpacity
+              onPress={this.checkChangeFalse}
+              style={this.state.check ? styles.FalseBoxCheckFalse : styles.FalseBoxCheckTrue}
+            >
+              <Text
+                style={
+                  this.state.check
+                    ? {
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        color: '#ffaaaa',
+                        textAlign: 'center',
+                      }
+                    : {
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        color: 'white',
+                        textAlign: 'center',
+                      }
+                }
               >
-                <Text
-                  style={
-                    this.state.check
-                      ? {
-                          fontSize: 20,
-                          fontWeight: 'bold',
-                          color: '#9a6464',
-                          textAlign: 'center',
-                        }
-                      : {
-                          fontSize: 20,
-                          fontWeight: 'bold',
-                          color: 'white',
-                          textAlign: 'center',
-                        }
-                  }
-                >
-                  아직이요!
-                </Text>
-              </TouchableOpacity>
-            </View>
+                아직이요!
+              </Text>
+            </TouchableOpacity>
           </View>
+        </View>
 
+        <ScrollView style={{ paddingLeft: 20, marginTop: 10 }}>
           {/* -- 약 올리기 뷰 -- */}
-          <View style={styles.viewBox}>
-            <View style={styles.seclectView}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Icon name="pills" size={22} color={'#D6E4E1'} />
-                <Text style={styles.seclectText}>등록된 약</Text>
-              </View>
-            </View>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>등록된 약</Text>
             <View>
               <FlatList
                 horizontal={true}
@@ -577,16 +572,12 @@ export default class AlarmUpdateScreen extends React.Component {
             style={{
               marginBottom: window.height * 0.01,
               borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
+              borderBottomColor: '#76a991',
               borderStyle: 'solid',
               width: window.width - 40,
             }}
           >
-            <View style={{ flexDirection: 'row', padding: 10 }}>
-              <Icon name="pencil-alt" size={23} color={'#D6E4E1'} />
-              <Text style={styles.seclectText}>알람 이름</Text>
-            </View>
-
+            <Text style={styles.textInputTitle}>알람 이름</Text>
             <Text
               style={{
                 textAlign: 'center',
@@ -595,7 +586,7 @@ export default class AlarmUpdateScreen extends React.Component {
                 fontSize: 20,
                 width: window.width - 40,
                 paddingBottom: 5,
-                color: '#6a9c90',
+                color: '#76a991',
               }}
             >
               {this.state.item[0]['title']}
@@ -603,22 +594,17 @@ export default class AlarmUpdateScreen extends React.Component {
           </View>
 
           {/* -- 알람 메모 입력 뷰 -- */}
-          <View style={styles.viewBox}>
-            <View style={{ flexDirection: 'row', padding: 10 }}>
-              <Icon name="pencil-alt" size={23} color={'#D6E4E1'} />
-              <Text style={styles.seclectText}>메모 작성</Text>
-            </View>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>메모 작성</Text>
             <TextInput
               style={{
                 textAlign: 'left',
-                marginBottom: window.height * 0.015,
                 marginTop: 5,
-                fontSize: 18,
-                width: window.width - 40,
-                padding: 5,
-                borderWidth: 1,
-                borderColor: '#D7E4E1',
-                borderStyle: 'solid',
+                marginLeft: 10,
+                fontSize: 16,
+                width: window.width - 60,
+                borderBottomWidth: 1,
+                borderBottomColor: '#d4d4d4',
               }}
               placeholder={this.state.item[0]['memo']}
               placeholderTextColor={'gray'}
@@ -629,12 +615,9 @@ export default class AlarmUpdateScreen extends React.Component {
           </View>
 
           {/* -- 날짜 선택 뷰 -- */}
-          <View style={styles.viewBox}>
+          <View style={styles.textInputBox}>
             <View style={styles.seclectView}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Icon name="calendar-alt" size={25} color={'#D6E4E1'} />
-                <Text style={styles.seclectText}>시작 날짜</Text>
-              </View>
+              <Text style={styles.textInputTitle}>시작 날짜</Text>
               {this.state.startDatePickerShow && (
                 <DateTimePicker
                   value={new Date()}
@@ -656,10 +639,7 @@ export default class AlarmUpdateScreen extends React.Component {
               </TouchableOpacity>
             </View>
             <View style={styles.seclectView}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Icon name="calendar-alt" size={25} color={'transparent'} />
-                <Text style={styles.seclectText}>종료 날짜</Text>
-              </View>
+              <Text style={styles.textInputTitle}>종료 날짜</Text>
               {this.state.endDatePickerShow && (
                 <DateTimePicker
                   value={new Date()}
@@ -683,7 +663,7 @@ export default class AlarmUpdateScreen extends React.Component {
           </View>
 
           {/* -- 시간 선택 뷰 -- */}
-          <View style={styles.viewBox}>
+          <View style={styles.textInputBox}>
             <View style={styles.seclectView}>
               <View
                 style={{
@@ -692,10 +672,16 @@ export default class AlarmUpdateScreen extends React.Component {
                   justifyContent: 'space-between',
                 }}
               >
-                <View style={{ flexDirection: 'row', flex: 1 }}>
-                  <Icon name="clock" size={24} color={'#D6E4E1'} />
-                  <Text style={styles.seclectText}>시간 설정</Text>
-                </View>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: '200',
+                    color: '#626262',
+                    flex: 1,
+                  }}
+                >
+                  시간 설정
+                </Text>
                 {this.state.timePickerShow && (
                   <DateTimePicker
                     value={new Date()}
@@ -705,15 +691,15 @@ export default class AlarmUpdateScreen extends React.Component {
                   />
                 )}
                 <TouchableOpacity onPress={this.onPressTime}>
-                  <Text style={{ fontSize: 16 }}>
-                    시간 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />
+                  <Text style={{ fontSize: 16, color: '#626262' }}>
+                    시간 추가 <Icon name="plus-square" size={16} color={'#76a991'} />
                   </Text>
                 </TouchableOpacity>
               </View>
             </View>
 
             <View style={{ alignItems: 'center' }}>
-              <Text style={{ color: '#6a9c90', fontWeight: 'bold', margin: 10 }}>
+              <Text style={{ color: '#76a991', fontWeight: 'bold', margin: 10 }}>
                 시간은 한 알람에 하나씩만 추가할 수 있어요!
               </Text>
             </View>
@@ -744,7 +730,7 @@ export default class AlarmUpdateScreen extends React.Component {
                           }}
                           name="times-circle"
                           size={20}
-                          color={'#9a6464'}
+                          color={'#ffaaaa'}
                         />
                       </Text>
                     </View>
@@ -762,8 +748,7 @@ export default class AlarmUpdateScreen extends React.Component {
                   }}
                 >
                   <View style={{ flexDirection: 'row', flex: 1 }}>
-                    <Icon name="clock" size={24} color={'white'} />
-                    <Text style={styles.seclectText}>반복 주기</Text>
+                    <Text style={styles.textInputTitle}>반복 주기</Text>
                   </View>
                   <TextInput
                     style={{
@@ -800,8 +785,8 @@ export default class AlarmUpdateScreen extends React.Component {
                   alignItems: 'center',
                   width: window.width * 0.7,
                   height: window.height * 0.075,
-                  backgroundColor: '#6a9c90',
-                  borderRadius: 20,
+                  backgroundColor: '#76a991',
+                  borderRadius: window.height * 0.075,
                 }}
               >
                 <Text style={{ fontSize: 20, color: 'white' }}>수정하기</Text>
@@ -826,8 +811,8 @@ export default class AlarmUpdateScreen extends React.Component {
                   alignItems: 'center',
                   width: window.width * 0.7,
                   height: window.height * 0.075,
-                  backgroundColor: '#9a6464',
-                  borderRadius: 20,
+                  backgroundColor: '#ffaaaa',
+                  borderRadius: window.height * 0.075,
                 }}
               >
                 <Text style={{ fontSize: 20, color: 'white' }}>삭제하기</Text>
@@ -841,20 +826,34 @@ export default class AlarmUpdateScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  textInputBox: {
+    marginBottom: verticalMargin,
+    borderBottomWidth: 1,
+    borderBottomColor: '#76a991',
+    borderStyle: 'solid',
+    width: window.width - 40,
+    paddingBottom: window.height * 0.015,
+  },
+  textInputTitle: {
+    fontSize: 18,
+    fontWeight: '200',
+    color: '#626262',
+    paddingLeft: 5,
+  },
   TrueBoxCheckTrue: {
     marginTop: 10,
-    width: window.width * 0.42,
-    height: window.width * 0.42,
-    backgroundColor: '#6a9c90',
+    width: window.width * 0.43,
+    height: window.width * 0.15,
+    backgroundColor: '#76a991',
     borderRadius: 30,
     alignContent: 'center',
     justifyContent: 'center',
   },
   TrueBoxCheckFalse: {
     marginTop: 10,
-    width: window.width * 0.42,
-    height: window.width * 0.42,
-    borderColor: '#6a9c90',
+    width: window.width * 0.43,
+    height: window.width * 0.15,
+    borderColor: '#76a991',
     borderStyle: 'solid',
     borderWidth: 2,
     borderRadius: 30,
@@ -863,40 +862,27 @@ const styles = StyleSheet.create({
   },
   FalseBoxCheckTrue: {
     marginTop: 10,
-    width: window.width * 0.42,
-    height: window.width * 0.42,
-    backgroundColor: '#9a6464',
+    width: window.width * 0.43,
+    height: window.width * 0.15,
+    backgroundColor: '#ffaaaa',
     borderRadius: 30,
     alignContent: 'center',
     justifyContent: 'center',
   },
   FalseBoxCheckFalse: {
     marginTop: 10,
-    width: window.width * 0.42,
-    height: window.width * 0.42,
-    borderColor: '#9a6464',
+    width: window.width * 0.43,
+    height: window.width * 0.15,
+    borderColor: '#ffaaaa',
     borderStyle: 'solid',
     borderWidth: 2,
     borderRadius: 30,
     alignContent: 'center',
     justifyContent: 'center',
   },
-  viewBox: {
-    marginBottom: window.height * 0.005,
-    width: window.width - 40,
-    borderBottomWidth: 1,
-    borderBottomColor: '#6A9C90',
-    borderStyle: 'solid',
-  },
   seclectView: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 8,
-  },
-  seclectText: {
-    paddingLeft: 10,
-    fontSize: 18,
-    fontWeight: 'bold',
   },
 });

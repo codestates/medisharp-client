@@ -6,6 +6,7 @@ import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-sto
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 export default class CheckScreen extends React.Component {
   static navigationOptions = {
@@ -101,14 +102,6 @@ export default class CheckScreen extends React.Component {
     });
   }
 
-  // changeScreen(Alarm) {
-  //   const resetAction = StackActions.reset({
-  //     index: 0,
-  //     actions: [NavigationActions.navigate({ routeName: 'Alarm' })],
-  //   });
-  //   this.props.navigation.dispatch(resetAction);
-  // }
-
   render() {
     return (
       <View
@@ -117,17 +110,18 @@ export default class CheckScreen extends React.Component {
           width: window.width - 40,
           marginLeft: 20,
           alignItems: 'center',
+          paddingTop: verticalMargin * 3,
         }}
       >
         <Image
           style={{
             width: window.width - 40,
             height: window.width - 40,
-            marginTop: 50,
             borderRadius: 50,
           }}
           source={{ uri: this.state.getImg }}
         />
+
         <Text
           style={{
             fontSize: 20,
@@ -147,20 +141,20 @@ export default class CheckScreen extends React.Component {
           <View
             style={{
               justifyContent: 'center',
-              marginTop: 30,
+              marginTop: 10,
               alignItems: 'center',
               width: window.width * 0.7,
               height: window.height * 0.075,
-              borderRadius: 20,
+              borderRadius: window.height * 0.075,
               borderWidth: 2,
-              borderColor: '#6a9c90',
+              borderColor: '#76a991',
               borderStyle: 'solid',
             }}
           >
             <Text
               style={{
                 fontSize: 20,
-                color: '#6a9c90',
+                color: '#76a991',
               }}
             >
               이 약이 맞아요!
@@ -185,8 +179,8 @@ export default class CheckScreen extends React.Component {
               alignItems: 'center',
               width: window.width * 0.7,
               height: window.height * 0.075,
-              backgroundColor: '#6a9c90',
-              borderRadius: 20,
+              backgroundColor: '#76a991',
+              borderRadius: window.height * 0.075,
             }}
           >
             <Text style={{ fontSize: 20, color: 'white' }}>직접 입력할래요!</Text>

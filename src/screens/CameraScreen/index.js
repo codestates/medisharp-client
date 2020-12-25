@@ -1,13 +1,10 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image } from 'react-native';
 import { ActivityIndicator, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
 import axios from 'axios';
-
-import medisharpLogo from '../../img/medisharpLogo.png';
-
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
 
@@ -48,13 +45,30 @@ export default class CameraScreen extends React.Component {
     const { hasPermission, cameraType, isLoading } = this.state;
     if (isLoading === true) {
       return (
-        <View style={styles.loginContainer}>
-          <View style={[styles.container, styles.horizontal]}>
+        <View style={{ height: '100%', backgroundColor: 'white', alignItems: 'center' }}>
+          <View
+            style={{
+              backgroundColor: '#76a991',
+              width: '100%',
+              height: window.height * 0.5,
+              borderBottomRightRadius: 50,
+              borderBottomLeftRadius: 50,
+              alignItems: 'center',
+            }}
+          >
             <Image
-              style={{ width: 77, height: 71, marginTop: '60%', marginBottom: '20%' }}
-              source={medisharpLogo}
+              style={{
+                width: window.width * 0.2,
+                height: window.width * 0.2,
+                resizeMode: 'center',
+                marginTop: window.height * 0.2,
+              }}
+              source={require('../../../assets/logoWhite.png')}
             />
-            <ActivityIndicator size={60} color="#6a9c90" />
+            <Text style={{ fontSize: 28, fontWeight: '200', color: 'white' }}>약올림</Text>
+          </View>
+          <View style={{ marginTop: '20%' }}>
+            <ActivityIndicator size={60} color="#76a991" />
           </View>
         </View>
       );
@@ -93,7 +107,7 @@ export default class CameraScreen extends React.Component {
                     }}
                   >
                     <TouchableOpacity onPress={this.switchCameraType}>
-                      <Icon name="camera-party-mode" size={35} color={'#649A8D'} />
+                      <Icon name="camera-party-mode" size={35} color={'#76a991'} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -103,7 +117,7 @@ export default class CameraScreen extends React.Component {
                 style={{
                   position: 'absolute',
                   bottom: -(window.height - window.width) * 0.5,
-                  backgroundColor: '#649A8D',
+                  backgroundColor: '#76a991',
                   width: 100,
                   height: 100,
                   left: window.width * 0.5 - 50,
@@ -144,7 +158,7 @@ export default class CameraScreen extends React.Component {
               <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                 <View
                   style={{
-                    backgroundColor: '#649A8D',
+                    backgroundColor: '#76a991',
                     margin: window.width * 0.15,
                     width: 100,
                     height: 100,
@@ -160,7 +174,7 @@ export default class CameraScreen extends React.Component {
                 {/* // Upload Photo : 사진 업로드 버튼 */}
                 <View
                   style={{
-                    backgroundColor: '#649A8D',
+                    backgroundColor: '#76a991',
                     margin: window.width * 0.15,
                     width: 100,
                     height: 100,
@@ -324,30 +338,4 @@ export default class CameraScreen extends React.Component {
         );
       });
   };
-
-  //   this.props.navigation.navigate('CheckScreen', {
-  //     form_data: form_data,
-  //     uri: this.state.photo,
-  //     mediname: null,
-  //   });
-  // };
-  // savePhoto = async () => {
-  //   try {
-  //     console.log(FileSystem.cacheDirectory);
-  //     // const getImg = await FileSystem.getInfoAsync(this.state.photo);
-  //     // console.log(getImg);
-  //     this.props.navigation.navigate('CheckScreen', {
-  //       uri: this.state.photo,
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 }
-
-const styles = StyleSheet.create({
-  loginContainer: {
-    alignItems: 'center',
-    height: '100%',
-  },
-});

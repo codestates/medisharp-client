@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import 'moment/locale/ko';
 import { View, Text, Dimensions, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import { exp } from 'react-native/Libraries/Animated/src/Easing';
-
-import { NavigationEvents } from 'react-navigation';
 
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 export default class CameraNoticeScreen extends React.Component {
   static navigationOptions = {
@@ -32,7 +29,7 @@ export default class CameraNoticeScreen extends React.Component {
             marginBottom: '30%',
           }}
         >
-          <Text style={{ fontSize: 18, textAlign: 'center' }}>
+          <Text style={{ fontSize: 18, lineHeight: 30, fontWeight: '200', textAlign: 'center' }}>
             의약품만 검색 가능하며{'\n'} 촬영여건에 따라 {'\n'}인식이 불가능 할 수 있습니다.
           </Text>
         </View>
@@ -54,8 +51,8 @@ export default class CameraNoticeScreen extends React.Component {
                 alignItems: 'center',
                 width: window.width * 0.7,
                 height: window.height * 0.075,
-                backgroundColor: '#6a9c90',
-                borderRadius: 20,
+                backgroundColor: '#76a991',
+                borderRadius: window.height * 0.075,
               }}
             >
               <Text style={{ fontSize: 20, color: 'white' }}>촬영하기</Text>

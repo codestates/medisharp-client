@@ -10,7 +10,6 @@ import {
   Dimensions,
 } from 'react-native';
 import axios from 'axios';
-
 import SocialWebviewModal from './SocialWebviewModal';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { setItem, getItem, removeItem } = useAsyncStorage('@yag_olim');

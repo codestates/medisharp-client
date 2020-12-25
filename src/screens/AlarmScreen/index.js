@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import axios from 'axios';
 import 'moment/locale/ko';
 import moment from 'moment';
@@ -15,21 +15,15 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { onChange } from 'react-native-reanimated';
-import CameraScreen from '../CameraScreen';
-import CameraNoticeScreen from '../CameraNoticeScreen';
-import { createStackNavigator } from 'react-navigation-stack';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
-import * as Permissions from 'expo-permissions';
-
 import { NavigationEvents } from 'react-navigation';
-
 import { useAsyncStorage } from '@react-native-community/async-storage';
+
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 export default class AlarmScreen extends React.Component {
   static navigationOptions = {
@@ -408,13 +402,11 @@ export default class AlarmScreen extends React.Component {
       ).toDate();
       let curr = startD;
       let pushArr = [];
-      console.log(curr);
       while (curr <= endD) {
         let trigger = new Date(curr);
         trigger.setHours(Number(this.state.selectedHour));
         trigger.setMinutes(Number(this.state.selectedMinute));
         trigger.setSeconds(0);
-        console.log('trigger:', trigger);
         const pushSched = await Notifications.scheduleNotificationAsync({
           content: {
             title: `약 챙겨먹을 시간입니다~!!!💊`,
@@ -435,9 +427,8 @@ export default class AlarmScreen extends React.Component {
       <View
         style={{
           backgroundColor: 'white',
-          paddingTop: getStatusBarHeight(),
-          height: window.height * 0.92 - 1,
-          paddingLeft: 20,
+          paddingTop: getStatusBarHeight() + verticalMargin,
+          height: window.height * 0.9,
         }}
       >
         <NavigationEvents
@@ -452,69 +443,90 @@ export default class AlarmScreen extends React.Component {
             console.log('resultArr  =>', resultArr);
           }}
         />
-        <Text
-          style={{
-            marginTop: 30,
-            fontSize: 24,
-            fontWeight: '300',
-          }}
-        >
-          약 올리기
-        </Text>
         <View
           style={{
-            borderBottomStyle: 'solid',
-            borderBottomWidth: 5,
-            borderBottomColor: '#6a9c90',
             alignSelf: 'flex-start',
-            marginBottom: window.height * 0.02,
+            backgroundColor: '#76a991',
+            padding: 10,
+            paddingLeft: 25,
+            paddingRight: 25,
+            borderTopRightRadius: 35,
+            borderBottomRightRadius: 35,
+            marginBottom: 10,
           }}
         >
           <Text
             style={{
-              alignSelf: 'center',
+              fontSize: 28,
+              fontWeight: '200',
+              color: 'white',
+            }}
+          >
+            약 올리기
+          </Text>
+          <Text
+            style={{
+              color: 'white',
               marginTop: 5,
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: 'bold',
               paddingBottom: 5,
             }}
           >
-            복용 알람 등록하기
+            알람 등록하기
           </Text>
         </View>
-        <ScrollView>
+
+        {/* -- 콘텐츠 시작 -- */}
+        <ScrollView style={{ paddingLeft: 20, paddingTop: -10 }}>
           {/* -- 약 올리기 뷰 -- */}
-          <View style={styles.viewBox}>
+          <View style={styles.textInputBox}>
             <View style={styles.seclectView}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Icon name="pills" size={22} color={'#D6E4E1'} />
-                <Text style={styles.seclectText}>약 올리기</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() =>
-                  this.props.navigation.navigate('CameraNoticeScreen', {
-                    update: '',
-                    item: '',
-                    clickedDate: '',
-                  })
-                }
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
               >
-                <Text style={{ fontSize: 16 }}>
-                  사진으로 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: '200',
+                    color: '#626262',
+                    flex: 1,
+                  }}
+                >
+                  약 올리기
                 </Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    this.props.navigation.navigate('CameraNoticeScreen', {
+                      update: '',
+                      item: '',
+                      clickedDate: '',
+                    })
+                  }
+                >
+                  <Text style={{ fontSize: 16, fontWeight: '200', color: '#626262', flex: 1 }}>
+                    사진으로 추가 <Icon name="plus-square" size={16} color={'#76a991'} />
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
+
             <View>
               <FlatList
                 horizontal={true}
                 data={this.state.alarmMedicine}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
-                  <View style={{ marginBottom: 10 }}>
+                  <View>
                     <View
                       style={{
                         flexDirection: 'row',
                         margin: 5,
+                        marginBottom: 0,
                         alignSelf: 'flex-start',
                         borderWidth: 1,
                         borderColor: '#939393',
@@ -545,7 +557,7 @@ export default class AlarmScreen extends React.Component {
                           }}
                           name="times-circle"
                           size={20}
-                          color={'#9a6464'}
+                          color={'#ffaaaa'}
                           style={{
                             marginLeft: 5,
                           }}
@@ -563,15 +575,12 @@ export default class AlarmScreen extends React.Component {
             style={{
               marginBottom: window.height * 0.01,
               borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
+              borderBottomColor: '#76a991',
               borderStyle: 'solid',
               width: window.width - 40,
             }}
           >
-            <View style={{ flexDirection: 'row', padding: 10 }}>
-              <Icon name="pencil-alt" size={23} color={'#D6E4E1'} />
-              <Text style={styles.seclectText}>알람 이름</Text>
-            </View>
+            <Text style={styles.textInputTitle}>알람 이름</Text>
             <TextInput
               style={{
                 textAlign: 'center',
@@ -590,22 +599,18 @@ export default class AlarmScreen extends React.Component {
           </View>
 
           {/* -- 알람 메모 입력 뷰 -- */}
-          <View style={styles.viewBox}>
-            <View style={{ flexDirection: 'row', padding: 10 }}>
-              <Icon name="pencil-alt" size={23} color={'#D6E4E1'} />
-              <Text style={styles.seclectText}>메모 작성</Text>
-            </View>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>메모 작성</Text>
+
             <TextInput
               style={{
                 textAlign: 'left',
-                marginBottom: window.height * 0.015,
                 marginTop: 5,
-                fontSize: 18,
-                width: window.width - 40,
-                padding: 5,
-                borderWidth: 1,
-                borderColor: '#D7E4E1',
-                borderStyle: 'solid',
+                marginLeft: 10,
+                fontSize: 16,
+                width: window.width - 60,
+                borderBottomWidth: 1,
+                borderBottomColor: '#d4d4d4',
               }}
               placeholder="알람에 메모를 추가하세요!"
               placeholderTextColor={'gray'}
@@ -616,12 +621,9 @@ export default class AlarmScreen extends React.Component {
           </View>
 
           {/* -- 날짜 선택 뷰 -- */}
-          <View style={styles.viewBox}>
+          <View style={styles.textInputBox}>
             <View style={styles.seclectView}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Icon name="calendar-alt" size={25} color={'#D6E4E1'} />
-                <Text style={styles.seclectText}>시작 날짜</Text>
-              </View>
+              <Text style={styles.textInputTitle}>시작 날짜</Text>
               {this.state.startDatePickerShow && (
                 <DateTimePicker
                   value={new Date()}
@@ -643,10 +645,7 @@ export default class AlarmScreen extends React.Component {
               </TouchableOpacity>
             </View>
             <View style={styles.seclectView}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Icon name="calendar-alt" size={25} color={'transparent'} />
-                <Text style={styles.seclectText}>종료 날짜</Text>
-              </View>
+              <Text style={styles.textInputTitle}>종료 날짜</Text>
               {this.state.endDatePickerShow && (
                 <DateTimePicker
                   value={new Date()}
@@ -670,7 +669,7 @@ export default class AlarmScreen extends React.Component {
           </View>
 
           {/* -- 시간 선택 뷰 -- */}
-          <View style={styles.viewBox}>
+          <View style={styles.textInputBox}>
             <View style={styles.seclectView}>
               <View
                 style={{
@@ -679,10 +678,16 @@ export default class AlarmScreen extends React.Component {
                   justifyContent: 'space-between',
                 }}
               >
-                <View style={{ flexDirection: 'row', flex: 1 }}>
-                  <Icon name="clock" size={24} color={'#D6E4E1'} />
-                  <Text style={styles.seclectText}>시간 설정</Text>
-                </View>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: '200',
+                    color: '#626262',
+                    flex: 1,
+                  }}
+                >
+                  시간 설정
+                </Text>
                 {this.state.timePickerShow && (
                   <DateTimePicker
                     value={new Date()}
@@ -692,8 +697,8 @@ export default class AlarmScreen extends React.Component {
                   />
                 )}
                 <TouchableOpacity onPress={this.onPressTime}>
-                  <Text style={{ fontSize: 16 }}>
-                    시간 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />
+                  <Text style={{ fontSize: 16, color: '#626262' }}>
+                    시간 추가 <Icon name="plus-square" size={16} color={'#76a991'} />
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -720,6 +725,7 @@ export default class AlarmScreen extends React.Component {
                         borderStyle: 'solid',
                         borderRadius: 5,
                         padding: 5,
+                        marginBottom: 0,
                       }}
                     >
                       <Text style={{ fontSize: 22, textAlign: 'right', marginRight: 5 }}>
@@ -731,7 +737,7 @@ export default class AlarmScreen extends React.Component {
                           }}
                           name="times-circle"
                           size={20}
-                          color={'#9a6464'}
+                          color={'#ffaaaa'}
                         />
                       </Text>
                     </View>
@@ -749,8 +755,7 @@ export default class AlarmScreen extends React.Component {
                   }}
                 >
                   <View style={{ flexDirection: 'row', flex: 1 }}>
-                    <Icon name="clock" size={24} color={'white'} />
-                    <Text style={styles.seclectText}>반복 주기</Text>
+                    <Text style={styles.textInputTitle}>반복 주기</Text>
                   </View>
                   <TextInput
                     style={{
@@ -786,8 +791,8 @@ export default class AlarmScreen extends React.Component {
                   alignItems: 'center',
                   width: window.width * 0.7,
                   height: window.height * 0.075,
-                  backgroundColor: '#6a9c90',
-                  borderRadius: 20,
+                  backgroundColor: '#76a991',
+                  borderRadius: window.height * 0.075,
                 }}
               >
                 <Text style={{ fontSize: 20, color: 'white' }}>등록하기</Text>
@@ -801,12 +806,13 @@ export default class AlarmScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  viewBox: {
-    marginBottom: window.height * 0.005,
-    width: window.width - 40,
+  textInputBox: {
+    marginBottom: verticalMargin,
     borderBottomWidth: 1,
-    borderBottomColor: '#6A9C90',
+    borderBottomColor: '#76a991',
     borderStyle: 'solid',
+    width: window.width - 40,
+    paddingBottom: window.height * 0.015,
   },
   seclectView: {
     flexDirection: 'row',
@@ -814,9 +820,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 8,
   },
-  seclectText: {
-    paddingLeft: 10,
+  textInputTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '200',
+    color: '#626262',
+    paddingLeft: 5,
   },
 });
