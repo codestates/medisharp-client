@@ -19,33 +19,35 @@ import { NavigationEvents } from 'react-navigation';
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 const CalendarMain = ({ navigation }) => {
-  //여기는 제가 짠 코드입니다.
   const [monthList, setMonthList] = useState([]); //캘린더 띄워져 있는 월의 모든 데이터
-  console.log('monthList:', monthList);
-
   const [monthCheck, setMonthCheck] = useState({}); // 해당 월의 모든 체크 값들
-  console.log('monthCheck:', monthCheck);
-
   const [todayDate, setTodayDate] = useState(moment().format().substring(0, 10));
-
   const [selectedMonth, setSelectedMonth] = useState(moment().format('YYYY-MM'));
-  console.log('selectedMonth:', selectedMonth);
-
   const [nextMonth, setNextMonth] = useState(moment().add(1, 'M').format('YYYY-MM'));
-  console.log('nextMonth:', nextMonth);
-
   const [clickedDate, setClickedDate] = useState(todayDate);
-  console.log('clickedDate:', clickedDate);
-  const [clickedList, setClickedList] = useState([]);
-  console.log('clickedList:', clickedList);
-  //여기까지 제가 짠 코드입니다.
-
-  const [markingDays, setMarkingDays] = useState([]);
+  const [clickedList, setClickedList] = useState([
+    {
+      title: '비타민',
+      cycle: 1,
+      memo: '아침마다',
+      schedules_common_id: 2,
+      time: '22:00',
+      check: true,
+    },
+    {
+      title: '처방받은 관절약',
+      cycle: 2,
+      memo: '자기 전에 꼭 먹어',
+      schedules_common_id: 5,
+      time: '23:30',
+      check: false,
+    },
+  ]);
   const [markedDates, setMarkedDates] = useState({});
 
-  //여기부터 API 입니다.
   useEffect(() => {
     useEffectForMonth();
     useEffectForClicked();
@@ -116,7 +118,7 @@ const CalendarMain = ({ navigation }) => {
                   customStyles: {
                     container: {
                       borderStyle: 'solid',
-                      borderBottomColor: '#9A6464', //빨간색
+                      borderBottomColor: '#ffaaaa', //빨간색
                       borderBottomWidth: 5,
                       borderRadius: 0,
                     },
@@ -142,13 +144,12 @@ const CalendarMain = ({ navigation }) => {
             customStyles: {
               container: {
                 borderRadius: 10,
-                backgroundColor: '#6a9c90',
+                backgroundColor: '#76a991',
               },
               text: { color: 'white', fontWeight: 'bold' },
             },
           }),
-            console.log('markedDateResult =>', markedDateResult);
-          setMarkedDates(markedDateResult);
+            setMarkedDates(markedDateResult);
         })
         .catch((err) => {
           Alert.alert(
@@ -205,11 +206,9 @@ const CalendarMain = ({ navigation }) => {
   return (
     <View
       style={{
-        paddingTop: getStatusBarHeight(),
         backgroundColor: 'white',
-        height: window.height * 0.92 - 1,
-        flex: 1,
-        flexDirection: 'column',
+        paddingTop: getStatusBarHeight() + verticalMargin,
+        height: window.height * 0.9,
       }}
     >
       <NavigationEvents
@@ -220,40 +219,45 @@ const CalendarMain = ({ navigation }) => {
       />
       <View
         style={{
-          paddingLeft: 20,
+          alignSelf: 'flex-start',
+          backgroundColor: '#76a991',
+          padding: 10,
+          paddingLeft: 25,
+          paddingRight: 25,
+          borderTopRightRadius: 35,
+          borderBottomRightRadius: 35,
+          marginBottom: verticalMargin,
         }}
       >
         <Text
           style={{
-            marginTop: 30,
-            fontSize: 24,
+            fontSize: 28,
+            fontWeight: '200',
+            color: 'white',
           }}
         >
           약올림 캘린더
         </Text>
-        <View
+        <Text
           style={{
-            borderBottomStyle: 'solid',
-            borderBottomWidth: 5,
-            borderBottomColor: '#6a9c90',
-            alignSelf: 'flex-start',
-            marginBottom: 15,
+            color: 'white',
+            marginTop: 5,
+            fontSize: 24,
+            fontWeight: 'bold',
+            paddingBottom: 5,
           }}
         >
-          <Text
-            style={{
-              alignSelf: 'center',
-              marginTop: 5,
-              fontSize: 20,
-              fontWeight: 'bold',
-              paddingBottom: 5,
-            }}
-          >
-            손 안의 복용 스케쥴러
-          </Text>
-        </View>
+          손 안의 복용 스케쥴러
+        </Text>
       </View>
-      <View>
+
+      {/* -- calendar -- */}
+      <View
+        style={{
+          marginTop: -10,
+          marginBottom: 0,
+        }}
+      >
         <Calendar
           current={Date()}
           minDate={'2020-01-01'}
@@ -285,131 +289,90 @@ const CalendarMain = ({ navigation }) => {
           // Replace default arrows with custom ones (direction can be 'left' or 'right')
           renderArrow={(direction) =>
             direction === 'left' ? (
-              <AntDesign name="left" size={20} color="#6a9c90" />
+              <AntDesign name="left" size={20} color="#76a991" />
             ) : (
-              <AntDesign name="right" size={20} color="#6a9c90" />
+              <AntDesign name="right" size={20} color="#76a991" />
             )
           }
-          // Do not show days of other months in month page. Default = false
           hideExtraDays={true}
-          // If hideArrows=false and hideExtraDays=false do not switch month when tapping on greyed out
-          // day from another month that is visible in calendar page. Default = false
           disableMonthChange={true}
-          // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday.
-          firstDay={1}
-          // Hide day names. Default = false
+          firstDay={7}
           hideDayNames={false}
-          // Show week numbers to the left. Default = false
           showWeekNumbers={false}
-          // Handler which gets executed when press arrow icon left. It receive a callback can go back month
           onPressArrowLeft={(substractMonth) => substractMonth()}
-          // Handler which gets executed when press arrow icon right. It receive a callback can go next month
           onPressArrowRight={(addMonth) => addMonth()}
-          // Disable left arrow. Default = false
           disableArrowLeft={false}
-          // Disable right arrow. Default = false
           disableArrowRight={false}
-          // Disable all touch events for disabled days. can be override with disableTouchEvent in markedDates
           disableAllTouchEventsForDisabledDays={true}
-          /** Replace default month and year title with custom one. the function receive a date as parameter. */
-          //renderHeader={(date) => {/*Return JSX*/}}
           theme={{
             textMonthFontWeight: 'bold',
             textDayFontSize: 16,
-            textMonthFontSize: 26,
+            textMonthFontSize: 28,
             textDayHeaderFontSize: 16,
-            todayTextColor: '#6a9c90',
+            todayTextColor: '#76a991',
+            monthTextColor: '#76a991',
           }}
           markingType={'custom'}
           markedDates={markedDates}
         />
       </View>
-      <View style={{ flex: 1 }}>
-        <Text
-          style={{
-            fontSize: 18,
-            fontWeight: '300',
-            marginLeft: 20,
-            marginBottom: 10,
-            marginTop: 10,
-          }}
-        >
-          {clickedDate.substring(8, 10) < 10
-            ? clickedDate.substring(9, 10)
-            : clickedDate.substring(8, 10)}
-          일의 알람
-        </Text>
-        <FlatList
-          style={{}}
-          data={clickedList}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={{ alignItems: 'center' }}>
-              <TouchableOpacity
-                onPress={() => {
-                  console.log(item);
-                  navigation.navigate('AlarmUpdateScreen', {
-                    item: [item],
-                    clickedDate: clickedDate,
-                  });
-                }}
+
+      {/* -- seletDateAlarm -- */}
+      <Text
+        style={{
+          textAlign: 'center',
+          fontSize: 22,
+          fontWeight: 'bold',
+          marginBottom: 10,
+          color: '#76a991',
+        }}
+      >
+        {clickedDate.substring(8, 10) < 10
+          ? clickedDate.substring(9, 10)
+          : clickedDate.substring(8, 10)}
+        일의 알람
+      </Text>
+      <FlatList
+        data={clickedList}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={{ alignItems: 'center' }}>
+            <TouchableOpacity
+              onPress={() => {
+                console.log(item);
+                navigation.navigate('AlarmUpdateScreen', {
+                  item: [item],
+                  clickedDate: clickedDate,
+                });
+              }}
+            >
+              <View
+                style={
+                  item['check'] === false
+                    ? styles.CalendarAlarmCheckFalse
+                    : styles.CalendarAlarmCheckTrue
+                }
               >
+                <Text numberOfLines={1} style={styles.alartmTitle}>
+                  {item['title']}
+                </Text>
                 <View
-                  style={
-                    item['check'] === false
-                      ? styles.CalendarAlarmCheckFalse
-                      : styles.CalendarAlarmCheckTrue
-                  }
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
                 >
-                  <Text
-                    style={
-                      item['check'] === false
-                        ? styles.firstItemCheckFalse
-                        : styles.firstItemCheckTrue
-                    }
-                  >
-                    {item['title']}
+                  <Text numberOfLines={1} style={styles.alarmContents}>
+                    {item['memo']}
                   </Text>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <Text
-                      style={
-                        item['check'] === false
-                          ? styles.secondItemCheckFalse
-                          : styles.secondItemCheckTrue
-                      }
-                    >
-                      {item['memo']}
-                    </Text>
-                    <Text
-                      style={
-                        item['check'] === false
-                          ? styles.thirdItemCheckFalse
-                          : styles.thirdItemCheckTrue
-                      }
-                    >
-                      {item['cycle']}일 마다
-                    </Text>
-                    <Text
-                      style={
-                        item['check'] === false
-                          ? styles.fourthItemCheckFalse
-                          : styles.fourthItemCheckTrue
-                      }
-                    >
-                      {item['time']}
-                    </Text>
-                  </View>
+                  <Text style={styles.alarmContents}>{item['cycle']}일 마다</Text>
+                  <Text style={styles.alarmContents}>{item['time']}</Text>
                 </View>
-              </TouchableOpacity>
-            </View>
-          )}
-        ></FlatList>
-      </View>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
+      ></FlatList>
     </View>
   );
 };
@@ -417,68 +380,30 @@ const CalendarMain = ({ navigation }) => {
 const styles = StyleSheet.create({
   CalendarAlarmCheckTrue: {
     width: window.width - 40,
-    backgroundColor: '#6a9c90',
+    backgroundColor: '#76a991',
     borderRadius: 25,
     padding: 15,
     marginBottom: 10,
-    height: 70,
+    height: window.width * 0.24,
   },
   CalendarAlarmCheckFalse: {
     width: window.width - 40,
-    backgroundColor: '#e9efee',
+    backgroundColor: '#ffaaaa',
     borderRadius: 20,
     padding: 15,
     marginBottom: 10,
-    height: 70,
+    height: window.width * 0.24,
   },
-  firstItemCheckTrue: {
-    fontSize: 16,
+  alartmTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
   },
-  secondItemCheckTrue: {
-    marginBottom: 10,
-    marginRight: 20,
-    fontWeight: '400',
+  alarmContents: {
+    marginTop: window.width * 0.04,
+    fontSize: 18,
+    fontWeight: '200',
     color: 'white',
-  },
-  thirdItemCheckTrue: {
-    position: 'absolute',
-    right: window.width * 0.3,
-    bottom: 20,
-    color: 'white',
-    marginRight: 20,
-  },
-  fourthItemCheckTrue: {
-    position: 'absolute',
-    bottom: 20,
-    color: 'white',
-    right: 15,
-  },
-
-  firstItemCheckFalse: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#313131',
-  },
-  secondItemCheckFalse: {
-    marginBottom: 10,
-    marginRight: 20,
-    fontWeight: '400',
-    color: '#313131',
-  },
-  thirdItemCheckFalse: {
-    position: 'absolute',
-    right: window.width * 0.3,
-    bottom: 20,
-    color: '#313131',
-    marginRight: 20,
-  },
-  fourthItemCheckFalse: {
-    position: 'absolute',
-    bottom: 20,
-    color: '#313131',
-    right: 15,
   },
 });
 

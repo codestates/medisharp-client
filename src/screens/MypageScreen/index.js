@@ -1,14 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import {
-  View,
-  Text,
-  Dimensions,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import { View, Text, Dimensions, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { StackActions, NavigationActions, NavigationEvents } from 'react-navigation';
 
@@ -16,6 +8,7 @@ import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem, removeItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 export default class Mypage extends React.Component {
   constructor(props) {
@@ -99,9 +92,8 @@ export default class Mypage extends React.Component {
       <View
         style={{
           backgroundColor: 'white',
-          paddingTop: getStatusBarHeight(),
-          height: window.height,
-          paddingLeft: 20,
+          paddingTop: getStatusBarHeight() + verticalMargin,
+          height: window.height * 0.9,
         }}
       >
         <NavigationEvents
@@ -112,166 +104,122 @@ export default class Mypage extends React.Component {
             }
           }}
         />
-        <View>
+        <View
+          style={{
+            alignSelf: 'flex-start',
+            backgroundColor: '#76a991',
+            padding: 10,
+            paddingLeft: 25,
+            paddingRight: 25,
+            borderTopRightRadius: 35,
+            borderBottomRightRadius: 35,
+            marginBottom: 10,
+          }}
+        >
           <Text
             style={{
-              marginTop: 30,
-              fontSize: 24,
-              fontWeight: '300',
+              fontSize: 28,
+              fontWeight: '200',
+              color: 'white',
             }}
           >
-            약 올림
+            약올림
           </Text>
-          <View
+          <Text
             style={{
-              borderBottomStyle: 'solid',
-              borderBottomWidth: 5,
-              borderBottomColor: '#6a9c90',
-              alignSelf: 'flex-start',
-              marginBottom: window.height * 0.02,
+              color: 'white',
+              marginTop: 5,
+              fontSize: 24,
+              fontWeight: 'bold',
+              paddingBottom: 5,
             }}
           >
-            <Text
-              style={{
-                alignSelf: 'center',
-                marginTop: 5,
-                fontSize: 20,
-                fontWeight: 'bold',
-                paddingBottom: 5,
-              }}
-            >
-              마이페이지
-            </Text>
-          </View>
+            마이페이지
+          </Text>
         </View>
-        <ScrollView>
+
+        {/* -- 콘텐츠 시작 -- */}
+        <View style={{ marginLeft: 20 }}>
           {/* -- 이름 뷰 -- */}
           <View
             style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
+              marginTop: window.height * 0.075,
+              marginBottom: verticalMargin,
             }}
           >
-            <Text
-              style={{
-                paddingLeft: 10,
-                fontSize: 18,
-                fontWeight: 'bold',
-                color: '#6a9c90',
-              }}
-            >
-              이름
-            </Text>
+            <Text style={styles.textInputTitle}>이름</Text>
             <Text style={styles.placeholderText}>{this.state.name}</Text>
           </View>
-
           {/* -- 이메일 뷰 -- */}
           <View
             style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
+              marginBottom: window.height * 0.075,
             }}
           >
-            <Text
-              style={{
-                paddingLeft: 10,
-                fontSize: 18,
-                fontWeight: 'bold',
-                color: '#6a9c90',
-              }}
-            >
-              이메일
-            </Text>
+            <Text style={styles.textInputTitle}>이메일</Text>
             <Text style={styles.placeholderText}>{this.state.useremail}</Text>
           </View>
+        </View>
 
-          {/* -- 수정하기 버튼 -- */}
-          <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity
-              onPress={() => {
-                this.props.navigation.navigate('EditMyinfoScreen', {
-                  name: this.state.name,
-                  useremail: this.state.useremail,
-                });
+        {/* -- 수정하기 버튼 -- */}
+        <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20 }}>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.navigation.navigate('EditMyinfoScreen', {
+                name: this.state.name,
+                useremail: this.state.useremail,
+              });
+            }}
+          >
+            <View
+              style={{
+                justifyContent: 'center',
+                marginBottom: 20,
+                width: window.width * 0.7,
+                height: window.height * 0.075,
+                backgroundColor: '#76a991',
+                borderRadius: window.height * 0.075,
               }}
             >
-              <View
-                style={{
-                  justifyContent: 'center',
-                  marginTop: 15,
-                  alignItems: 'center',
-                  width: window.width * 0.7,
-                  height: window.height * 0.075,
-                  backgroundColor: '#6a9c90',
-                  borderRadius: 20,
-                }}
-              >
-                <Text style={{ fontSize: 20, color: 'white' }}>수정하기</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
+              <Text style={{ fontSize: 20, color: 'white', textAlign: 'center' }}>수정하기</Text>
+            </View>
+          </TouchableOpacity>
 
           {/* -- 로그아웃 버튼 -- */}
-          <View style={{ alignItems: 'center', marginBottom: 20, marginLeft: -20 }}>
-            <TouchableOpacity onPress={this.logout}>
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: window.width * 0.7,
-                  height: window.height * 0.075,
-                  backgroundColor: '#9a6464',
-                  borderRadius: 20,
-                }}
-              >
-                <Text style={{ fontSize: 20, color: 'white' }}>로그아웃</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
+          <TouchableOpacity onPress={this.logout}>
+            <View
+              style={{
+                justifyContent: 'center',
+                marginBottom: 20,
+                width: window.width * 0.7,
+                height: window.height * 0.075,
+                backgroundColor: '#ffaaaa',
+                borderRadius: window.height * 0.075,
+              }}
+            >
+              <Text style={{ fontSize: 20, color: 'white', textAlign: 'center' }}>로그아웃</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  viewBox: {
-    marginBottom: window.height * 0.005,
-    width: window.width - 40,
-    borderBottomWidth: 1,
-    borderBottomColor: '#6A9C90',
-    borderStyle: 'solid',
-  },
-  seclectView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 8,
-  },
-  seclectText: {
-    marginTop: 30,
-    paddingLeft: 10,
+  textInputTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#6a9c90',
+    fontWeight: '200',
+    color: '#626262',
+    paddingLeft: 5,
   },
   placeholderText: {
     textAlign: 'right',
     fontSize: 18,
+    padding: 5,
     width: window.width - 40,
-    padding: 10,
-    paddingBottom: 5,
-  },
-  nonAvailableText: {
-    paddingLeft: 10,
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#9a6464',
+    borderBottomWidth: 1,
+    borderBottomColor: '#76a991',
+    borderStyle: 'solid',
   },
 });

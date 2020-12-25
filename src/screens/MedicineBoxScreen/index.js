@@ -12,19 +12,34 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-
 import { NavigationEvents } from 'react-navigation';
-
 import medisharpLogo from '../../img/medisharpLogo.png';
-
 import { useAsyncStorage } from '@react-native-community/async-storage';
+
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 const MedicineBox = ({ navigation }) => {
-  const [myMedicines, setMyMedicines] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [myMedicines, setMyMedicines] = useState([
+    {
+      id: 1,
+      name: '오메가정',
+      camera: false,
+      image_dir:
+        'https://medisharp.s3.ap-northeast-2.amazonaws.com//4444444-DCC1-451F-B331-458580722917.jpg_L',
+    },
+    {
+      id: 2,
+      name: '타이레놀정500밀리그람',
+      camera: true,
+      image_dir:
+        'https://medisharp.s3.ap-northeast-2.amazonaws.com//5555555-DCC1-451F-B331-458580722917.jpg_L',
+    },
+  ]);
+  // const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     useEffectForMedicines();
@@ -42,25 +57,24 @@ const MedicineBox = ({ navigation }) => {
         headers: {
           Authorization: token,
         },
-      })
-        .then((data) => {
-          setMyMedicines(data.data.results);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          Alert.alert(
-            '에러가 발생했습니다!',
-            '다시 시도해주세요',
-            [
-              {
-                text: '다시시도하기',
-                onPress: () => useEffectForMedicines(),
-              },
-            ],
-            { cancelable: false },
-          );
-        });
+      }).then((data) => {
+        setMyMedicines(data.data.results);
+        setIsLoading(false);
+      });
+    .catch((err) => {
+      console.error(err);
+      Alert.alert(
+        '에러가 발생했습니다!',
+        '다시 시도해주세요',
+        [
+          {
+            text: '다시시도하기',
+            onPress: () => useEffectForMedicines(),
+          },
+        ],
+        { cancelable: false },
+      );
+    });
     });
   };
 
@@ -81,24 +95,34 @@ const MedicineBox = ({ navigation }) => {
     setCameraTabSelected(!cameraTabSelected);
     setSelfTabSelected(!selfTabSelected);
   };
-
-  //console.log('MyMedicine배열길이: ', myMedicines, myMedicines.length);
-
+  
   if (isLoading === true) {
     //로딩
     return (
-      <View style={styles.loginContainer}>
-        <NavigationEvents
-          onDidFocus={(payload) => {
-            useEffectForMedicines();
+      <View style={{ height: '100%', backgroundColor: 'white', alignItems: 'center' }}>
+        <View
+          style={{
+            backgroundColor: '#76a991',
+            width: '100%',
+            height: window.height * 0.5,
+            borderBottomRightRadius: 50,
+            borderBottomLeftRadius: 50,
+            alignItems: 'center',
           }}
-        />
-        <View style={[styles.container, styles.horizontal]}>
+        >
           <Image
-            style={{ width: 77, height: 71, marginTop: '60%', marginBottom: '20%' }}
-            source={medisharpLogo}
+            style={{
+              width: window.width * 0.2,
+              height: window.width * 0.2,
+              resizeMode: 'center',
+              marginTop: window.height * 0.2,
+            }}
+            source={require('../../../assets/logoWhite.png')}
           />
-          <ActivityIndicator size={60} color="#6a9c90" />
+          <Text style={{ fontSize: 28, fontWeight: '200', color: 'white' }}>약올림</Text>
+        </View>
+        <View style={{ marginTop: '20%' }}>
+          <ActivityIndicator size={60} color="#76a991" />
         </View>
       </View>
     );
@@ -108,9 +132,8 @@ const MedicineBox = ({ navigation }) => {
         <View
           style={{
             backgroundColor: 'white',
-            height: window.height * 0.92 - 1,
-            paddingLeft: 20,
-            paddingTop: getStatusBarHeight(),
+            paddingTop: getStatusBarHeight() + verticalMargin,
+            height: window.height * 0.9,
           }}
         >
           <NavigationEvents
@@ -118,28 +141,32 @@ const MedicineBox = ({ navigation }) => {
               useEffectForMedicines();
             }}
           />
-          <Text
-            style={{
-              marginTop: 30,
-              fontSize: 24,
-            }}
-          >
-            약통
-          </Text>
           <View
             style={{
-              borderBottomStyle: 'solid',
-              borderBottomWidth: 5,
-              borderBottomColor: '#6a9c90',
               alignSelf: 'flex-start',
-              marginBottom: 15,
+              backgroundColor: '#76a991',
+              padding: 10,
+              paddingLeft: 25,
+              paddingRight: 25,
+              borderTopRightRadius: 35,
+              borderBottomRightRadius: 35,
+              marginBottom: 10,
             }}
           >
             <Text
               style={{
-                alignSelf: 'center',
+                fontSize: 28,
+                fontWeight: '200',
+                color: 'white',
+              }}
+            >
+              약통
+            </Text>
+            <Text
+              style={{
+                color: 'white',
                 marginTop: 5,
-                fontSize: 20,
+                fontSize: 24,
                 fontWeight: 'bold',
                 paddingBottom: 5,
               }}
@@ -148,11 +175,16 @@ const MedicineBox = ({ navigation }) => {
             </Text>
           </View>
 
+          {/* -- 콘텐츠 시작 -- */}
+
           <View
             style={{
-              width: window.width - 40,
+              width: window.width - 20,
+              marginTop: 0,
+              marginBottom: 10,
               flexDirection: 'row',
               justifyContent: 'space-between',
+              paddingLeft: 20,
             }}
           >
             <TouchableOpacity onPress={tabChange} style={styles.medicineByChangeTabSelected}>
@@ -165,7 +197,7 @@ const MedicineBox = ({ navigation }) => {
           </View>
 
           <FlatList
-            style={{ width: window.width - 40 }}
+            style={{ width: window.width - 40, marginLeft: 20 }}
             data={MedicineByCamera}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -181,7 +213,7 @@ const MedicineBox = ({ navigation }) => {
                       height: window.height * 0.12,
                       marginTop: 10,
                       marginBottom: 5,
-                      borderBottomColor: '#6a9c90',
+                      borderBottomColor: '#76a991',
                       borderBottomWidth: 1,
                       borderStyle: 'solid',
                       flexDirection: 'row',
@@ -194,17 +226,23 @@ const MedicineBox = ({ navigation }) => {
                         width: window.width * 0.35,
                         resizeMode: 'contain',
                         marginBottom: 10,
+                        borderRadius: 15,
                       }}
                     />
                     <View
                       style={{
-                        width: window.width * 0.35,
+                        width: window.width * 0.5,
                         marginLeft: 20,
                         justifyContent: 'center',
-                        color: '#6a9c90',
+                        color: '#76a991',
                       }}
                     >
-                      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
+                      <Text
+                        numberOfLines={1}
+                        style={{ fontSize: 16, fontWeight: 'bold', lineHeight: 16 }}
+                      >
+                        {item.name}
+                      </Text>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -218,9 +256,8 @@ const MedicineBox = ({ navigation }) => {
         <View
           style={{
             backgroundColor: 'white',
-            height: window.height * 0.92 - 1,
-            paddingLeft: 20,
-            paddingTop: getStatusBarHeight(),
+            paddingTop: getStatusBarHeight() + verticalMargin,
+            height: window.height * 0.9,
           }}
         >
           <NavigationEvents
@@ -228,28 +265,33 @@ const MedicineBox = ({ navigation }) => {
               useEffectForMedicines();
             }}
           />
-          <Text
-            style={{
-              marginTop: 30,
-              fontSize: 24,
-            }}
-          >
-            약통
-          </Text>
+
           <View
             style={{
-              borderBottomStyle: 'solid',
-              borderBottomWidth: 5,
-              borderBottomColor: '#6a9c90',
               alignSelf: 'flex-start',
-              marginBottom: 15,
+              backgroundColor: '#76a991',
+              padding: 10,
+              paddingLeft: 25,
+              paddingRight: 25,
+              borderTopRightRadius: 35,
+              borderBottomRightRadius: 35,
+              marginBottom: 10,
             }}
           >
             <Text
               style={{
-                alignSelf: 'center',
+                fontSize: 28,
+                fontWeight: '200',
+                color: 'white',
+              }}
+            >
+              약통
+            </Text>
+            <Text
+              style={{
+                color: 'white',
                 marginTop: 5,
-                fontSize: 20,
+                fontSize: 24,
                 fontWeight: 'bold',
                 paddingBottom: 5,
               }}
@@ -258,24 +300,28 @@ const MedicineBox = ({ navigation }) => {
             </Text>
           </View>
 
+          {/* -- 콘텐츠 시작 -- */}
+
           <View
             style={{
-              width: window.width - 40,
+              width: window.width - 20,
+              marginTop: 0,
+              marginBottom: 10,
               flexDirection: 'row',
               justifyContent: 'space-between',
+              paddingLeft: 20,
             }}
           >
-            <TouchableOpacity onPress={tabChange} style={styles.medicineByChangeTabNotSelected}>
-              <Text style={styles.medicineByChangeTabNotSelectedText}>카메라로 등록한 약</Text>
+            <TouchableOpacity onPress={tabChange} style={styles.medicineByChangeTabSelected}>
+              <Text style={styles.medicineByChangeTabSelectedText}>카메라로 등록한 약</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={tabChange} style={styles.medicineByChangeTabSelected}>
-              <Text style={styles.medicineByChangeTabSelectedText}>직접 등록한 약</Text>
+            <TouchableOpacity onPress={tabChange} style={styles.medicineByChangeTabNotSelected}>
+              <Text style={styles.medicineByChangeTabNotSelectedText}>직접 등록한 약</Text>
             </TouchableOpacity>
           </View>
-
           <FlatList
-            style={{ width: window.width - 40 }}
+            style={{ width: window.width - 40, marginLeft: 20 }}
             data={MedicineBySelf}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -291,7 +337,7 @@ const MedicineBox = ({ navigation }) => {
                       height: window.height * 0.12,
                       marginTop: 10,
                       marginBottom: 5,
-                      borderBottomColor: '#6a9c90',
+                      borderBottomColor: '#76a991',
                       borderBottomWidth: 1,
                       borderStyle: 'solid',
                       flexDirection: 'row',
@@ -304,17 +350,23 @@ const MedicineBox = ({ navigation }) => {
                         width: window.width * 0.35,
                         resizeMode: 'contain',
                         marginBottom: 10,
+                        borderRadius: 15,
                       }}
                     />
                     <View
                       style={{
-                        width: window.width * 0.35,
+                        width: window.width * 0.5,
                         marginLeft: 20,
                         justifyContent: 'center',
-                        color: '#6a9c90',
+                        color: '#76a991',
                       }}
                     >
-                      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
+                      <Text
+                        numberOfLines={1}
+                        style={{ fontSize: 16, fontWeight: 'bold', lineHeight: 16 }}
+                      >
+                        {item.name}
+                      </Text>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -335,32 +387,35 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   medicineByChangeTabSelected: {
-    backgroundColor: '#6a9c90',
-    borderRadius: 40,
-    width: (window.width - 40) * 0.47,
-    height: 40,
+    marginTop: 10,
+    width: window.width * 0.43,
+    height: window.width * 0.15,
+    backgroundColor: '#76a991',
+    borderRadius: 30,
+    alignContent: 'center',
     justifyContent: 'center',
   },
   medicineByChangeTabNotSelected: {
-    backgroundColor: 'white',
+    marginTop: 10,
+    width: window.width * 0.43,
+    height: window.width * 0.15,
+    borderColor: '#76a991',
     borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#6a9c90',
-    borderRadius: 40,
-    width: (window.width - 40) * 0.47,
-    height: 40,
+    borderWidth: 2,
+    borderRadius: 30,
+    alignContent: 'center',
     justifyContent: 'center',
   },
   medicineByChangeTabSelectedText: {
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     color: 'white',
   },
   medicineByChangeTabNotSelectedText: {
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#6a9c90',
+    color: '#76a991',
   },
 });

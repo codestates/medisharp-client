@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, Dimensions } from 'react-native';
+import { Text, View, Dimensions, Image } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
@@ -18,7 +18,6 @@ import SelfInputScreen from './SelfInputScreen';
 import AlarmUpdateScreen from './AlarmUpdateScreen';
 import MedicineDetailScreen from './MedicineBoxScreen/MedicineDetailScreen';
 import DeleteCheckScreen from './AlarmUpdateScreen/DeleteCheck';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import SignUpScreen from './LoginScreen/SignUp';
 import FindIdScreen from './LoginScreen/FindId';
 import FindPwScreen from './LoginScreen/FindPw';
@@ -87,17 +86,59 @@ const TabNavigator = createBottomTabNavigator(
       tabBarIcon: ({ focused }) => {
         const { routeName } = navigation.state;
 
-        if (routeName === 'Home') {
+        if (routeName === 'Home' && focused) {
           return (
             <View>
-              <Icon name="home" size={25} color={(focused && '#6a9c90') || '#888'} />
+              <Image
+                style={{
+                  width: 100,
+                  height: 100,
+                  resizeMode: 'center',
+                }}
+                source={require('../../assets/homeActive.png')}
+              />
             </View>
           );
         }
-        if (routeName === 'Calendar') {
+        if (routeName === 'Home' && !focused) {
           return (
-            <View style={{ paddingRight: 10 }}>
-              <Icon name="calendar-alt" size={25} color={(focused && '#6a9c90') || '#888'} />
+            <View>
+              <Image
+                style={{
+                  width: 100,
+                  height: 100,
+                  resizeMode: 'center',
+                }}
+                source={require('../../assets/home.png')}
+              />
+            </View>
+          );
+        }
+        if (routeName === 'Calendar' && focused) {
+          return (
+            <View>
+              <Image
+                style={{
+                  width: 100,
+                  height: 100,
+                  resizeMode: 'center',
+                }}
+                source={require('../../assets/calendarActive.png')}
+              />
+            </View>
+          );
+        }
+        if (routeName === 'Calendar' && !focused) {
+          return (
+            <View>
+              <Image
+                style={{
+                  width: 100,
+                  height: 100,
+                  resizeMode: 'center',
+                }}
+                source={require('../../assets/calendar.png')}
+              />
             </View>
           );
         }
@@ -105,32 +146,73 @@ const TabNavigator = createBottomTabNavigator(
           return (
             <View
               style={{
-                backgroundColor: '#6a9c90',
-                width: window.height * 0.09,
+                backgroundColor: '#76a991',
+                width: window.height * 0.06,
                 height: window.height * 0.06,
                 borderRadius: window.height * 0.06,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              {/* <Icon name="clock" size={25} color={(focused && '#6a9c90') || '#888'} /> */}
-              <Text style={{ color: 'white', fontSize: 30, fontWeight: '800', marginBottom: 5 }}>
+              <Text style={{ color: 'white', fontSize: 30, fontWeight: '300', marginBottom: 5 }}>
                 +
               </Text>
             </View>
           );
         }
-        if (routeName === 'MedicineBox') {
+        if (routeName === 'MedicineBox' && focused) {
           return (
-            <View style={{ paddingLeft: 10 }}>
-              <Icon name="pills" size={25} color={(focused && '#6a9c90') || '#888'} />
+            <View>
+              <Image
+                style={{
+                  width: 100,
+                  height: 100,
+                  resizeMode: 'center',
+                }}
+                source={require('../../assets/medicineBoxActive.png')}
+              />
             </View>
           );
         }
-        if (routeName === 'Mypage') {
+        if (routeName === 'MedicineBox' && !focused) {
           return (
             <View>
-              <Icon name="user-alt" size={25} color={(focused && '#6a9c90') || '#888'} />
+              <Image
+                style={{
+                  width: 100,
+                  height: 100,
+                  resizeMode: 'center',
+                }}
+                source={require('../../assets/medicineBox.png')}
+              />
+            </View>
+          );
+        }
+        if (routeName === 'Mypage' && focused) {
+          return (
+            <View>
+              <Image
+                style={{
+                  width: 100,
+                  height: 100,
+                  resizeMode: 'center',
+                }}
+                source={require('../../assets/mypageActive.png')}
+              />
+            </View>
+          );
+        }
+        if (routeName === 'Mypage' && !focused) {
+          return (
+            <View>
+              <Image
+                style={{
+                  width: 100,
+                  height: 100,
+                  resizeMode: 'center',
+                }}
+                source={require('../../assets/mypage.png')}
+              />
             </View>
           );
         }
@@ -138,10 +220,10 @@ const TabNavigator = createBottomTabNavigator(
     }),
     tabBarOptions: {
       style: {
-        borderTopColor: '#6a9c90',
-        borderTopWidth: 1,
+        borderTopColor: '#76a991',
+        borderTopWidth: 0.8,
         borderStyle: 'solid',
-        height: window.height * 0.08,
+        height: window.height * 0.1,
       },
       showLabel: false,
     },
