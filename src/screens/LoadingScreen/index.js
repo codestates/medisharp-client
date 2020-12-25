@@ -16,22 +16,30 @@ export default class LoadingScreen extends Component {
       const token = await getItem();
       return token;
     }
-    get_token().then((token) => {
-      axios({
-        method: 'get',
-        url: 'http://127.0.0.1:5000/users/isloading',
+    get_token()
+      // .then((token) => {
+      //   axios({
+      //     method: 'get',
+      //     url: 'https://yag-olim-test-prod.herokuapp.com/users/isloading',
+      //   })
+      .then((token) => {
+        if (token) {
+          this.props.navigation.replace('TabNavigator');
+        } else {
+          this.props.navigation.replace('LoginScreen');
+        }
       })
-        .then((token) => {
-          if (token) {
-            this.props.navigation.replace('TabNavigator');
-          } else {
-            this.props.navigation.replace('LoginScreen');
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    });
+      .then((token) => {
+        if (token) {
+          this.props.navigation.replace('TabNavigator');
+        } else {
+          this.props.navigation.replace('LoginScreen');
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    //});
     // })
     // .catch((err) => {
     //   console.error(err);
