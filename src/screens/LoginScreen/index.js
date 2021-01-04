@@ -1,12 +1,20 @@
 import React, { Component } from 'react';
-import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  Dimensions,
+} from 'react-native';
 import axios from 'axios';
-
 import SocialWebviewModal from './SocialWebviewModal';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { setItem, getItem, removeItem } = useAsyncStorage('@yag_olim');
 
-//import axios from 'axios';
+const window = Dimensions.get('window');
 
 export default class LoginScreen extends Component {
   static navigationOptions = {
@@ -65,7 +73,7 @@ export default class LoginScreen extends Component {
   onPressSocial = async (social) => {
     this.setState({
       socialModalVisible: !this.state.socialModalVisible,
-      source: `https://yag-olim-test-prod.herokuapp.com/users/oauth/${social}`,
+      source: `http://127.0.0.1:5000/users/oauth/${social}`,
     });
   };
 
@@ -116,72 +124,69 @@ export default class LoginScreen extends Component {
 
   render() {
     return (
-      <View style={styles.loginContainer}>
-        <Image
+      <View style={{ height: '100%', backgroundColor: 'white', alignItems: 'center' }}>
+        <View
           style={{
-            top: '20%',
-            width: 310 * 0.85,
-            height: 111 * 0.85,
+            backgroundColor: '#76a991',
+            width: '100%',
+            height: window.height * 0.5,
+            borderBottomRightRadius: 50,
+            borderBottomLeftRadius: 50,
+            alignItems: 'center',
           }}
-          source={require('../../img/loginMain.png')}
-        />
+        >
+          <Image
+            style={{
+              width: window.width * 0.2,
+              height: window.width * 0.2,
+              resizeMode: 'center',
+              marginTop: window.height * 0.2,
+            }}
+            source={require('../../../assets/logoWhite.png')}
+          />
+          <Text style={{ fontSize: 28, fontWeight: '200', color: 'white' }}>약올림</Text>
+        </View>
         <View style={styles.LoginBox}>
-          <Text style={{ color: 'white', fontSize: 16 }}>ID</Text>
+          <Text style={{ color: '#76a991', fontSize: 16 }}>E-mail</Text>
           <TextInput
             value={this.state.email}
             autoCompleteType={'email'}
-            placeholder={'e-mail'}
+            placeholder={''}
             autoCapitalize="none"
             autoCorrect={false}
             onChangeText={(emailValue) => this.setState({ email: emailValue })}
             underlineColorAndroid="transparent"
-            placeholderTextColor="#999"
-            style={{
-              borderRadius: 10,
-              height: 40,
-              width: 250,
-              marginTop: 5,
-              marginBottom: 10,
-              backgroundColor: 'white',
-              paddingLeft: 10,
-            }}
+            style={styles.TextInputBox}
           />
-          <Text style={{ color: 'white', fontSize: 16 }}>Password</Text>
+          <Text style={{ color: '#76a991', fontSize: 16 }}>Password</Text>
           <TextInput
             autoCompleteType={'password'}
-            placeholder={'password'}
+            placeholder={''}
             secureTextEntry={true}
             onChangeText={(passwordValue) => this.setState({ password: passwordValue })}
             underlineColorAndroid="transparent"
             placeholderTextColor="#999"
-            style={{
-              borderRadius: 10,
-              height: 40,
-              width: 250,
-              marginTop: 5,
-              marginBottom: 20,
-              backgroundColor: 'white',
-              paddingLeft: 10,
-            }}
+            style={styles.TextInputBox}
           />
           <TouchableOpacity
             style={{
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: '#FFFFFF',
-              width: 250,
-              borderRadius: 30,
+              backgroundColor: '#76a991',
+              width: window.width * 0.7,
+              borderRadius: 100,
               height: 45,
               padding: 10,
-              marginBottom: 30,
+              marginTop: 10,
+              marginBottom: 15,
             }}
             onPress={this.doLogin.bind(this)}
           >
             <Text
-              style={{ color: '#649A8D', fontSize: 18, fontWeight: 'bold' }}
+              style={{ color: 'white', fontSize: 18, fontWeight: '200' }}
               onPress={this.doLogin.bind(this)}
             >
-              들어가기
+              약올림 로그인
             </Text>
           </TouchableOpacity>
           <View>
@@ -196,59 +201,43 @@ export default class LoginScreen extends Component {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#FAE301',
-                width: 250,
-                borderRadius: 20,
-                height: 60,
+                backgroundColor: '#ffef53',
+                width: window.width * 0.7,
+                borderRadius: 100,
+                height: 45,
                 padding: 10,
-                flexDirection: 'row',
+                marginBottom: 10,
               }}
               onPress={() => this.onPressSocial('kakao')}
             >
-              <Image
-                style={{ width: 35, height: 40, marginRight: 30 }}
-                source={require('../../img/kakaoLogo.png')}
-              />
-              <Text style={{ color: '#391B1B', fontSize: 18, fontWeight: 'bold' }}>
+              <Text style={{ color: '#745b5b', fontSize: 18, fontWeight: '200' }}>
                 카카오 로그인
               </Text>
             </TouchableOpacity>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
             <TouchableOpacity
-              style={{
-                justifyContent: 'center',
-                padding: 10,
-              }}
               onPress={() => {
                 this.props.navigation.navigate('SignUpScreen');
               }}
             >
-              <Text style={{ fontSize: 14, color: 'white' }}>회원가입</Text>
+              <Text style={styles.TextStyle}>회원가입</Text>
             </TouchableOpacity>
-            <Text style={{ fontSize: 14, color: 'white', paddingTop: 10 }}>|</Text>
+            <Text style={styles.TextStyle}> | </Text>
             <TouchableOpacity
-              style={{
-                justifyContent: 'center',
-                padding: 10,
-              }}
               onPress={() => {
                 this.props.navigation.navigate('FindIdScreen');
               }}
             >
-              <Text style={{ fontSize: 14, color: 'white' }}>아이디 찾기</Text>
+              <Text style={styles.TextStyle}>아이디 찾기</Text>
             </TouchableOpacity>
-            <Text style={{ fontSize: 14, color: 'white', paddingTop: 10 }}>|</Text>
+            <Text style={styles.TextStyle}> | </Text>
             <TouchableOpacity
-              style={{
-                justifyContent: 'center',
-                padding: 10,
-              }}
               onPress={() => {
                 this.props.navigation.navigate('FindPwScreen');
               }}
             >
-              <Text style={{ fontSize: 14, color: 'white' }}>비밀번호 찾기</Text>
+              <Text style={styles.TextStyle}>비밀번호 찾기</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -258,20 +247,28 @@ export default class LoginScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-  loginContainer: {
-    alignItems: 'center',
-    height: '100%',
-    position: 'relative',
-  },
   LoginBox: {
-    borderTopLeftRadius: 50,
-    borderTopRightRadius: 50,
-    backgroundColor: '#8AB3A9',
+    borderRadius: 50,
+    backgroundColor: 'white',
+    elevation: 5,
     alignItems: 'center',
     justifyContent: 'center',
-    height: '55%',
     position: 'absolute',
-    bottom: 0,
-    width: '100%',
+    top: '40%',
+    width: window.width * 0.8,
+    height: window.width * 0.9,
   },
+  TextInputBox: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#c4c4c4',
+    borderStyle: 'solid',
+    height: 40,
+    width: window.width * 0.7,
+    marginTop: 5,
+    marginBottom: 15,
+    backgroundColor: 'white',
+    paddingLeft: 10,
+  },
+  TextStyle: { fontSize: 14, color: '#76a991' },
 });

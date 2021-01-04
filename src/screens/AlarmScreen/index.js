@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import axios from 'axios';
 import 'moment/locale/ko';
 import moment from 'moment';
@@ -15,21 +15,15 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { onChange } from 'react-native-reanimated';
-import CameraScreen from '../CameraScreen';
-import CameraNoticeScreen from '../CameraNoticeScreen';
-import { createStackNavigator } from 'react-navigation-stack';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
-import * as Permissions from 'expo-permissions';
-
 import { NavigationEvents } from 'react-navigation';
-
 import { useAsyncStorage } from '@react-native-community/async-storage';
+
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 export default class AlarmScreen extends React.Component {
   static navigationOptions = {
@@ -74,8 +68,8 @@ export default class AlarmScreen extends React.Component {
       medi_ids: [],
       schedules_common_id: null,
       pushArr: [],
-      startD: null,
-      endD: null,
+      mediupload: false,
+      schedulescomupload: false,
     };
   }
 
@@ -102,8 +96,6 @@ export default class AlarmScreen extends React.Component {
     const startDate = selectedDate || this.state.date;
 
     this.setState({ date: startDate });
-    this.setState({ startD: startDate });
-    console.log(startDate);
 
     const startDateToShowYear = startDate.getFullYear();
     const startDateToShowMonth = startDate.getMonth();
@@ -119,7 +111,6 @@ export default class AlarmScreen extends React.Component {
     this.setState({ endDatePickerShow: !this.state.endDatePickerShow });
     const endDate = selectedDate || this.state.date;
     this.setState({ date: endDate });
-    this.setState({ endD: endDate });
 
     const endDateToShowYear = endDate.getFullYear();
     const endDateToShowMonth = endDate.getMonth();
@@ -157,8 +148,8 @@ export default class AlarmScreen extends React.Component {
   };
 
   postMedi = () => {
-    return (
-      axios
+    if (this.state.mediupload === false) {
+      return axios
         .post(
           'http://127.0.0.1:5000/medicines',
           { medicine: this.state.alarmMedicine },
@@ -168,38 +159,36 @@ export default class AlarmScreen extends React.Component {
             },
           },
         )
-        // .then((res) => {
-        //   this.setState({ medi_ids: res.data['medicine_id'] });
-        // })
+        .then((res) => {
+          this.setState({ mediupload: true, medi_ids: res.data['medicine_id'] });
+          console.log('약등록 성공', this.state.mediupload);
+          console.log('약등록 성공', this.state.medi_ids);
+        })
         .catch((e) => {
           console.log('error postmedi');
-          Alert.alert(
-            '에러가 발생했습니다!',
-            '다시 시도해주세요',
-            [
-              {
-                text: '다시시도하기',
-                onPress: async () => {
-                  if (this.state.medi_ids === []) {
-                    await this.postMedi();
-                    await this.postMeSCeUsId();
-                  } else if (this.state.medi_ids !== []) {
-                    await this.postMeSCeUsId();
-                  }
-                },
-              },
-            ],
-            { cancelable: false },
-          );
-        })
-    );
+          // Alert.alert(
+          //   '에러가 발생했습니다!',
+          //   '다시 시도해주세요',
+          //   [
+          //     {
+          //       text: '다시시도하기',
+          //       onPress: async () => {
+          //         await this.postMedi();
+          //         await this.postMeSceUsId();
+          //       },
+          //     },
+          //   ],
+          //   { cancelable: false },
+          // );
+        });
+    }
   };
 
   postScheduleCommon = () => {
-    return (
-      axios
+    if (this.state.schedulescomupload === false) {
+      return axios
         .post(
-          'http:127.0.0.1:5000/schedules-commons',
+          'http://127.0.0.1:5000/schedules-commons',
           {
             schedules_common: {
               title: this.state.alarmTitle,
@@ -215,39 +204,39 @@ export default class AlarmScreen extends React.Component {
             },
           },
         )
-        // .then((res) => {
-        //   this.setState({ schedules_common_id: res.data.results['new_schedules_common_id'] });
-        // })
+        .then((res) => {
+          this.setState({
+            schedulescomupload: true,
+            schedules_common_id: res.data.results['new_schedules_common_id'],
+          });
+          console.log('스케줄등록 성공', this.state.schedulescomupload);
+          console.log('스케줄등록 성공', this.state.schedules_common_id);
+        })
         .catch((e) => {
           console.log('error schedules common');
-          Alert.alert(
-            '에러가 발생했습니다!',
-            '다시 시도해주세요',
-            [
-              {
-                text: '다시시도하기',
-                onPress: async () => {
-                  if (this.state.schedules_common_id === 0 || null) {
-                    await this.postScheduleCommon();
-                    await this.postScheduleDate();
-                    await this.postMeSCeUsId();
-                  } else if (this.state.schedules_common_id !== 0 || null) {
-                    await this.postScheduleDate();
-                    await this.postMeSCeUsId();
-                  }
-                },
-              },
-            ],
-            { cancelable: false },
-          );
-        })
-    );
+          // Alert.alert(
+          //   '에러가 발생했습니다!',
+          //   '다시 시도해주세요',
+          //   [
+          //     {
+          //       text: '다시시도하기',
+          //       onPress: async () => {
+          //         await this.postScheduleCommon();
+          //         await this.postScheduleDate();
+          //         await this.postMeSceUsId();
+          //       },
+          //     },
+          //   ],
+          //   { cancelable: false },
+          // );
+        });
+    }
   };
 
   postMediSchedId = () => {
     return axios
       .post(
-        'http:127.0.0.1:5000/medicines/schedules-medicines',
+        'http://127.0.0.1:5000/medicines/schedules-medicines',
         {
           schedules_common_medicines: {
             medicines_id: this.state.medi_ids,
@@ -279,7 +268,7 @@ export default class AlarmScreen extends React.Component {
   postMediUId = () => {
     return axios
       .post(
-        'http:127.0.0.1:5000/medicines/users-medicines',
+        'http://127.0.0.1:5000/medicines/users-medicines',
         {
           medicines: {
             medicines_id: this.state.medi_ids,
@@ -311,18 +300,20 @@ export default class AlarmScreen extends React.Component {
     return axios.all([this.postMedi(), this.postScheduleCommon()]).then(
       axios.spread(async (medires, schedulesres) => {
         await this.setState({
-          medi_ids: medires.data['medicine_id'],
-          schedules_common_id: schedulesres.data.results['new_schedules_common_id'],
+          // medi_ids: medires.data['medicine_id'],
+          // schedules_common_id: schedulesres.data.results['new_schedules_common_id'],
+          mediupload: true,
+          schedulescomupload: true,
         });
       }),
     );
   };
 
   postScheduleDate = () => {
-    if ((this.state.schedules_common_id !== 0 || null) && this.state.push !== []) {
+    if (this.state.schedulescomupload === true && this.state.pushArr !== []) {
       return axios
         .post(
-          'http:127.0.0.1:5000/schedules-commons/schedules-dates',
+          'http://127.0.0.1:5000/schedules-commons/schedules-dates',
           {
             schedules_common: {
               schedules_common_id: Number(this.state.schedules_common_id),
@@ -341,23 +332,23 @@ export default class AlarmScreen extends React.Component {
         )
         .catch((e) => {
           console.log('error postScheduleDate');
-          Alert.alert(
-            '에러가 발생했습니다!',
-            '다시 시도해주세요',
-            [
-              {
-                text: '다시시도하기',
-                onPress: () => this.postScheduleDate(),
-              },
-            ],
-            { cancelable: false },
-          );
+          // Alert.alert(
+          //   '에러가 발생했습니다!',
+          //   '다시 시도해주세요',
+          //   [
+          //     {
+          //       text: '다시시도하기',
+          //       onPress: () => this.postScheduleDate(),
+          //     },
+          //   ],
+          //   { cancelable: false },
+          // );
         });
     }
   };
 
-  postMeSCeUsId = () => {
-    if (this.state.medi_ids !== [] && (this.state.schedules_common_id !== null || 0)) {
+  postMeSceUsId = async () => {
+    if (this.state.mediupload === true && this.state.schedulescomupload === true) {
       return axios.all([this.postMediSchedId(), this.postMediUId()]).then(async () => {
         await this.setState({
           alarmTitle: '',
@@ -375,10 +366,20 @@ export default class AlarmScreen extends React.Component {
           selectedHour: '',
           selectedMinute: '',
           alarmMedicine: [],
+          mediupload: false,
+          schedulescomupload: false,
+          pushArr: [],
         });
         await this.props.navigation.navigate('Calendar');
       });
-    } else if (this.state.medi_ids === [] && (this.state.schedules_common_id === null || 0)) {
+    } else if (this.state.mediupload === false && this.state.schedulescomupload === true) {
+      await this.postMedi();
+      await this.postMeSceUsId();
+    } else if (this.state.mediupload === true && this.state.schedulescomupload === false) {
+      await this.postScheduleCommon();
+      await this.postScheduleDate();
+      await this.postMeSceUsId;
+    } else if (this.state.mediupload === false && this.state.schedulescomupload === false) {
       this.postSchedules();
     }
   };
@@ -387,7 +388,7 @@ export default class AlarmScreen extends React.Component {
     await this.get_token();
     await this.postMediSchedules();
     await this.postScheduleDate();
-    await this.postMeSCeUsId();
+    await this.postMeSceUsId();
   };
 
   postPush = async () => {
@@ -398,18 +399,23 @@ export default class AlarmScreen extends React.Component {
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#FF231F7C',
       });
-      let curr = this.state.startD;
+      let startD = moment(
+        `${this.state.startYear}-${this.state.startMonth}-${this.state.startDate}`,
+      ).toDate();
+      let endD = moment(
+        `${this.state.endYear}-${this.state.endMonth}-${this.state.endDate}`,
+      ).toDate();
+      let curr = startD;
       let pushArr = [];
-      while (curr <= this.state.endD) {
+      while (curr <= endD) {
         let trigger = new Date(curr);
         trigger.setHours(Number(this.state.selectedHour));
         trigger.setMinutes(Number(this.state.selectedMinute));
         trigger.setSeconds(0);
-        console.log('trigger:', trigger);
         const pushSched = await Notifications.scheduleNotificationAsync({
           content: {
-            title: '약먹을 시간입니다~!!! 📬',
-            body: '오늘 먹을 약은 타이레놀',
+            title: `약 챙겨먹을 시간입니다~!!!💊`,
+            body: `등록하신 ${this.state.alarmMemo} 일정이에요!`,
             sound: 'email-sound.wav', // <- for Android below 8.0
           },
           trigger,
@@ -426,9 +432,8 @@ export default class AlarmScreen extends React.Component {
       <View
         style={{
           backgroundColor: 'white',
-          paddingTop: getStatusBarHeight(),
-          height: window.height * 0.92 - 1,
-          paddingLeft: 20,
+          paddingTop: getStatusBarHeight() + verticalMargin,
+          height: window.height * 0.9,
         }}
       >
         <NavigationEvents
@@ -443,69 +448,90 @@ export default class AlarmScreen extends React.Component {
             console.log('resultArr  =>', resultArr);
           }}
         />
-        <Text
-          style={{
-            marginTop: 30,
-            fontSize: 24,
-            fontWeight: '300',
-          }}
-        >
-          약 올리기
-        </Text>
         <View
           style={{
-            borderBottomStyle: 'solid',
-            borderBottomWidth: 5,
-            borderBottomColor: '#6a9c90',
             alignSelf: 'flex-start',
-            marginBottom: window.height * 0.02,
+            backgroundColor: '#76a991',
+            padding: 10,
+            paddingLeft: 25,
+            paddingRight: 25,
+            borderTopRightRadius: 35,
+            borderBottomRightRadius: 35,
+            marginBottom: 10,
           }}
         >
           <Text
             style={{
-              alignSelf: 'center',
+              fontSize: 28,
+              fontWeight: '200',
+              color: 'white',
+            }}
+          >
+            약 올리기
+          </Text>
+          <Text
+            style={{
+              color: 'white',
               marginTop: 5,
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: 'bold',
               paddingBottom: 5,
             }}
           >
-            복용 알람 등록하기
+            알람 등록하기
           </Text>
         </View>
-        <ScrollView>
+
+        {/* -- 콘텐츠 시작 -- */}
+        <ScrollView style={{ paddingLeft: 20, paddingTop: -10 }}>
           {/* -- 약 올리기 뷰 -- */}
-          <View style={styles.viewBox}>
+          <View style={styles.textInputBox}>
             <View style={styles.seclectView}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Icon name="pills" size={22} color={'#D6E4E1'} />
-                <Text style={styles.seclectText}>약 올리기</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() =>
-                  this.props.navigation.navigate('CameraNoticeScreen', {
-                    update: '',
-                    item: '',
-                    clickedDate: '',
-                  })
-                }
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
               >
-                <Text style={{ fontSize: 16 }}>
-                  사진으로 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: '200',
+                    color: '#626262',
+                    flex: 1,
+                  }}
+                >
+                  약 올리기
                 </Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    this.props.navigation.navigate('CameraNoticeScreen', {
+                      update: '',
+                      item: '',
+                      clickedDate: '',
+                    })
+                  }
+                >
+                  <Text style={{ fontSize: 16, fontWeight: '200', color: '#626262', flex: 1 }}>
+                    사진으로 추가 <Icon name="plus-square" size={16} color={'#76a991'} />
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
+
             <View>
               <FlatList
                 horizontal={true}
                 data={this.state.alarmMedicine}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
-                  <View style={{ marginBottom: 10 }}>
+                  <View>
                     <View
                       style={{
                         flexDirection: 'row',
                         margin: 5,
+                        marginBottom: 0,
                         alignSelf: 'flex-start',
                         borderWidth: 1,
                         borderColor: '#939393',
@@ -536,7 +562,7 @@ export default class AlarmScreen extends React.Component {
                           }}
                           name="times-circle"
                           size={20}
-                          color={'#9a6464'}
+                          color={'#ffaaaa'}
                           style={{
                             marginLeft: 5,
                           }}
@@ -554,15 +580,12 @@ export default class AlarmScreen extends React.Component {
             style={{
               marginBottom: window.height * 0.01,
               borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
+              borderBottomColor: '#76a991',
               borderStyle: 'solid',
               width: window.width - 40,
             }}
           >
-            <View style={{ flexDirection: 'row', padding: 10 }}>
-              <Icon name="pencil-alt" size={23} color={'#D6E4E1'} />
-              <Text style={styles.seclectText}>알람 이름</Text>
-            </View>
+            <Text style={styles.textInputTitle}>알람 이름</Text>
             <TextInput
               style={{
                 textAlign: 'center',
@@ -581,22 +604,18 @@ export default class AlarmScreen extends React.Component {
           </View>
 
           {/* -- 알람 메모 입력 뷰 -- */}
-          <View style={styles.viewBox}>
-            <View style={{ flexDirection: 'row', padding: 10 }}>
-              <Icon name="pencil-alt" size={23} color={'#D6E4E1'} />
-              <Text style={styles.seclectText}>메모 작성</Text>
-            </View>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>메모 작성</Text>
+
             <TextInput
               style={{
                 textAlign: 'left',
-                marginBottom: window.height * 0.015,
                 marginTop: 5,
-                fontSize: 18,
-                width: window.width - 40,
-                padding: 5,
-                borderWidth: 1,
-                borderColor: '#D7E4E1',
-                borderStyle: 'solid',
+                marginLeft: 10,
+                fontSize: 16,
+                width: window.width - 60,
+                borderBottomWidth: 1,
+                borderBottomColor: '#d4d4d4',
               }}
               placeholder="알람에 메모를 추가하세요!"
               placeholderTextColor={'gray'}
@@ -607,12 +626,9 @@ export default class AlarmScreen extends React.Component {
           </View>
 
           {/* -- 날짜 선택 뷰 -- */}
-          <View style={styles.viewBox}>
+          <View style={styles.textInputBox}>
             <View style={styles.seclectView}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Icon name="calendar-alt" size={25} color={'#D6E4E1'} />
-                <Text style={styles.seclectText}>시작 날짜</Text>
-              </View>
+              <Text style={styles.textInputTitle}>시작 날짜</Text>
               {this.state.startDatePickerShow && (
                 <DateTimePicker
                   value={new Date()}
@@ -634,10 +650,7 @@ export default class AlarmScreen extends React.Component {
               </TouchableOpacity>
             </View>
             <View style={styles.seclectView}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Icon name="calendar-alt" size={25} color={'transparent'} />
-                <Text style={styles.seclectText}>종료 날짜</Text>
-              </View>
+              <Text style={styles.textInputTitle}>종료 날짜</Text>
               {this.state.endDatePickerShow && (
                 <DateTimePicker
                   value={new Date()}
@@ -661,7 +674,7 @@ export default class AlarmScreen extends React.Component {
           </View>
 
           {/* -- 시간 선택 뷰 -- */}
-          <View style={styles.viewBox}>
+          <View style={styles.textInputBox}>
             <View style={styles.seclectView}>
               <View
                 style={{
@@ -670,10 +683,16 @@ export default class AlarmScreen extends React.Component {
                   justifyContent: 'space-between',
                 }}
               >
-                <View style={{ flexDirection: 'row', flex: 1 }}>
-                  <Icon name="clock" size={24} color={'#D6E4E1'} />
-                  <Text style={styles.seclectText}>시간 설정</Text>
-                </View>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: '200',
+                    color: '#626262',
+                    flex: 1,
+                  }}
+                >
+                  시간 설정
+                </Text>
                 {this.state.timePickerShow && (
                   <DateTimePicker
                     value={new Date()}
@@ -683,8 +702,8 @@ export default class AlarmScreen extends React.Component {
                   />
                 )}
                 <TouchableOpacity onPress={this.onPressTime}>
-                  <Text style={{ fontSize: 16 }}>
-                    시간 추가 <Icon name="plus-square" size={16} color={'#6A9C90'} />
+                  <Text style={{ fontSize: 16, color: '#626262' }}>
+                    시간 추가 <Icon name="plus-square" size={16} color={'#76a991'} />
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -711,6 +730,7 @@ export default class AlarmScreen extends React.Component {
                         borderStyle: 'solid',
                         borderRadius: 5,
                         padding: 5,
+                        marginBottom: 0,
                       }}
                     >
                       <Text style={{ fontSize: 22, textAlign: 'right', marginRight: 5 }}>
@@ -722,7 +742,7 @@ export default class AlarmScreen extends React.Component {
                           }}
                           name="times-circle"
                           size={20}
-                          color={'#9a6464'}
+                          color={'#ffaaaa'}
                         />
                       </Text>
                     </View>
@@ -740,8 +760,7 @@ export default class AlarmScreen extends React.Component {
                   }}
                 >
                   <View style={{ flexDirection: 'row', flex: 1 }}>
-                    <Icon name="clock" size={24} color={'white'} />
-                    <Text style={styles.seclectText}>반복 주기</Text>
+                    <Text style={styles.textInputTitle}>반복 주기</Text>
                   </View>
                   <TextInput
                     style={{
@@ -777,8 +796,8 @@ export default class AlarmScreen extends React.Component {
                   alignItems: 'center',
                   width: window.width * 0.7,
                   height: window.height * 0.075,
-                  backgroundColor: '#6a9c90',
-                  borderRadius: 20,
+                  backgroundColor: '#76a991',
+                  borderRadius: window.height * 0.075,
                 }}
               >
                 <Text style={{ fontSize: 20, color: 'white' }}>등록하기</Text>
@@ -792,12 +811,13 @@ export default class AlarmScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  viewBox: {
-    marginBottom: window.height * 0.005,
-    width: window.width - 40,
+  textInputBox: {
+    marginBottom: verticalMargin,
     borderBottomWidth: 1,
-    borderBottomColor: '#6A9C90',
+    borderBottomColor: '#76a991',
     borderStyle: 'solid',
+    width: window.width - 40,
+    paddingBottom: window.height * 0.015,
   },
   seclectView: {
     flexDirection: 'row',
@@ -805,9 +825,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 8,
   },
-  seclectText: {
-    paddingLeft: 10,
+  textInputTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '200',
+    color: '#626262',
+    paddingLeft: 5,
   },
 });

@@ -1,5 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
-import react from 'react';
+import React from 'react';
 import {
   View,
   Image,
@@ -8,18 +7,18 @@ import {
   TextInput,
   Dimensions,
   TouchableOpacity,
-  ActivityIndicator,
-  TouchableHighlightBase,
   Alert,
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import axios from 'axios';
-
-import AsyncStorage, { useAsyncStorage } from '@react-native-community/async-storage';
+import { useAsyncStorage } from '@react-native-community/async-storage';
 import { ScrollView } from 'react-native-gesture-handler';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
+
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 export default class CheckScreen extends React.Component {
   static navigationOptions = {
@@ -133,16 +132,16 @@ export default class CheckScreen extends React.Component {
     return (
       <View
         style={{
-          height: window.height * 0.92 - 1,
+          height: window.height * 0.9,
           width: window.width - 40,
           marginLeft: 20,
           alignItems: 'center',
+          marginTop: getStatusBarHeight(),
         }}
       >
         <ScrollView
           style={{
             height: window.height * 0.8,
-            marginTop: 50,
           }}
         >
           <Image
@@ -150,15 +149,18 @@ export default class CheckScreen extends React.Component {
               width: window.width - 40,
               height: window.width - 40,
               borderRadius: 50,
+              marginTop: verticalMargin,
             }}
             source={{ uri: this.state.getImg }}
           />
+
           <Text
             style={{
               fontSize: 20,
               color: '#313131',
               fontWeight: 'bold',
               marginTop: '5%',
+              marginBottom: '5%',
               textAlign: 'center',
             }}
           >
@@ -166,25 +168,11 @@ export default class CheckScreen extends React.Component {
           </Text>
 
           {/* -- 약 이름 입력 뷰 -- */}
-          <View
-            style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
-            }}
-          >
-            <Text style={styles.seclectText}>약 이름</Text>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>약 이름</Text>
+
             <TextInput
-              style={{
-                textAlign: 'center',
-                marginTop: 10,
-                marginBottom: 5,
-                fontSize: 20,
-                width: window.width - 40,
-                paddingBottom: 5,
-              }}
+              style={styles.textInputStyle}
               placeholder="약 이름을 입력하세요 :)"
               placeholderTextColor={'gray'}
               maxLength={10}
@@ -196,10 +184,10 @@ export default class CheckScreen extends React.Component {
           </View>
 
           {/* -- 효능/효과 메모 입력 뷰 -- */}
-          <View style={styles.viewBox}>
-            <Text style={styles.seclectText}>효능/효과</Text>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>효능/효과</Text>
             <TextInput
-              style={styles.inputBox}
+              style={styles.textInputStyle}
               placeholder="효능/효과을 입력하세요!"
               placeholderTextColor={'gray'}
               maxLength={30}
@@ -209,10 +197,10 @@ export default class CheckScreen extends React.Component {
           </View>
 
           {/* -- 용법/용량 메모 입력 뷰 -- */}
-          <View style={styles.viewBox}>
-            <Text style={styles.seclectText}>용법/용량</Text>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>용법/용량</Text>
             <TextInput
-              style={styles.inputBox}
+              style={styles.textInputStyle}
               placeholder="용법/용량을 입력하세요!"
               placeholderTextColor={'gray'}
               maxLength={30}
@@ -222,10 +210,10 @@ export default class CheckScreen extends React.Component {
           </View>
 
           {/* -- 유효기간 메모 입력 뷰 -- */}
-          <View style={styles.viewBox}>
-            <Text style={styles.seclectText}>유효기간</Text>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>유효기간</Text>
             <TextInput
-              style={styles.inputBox}
+              style={styles.textInputStyle}
               placeholder="유효기간을 입력하세요!"
               placeholderTextColor={'gray'}
               maxLength={30}
@@ -235,7 +223,7 @@ export default class CheckScreen extends React.Component {
           </View>
 
           {/* -- 확인 버튼 -- */}
-          <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
+          <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20 }}>
             <TouchableOpacity
               onPress={() => {
                 this.redirectToAlarmScreen();
@@ -248,8 +236,8 @@ export default class CheckScreen extends React.Component {
                   alignItems: 'center',
                   width: window.width * 0.7,
                   height: window.height * 0.075,
-                  backgroundColor: '#6a9c90',
-                  borderRadius: 20,
+                  backgroundColor: '#76a991',
+                  borderRadius: window.height * 0.075,
                 }}
               >
                 <Text style={{ fontSize: 20, color: 'white' }}>이걸로 결정!</Text>
@@ -263,33 +251,27 @@ export default class CheckScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  loginContainer: {
-    alignItems: 'center',
-    height: '100%',
-    position: 'relative',
-  },
-  viewBox: {
-    marginBottom: window.height * 0.005,
-    width: window.width - 40,
+  textInputBox: {
+    marginBottom: verticalMargin,
     borderBottomWidth: 1,
-    borderBottomColor: '#6A9C90',
+    borderBottomColor: '#76a991',
     borderStyle: 'solid',
-  },
-  seclectText: {
-    paddingLeft: 10,
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 15,
-  },
-  inputBox: {
-    textAlign: 'left',
-    marginBottom: window.height * 0.015,
-    marginTop: 5,
-    fontSize: 18,
     width: window.width - 40,
-    padding: 5,
-    borderWidth: 1,
-    borderColor: '#D7E4E1',
-    borderStyle: 'solid',
+    paddingBottom: window.height * 0.015,
+  },
+  textInputTitle: {
+    fontSize: 18,
+    fontWeight: '200',
+    color: '#626262',
+    paddingLeft: 5,
+  },
+  textInputStyle: {
+    textAlign: 'left',
+    marginTop: 5,
+    marginLeft: 10,
+    fontSize: 16,
+    width: window.width - 60,
+    borderBottomWidth: 1,
+    borderBottomColor: '#d4d4d4',
   },
 });

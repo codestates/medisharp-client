@@ -12,9 +12,8 @@ import {
 } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 
-import { NavigationEvents } from 'react-navigation';
-
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 export default class FindId extends React.Component {
   static navigationOptions = {
@@ -65,11 +64,11 @@ export default class FindId extends React.Component {
       [
         {
           text: 'OK',
-          onPress: () => this.props.navigation.navigate('LoginScreen'),
+          onPress: () => this.props.navigation.replace('LoginScreen'),
         },
         {
           text: '회원가입 할래요',
-          onPress: () => this.props.navigation.navigate('SignUpScreen'),
+          onPress: () => this.props.navigation.replace('SignUpScreen'),
         },
         { text: '다시 찾을래요', onPress: () => console.log('다시 찾을래요') },
       ],
@@ -88,8 +87,8 @@ export default class FindId extends React.Component {
     })
       .then((data) => {
         console.log(data.data.email);
-        const userEmail = data.data.email;
-        this.createThreeButtonAlert(userEmail).bind(this);
+        const userEmail = data.data.email[0];
+        this.createThreeButtonAlert(userEmail);
       })
       .catch((e) => {
         console.log(e);
@@ -112,69 +111,51 @@ export default class FindId extends React.Component {
       <View
         style={{
           backgroundColor: 'white',
-          paddingTop: getStatusBarHeight(),
+          paddingTop: getStatusBarHeight() + verticalMargin,
           height: window.height,
-          paddingLeft: 20,
         }}
       >
-        <NavigationEvents onDidFocus={(payload) => {}} />
-        <View>
+        <View
+          style={{
+            alignSelf: 'flex-start',
+            backgroundColor: '#76a991',
+            padding: 10,
+            paddingLeft: 25,
+            paddingRight: 25,
+            borderTopRightRadius: 35,
+            borderBottomRightRadius: 35,
+            marginBottom: verticalMargin,
+          }}
+        >
           <Text
             style={{
-              marginTop: 30,
-              fontSize: 24,
-              fontWeight: '300',
+              fontSize: 28,
+              fontWeight: '200',
+              color: 'white',
             }}
           >
             약 올림
           </Text>
-          <View
+          <Text
             style={{
-              borderBottomStyle: 'solid',
-              borderBottomWidth: 5,
-              borderBottomColor: '#6a9c90',
-              alignSelf: 'flex-start',
-              marginBottom: window.height * 0.02,
+              color: 'white',
+              marginTop: 5,
+              fontSize: 24,
+              fontWeight: 'bold',
+              paddingBottom: 5,
             }}
           >
-            <Text
-              style={{
-                alignSelf: 'center',
-                marginTop: 5,
-                fontSize: 20,
-                fontWeight: 'bold',
-                paddingBottom: 5,
-              }}
-            >
-              아이디 찾기
-            </Text>
-          </View>
+            아이디 찾기
+          </Text>
         </View>
-        <ScrollView>
+        <ScrollView style={{ paddingLeft: 20 }}>
           {/* -- 이름 입력 뷰 -- */}
-          <View
-            style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
-            }}
-          >
-            <Text
-              style={{
-                paddingLeft: 10,
-                fontSize: 18,
-                fontWeight: 'bold',
-                color: '#6a9c90',
-              }}
-            >
-              이름
-            </Text>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>이름</Text>
             <TextInput
               style={styles.placeholderText}
               placeholder="이름을 입력하세요."
-              placeholderTextColor={'gray'}
+              placeholderTextColor={'#c4c4c4'}
               maxLength={12}
               onChangeText={(nameValue) => this.handleSignUpValue('name', nameValue)}
               defaultValue={this.state.name}
@@ -183,20 +164,12 @@ export default class FindId extends React.Component {
           <Text style={styles.nonAvailableText}>{this.state.isAvailedName}</Text>
 
           {/* -- 전화번호 입력 뷰 -- */}
-          <View
-            style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
-            }}
-          >
-            <Text style={styles.seclectText}>전화번호</Text>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>전화번호</Text>
             <TextInput
               style={styles.placeholderText}
               placeholder="공백없이 숫자만 입력하세요."
-              placeholderTextColor={'gray'}
+              placeholderTextColor={'#c4c4c4'}
               maxLength={11}
               onChangeText={(phoneNumberValue) =>
                 this.handleSignUpValue('phoneNumber', phoneNumberValue)
@@ -207,7 +180,7 @@ export default class FindId extends React.Component {
           <Text style={styles.nonAvailableText}>{this.state.isAvailedPhoneNumber}</Text>
 
           {/* -- 확인 버튼 -- */}
-          <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
+          <View style={{ alignItems: 'center', marginTop: -10, marginBottom: 30, marginLeft: -20 }}>
             <TouchableOpacity
               onPress={() => {
                 this.onFindId();
@@ -216,12 +189,11 @@ export default class FindId extends React.Component {
               <View
                 style={{
                   justifyContent: 'center',
-                  marginTop: 15,
                   alignItems: 'center',
                   width: window.width * 0.7,
                   height: window.height * 0.075,
-                  backgroundColor: '#6a9c90',
-                  borderRadius: 20,
+                  backgroundColor: '#76a991',
+                  borderRadius: 100,
                 }}
               >
                 <Text style={{ fontSize: 20, color: 'white' }}>아이디 찾기</Text>
@@ -235,37 +207,31 @@ export default class FindId extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  viewBox: {
-    marginBottom: window.height * 0.005,
-    width: window.width - 40,
+  textInputBox: {
+    marginBottom: verticalMargin,
     borderBottomWidth: 1,
-    borderBottomColor: '#6A9C90',
+    borderBottomColor: '#76a991',
     borderStyle: 'solid',
+    width: window.width - 40,
   },
-  seclectView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 8,
-  },
-  seclectText: {
-    marginTop: 30,
+  textInputTitle: {
     paddingLeft: 10,
+    marginBottom: 5,
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#6a9c90',
+    fontWeight: '200',
+    color: '#76a991',
   },
   placeholderText: {
-    textAlign: 'right',
-    fontSize: 18,
+    fontSize: 16,
     width: window.width - 40,
-    padding: 10,
-    paddingBottom: 5,
+    paddingLeft: 10,
   },
   nonAvailableText: {
+    marginTop: -verticalMargin,
+    marginBottom: verticalMargin,
     paddingLeft: 10,
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#9a6464',
+    color: '#ffaaaa',
   },
 });

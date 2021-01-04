@@ -49,6 +49,7 @@ export default class LoadingScreen extends Component {
       });
   };
 
+
   render() {
     return (
       <View style={styles.loginContainer}>

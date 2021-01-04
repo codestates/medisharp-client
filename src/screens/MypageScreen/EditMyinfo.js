@@ -11,12 +11,12 @@ import {
   Alert,
 } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import { NavigationEvents } from 'react-navigation';
-
 import { useAsyncStorage } from '@react-native-community/async-storage';
+
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 export default class Mypage extends React.Component {
   constructor(props) {
@@ -163,70 +163,57 @@ export default class Mypage extends React.Component {
       <View
         style={{
           backgroundColor: 'white',
-          paddingTop: getStatusBarHeight(),
-          height: window.height * 0.92 - 1,
-          paddingLeft: 20,
+          paddingTop: getStatusBarHeight() + verticalMargin,
+          height: window.height * 0.9,
         }}
       >
-        <NavigationEvents onDidFocus={(payload) => {}} />
-        <View>
+        <View
+          style={{
+            alignSelf: 'flex-start',
+            backgroundColor: '#76a991',
+            padding: 10,
+            paddingLeft: 25,
+            paddingRight: 25,
+            borderTopRightRadius: 35,
+            borderBottomRightRadius: 35,
+            marginBottom: 10,
+          }}
+        >
           <Text
             style={{
-              marginTop: 30,
-              fontSize: 24,
-              fontWeight: '300',
+              fontSize: 28,
+              fontWeight: '200',
+              color: 'white',
             }}
           >
             약 올림
           </Text>
-          <View
+          <Text
             style={{
-              borderBottomStyle: 'solid',
-              borderBottomWidth: 5,
-              borderBottomColor: '#6a9c90',
-              alignSelf: 'flex-start',
-              marginBottom: window.height * 0.02,
+              color: 'white',
+              marginTop: 5,
+              fontSize: 24,
+              fontWeight: 'bold',
+              paddingBottom: 5,
             }}
           >
-            <Text
-              style={{
-                alignSelf: 'center',
-                marginTop: 5,
-                fontSize: 20,
-                fontWeight: 'bold',
-                paddingBottom: 5,
-              }}
-            >
-              개인정보 수정
-            </Text>
-          </View>
-          <Text>수정할 정보를 입력하지 않으실 경우 기존의 정보로 유지됩니다.</Text>
+            개인 정보 수정
+          </Text>
         </View>
-        <ScrollView>
+
+        {/* -- 콘텐츠 시작 -- */}
+
+        <Text style={{ textAlign: 'center', color: '#6a9c90', fontWeight: 'bold', margin: 10 }}>
+          수정할 정보를 입력하지 않으실 경우{'\n'} 기존의 정보로 유지됩니다.
+        </Text>
+        <ScrollView style={{ marginLeft: 20 }}>
           {/* -- 이름 입력 뷰 -- */}
-          <View
-            style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
-            }}
-          >
-            <Text
-              style={{
-                paddingLeft: 10,
-                fontSize: 18,
-                fontWeight: 'bold',
-                color: '#6a9c90',
-              }}
-            >
-              이름
-            </Text>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>이름</Text>
             <TextInput
               style={styles.placeholderText}
               placeholder="이름을 입력하세요."
-              placeholderTextColor={'gray'}
+              placeholderTextColor={'#c4c4c4'}
               maxLength={12}
               onChangeText={(nameValue) => this.handleSignUpValue('name', nameValue)}
               defaultValue={this.state.name}
@@ -235,67 +222,35 @@ export default class Mypage extends React.Component {
           <Text style={styles.nonAvailableText}>{this.state.isAvailedName}</Text>
 
           {/* -- 전화번호 입력 뷰 -- */}
-          <View
-            style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
-            }}
-          >
-            <Text style={styles.seclectText}>전화번호</Text>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>전화번호</Text>
             <TextInput
               style={styles.placeholderText}
               placeholder="아이디를 찾을 때 사용됩니다."
-              placeholderTextColor={'gray'}
+              placeholderTextColor={'#c4c4c4'}
               maxLength={11}
               onChangeText={(phoneNumberValue) =>
                 this.handleSignUpValue('phoneNumber', phoneNumberValue)
               }
-              defaultValue={this.state.phoneNumber}
+              defaultValue={this.state.phone}
             />
           </View>
           <Text style={styles.nonAvailableText}>{this.state.isAvailedPhoneNumber}</Text>
 
           {/* -- 이메일 뷰 -- */}
-          <View
-            style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
-            }}
-          >
-            <Text
-              style={{
-                paddingLeft: 10,
-                fontSize: 18,
-                fontWeight: 'bold',
-                color: '#6a9c90',
-              }}
-            >
-              이메일
-            </Text>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>이메일 주소</Text>
             <Text style={styles.placeholderText}>{this.state.useremail}</Text>
           </View>
+          <Text style={styles.nonAvailableText}></Text>
 
           {/* -- 비밀번호 입력 뷰 -- */}
-          <View
-            style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
-            }}
-          >
-            <Text style={styles.seclectText}>비밀번호</Text>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>비밀번호</Text>
             <TextInput
               style={styles.placeholderText}
               placeholder="비밀번호를 입력하세요."
-              placeholderTextColor={'gray'}
+              placeholderTextColor={'#c4c4c4'}
               maxLength={16}
               secureTextEntry={true}
               onChangeText={(passwordValue) => this.handleSignUpValue('password', passwordValue)}
@@ -305,20 +260,12 @@ export default class Mypage extends React.Component {
           <Text style={styles.nonAvailableText}>{this.state.isAvailedPassword}</Text>
 
           {/* -- 비밀번호 확인 뷰 -- */}
-          <View
-            style={{
-              marginBottom: window.height * 0.01,
-              borderBottomWidth: 1,
-              borderBottomColor: '#6A9C90',
-              borderStyle: 'solid',
-              width: window.width - 40,
-            }}
-          >
-            <Text style={styles.seclectText}>비밀번호 확인</Text>
+          <View style={styles.textInputBox}>
+            <Text style={styles.textInputTitle}>비밀번호 확인</Text>
             <TextInput
               style={styles.placeholderText}
               placeholder="맞게 입력되었는지 확인!"
-              placeholderTextColor={'gray'}
+              placeholderTextColor={'#c4c4c4'}
               maxLength={16}
               secureTextEntry={true}
               onChangeText={(passwordCheckValue) =>
@@ -330,17 +277,16 @@ export default class Mypage extends React.Component {
           <Text style={styles.nonAvailableText}>{this.state.isAvailedPasswordCheck}</Text>
 
           {/* -- 확인 버튼 -- */}
-          <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20, marginLeft: -20 }}>
+          <View style={{ alignItems: 'center', marginBottom: 20, marginLeft: -20 }}>
             <TouchableOpacity onPress={this.editUserInfo}>
               <View
                 style={{
                   justifyContent: 'center',
-                  marginTop: 15,
                   alignItems: 'center',
                   width: window.width * 0.7,
                   height: window.height * 0.075,
-                  backgroundColor: '#6a9c90',
-                  borderRadius: 20,
+                  backgroundColor: '#76a991',
+                  borderRadius: window.height * 0.075,
                 }}
               >
                 <Text style={{ fontSize: 20, color: 'white' }}>변경하기</Text>
@@ -354,37 +300,32 @@ export default class Mypage extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  viewBox: {
-    marginBottom: window.height * 0.005,
-    width: window.width - 40,
+  textInputBox: {
+    marginBottom: verticalMargin,
     borderBottomWidth: 1,
-    borderBottomColor: '#6A9C90',
+    borderBottomColor: '#76a991',
     borderStyle: 'solid',
+    width: window.width - 40,
   },
-  seclectView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 8,
-  },
-  seclectText: {
-    marginTop: 30,
+  textInputTitle: {
     paddingLeft: 10,
+    marginBottom: 5,
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#6a9c90',
+    fontWeight: '200',
+    color: '#76a991',
   },
   placeholderText: {
-    textAlign: 'right',
-    fontSize: 18,
+    fontSize: 16,
     width: window.width - 40,
-    padding: 10,
-    paddingBottom: 5,
+    paddingLeft: 10,
+    textAlign: 'right',
   },
   nonAvailableText: {
+    marginTop: -verticalMargin,
+    marginBottom: verticalMargin,
     paddingLeft: 10,
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#9a6464',
+    color: '#ffaaaa',
   },
 });

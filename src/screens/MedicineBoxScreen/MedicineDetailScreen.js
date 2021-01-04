@@ -12,14 +12,11 @@ import {
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import { NavigationEvents } from 'react-navigation';
-
-import medisharpLogo from '../../img/medisharpLogo.png';
-
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { getItem } = useAsyncStorage('@yag_olim');
 
 const window = Dimensions.get('window');
+let verticalMargin = window.height * 0.02;
 
 export default class MedicineDetailScreen extends React.Component {
   constructor(props) {
@@ -124,14 +121,30 @@ export default class MedicineDetailScreen extends React.Component {
   render() {
     if (this.state.isLoading === true) {
       return (
-        <View style={styles.loginContainer}>
-          <View style={[styles.container, styles.horizontal]}>
+        <View style={{ height: '100%', backgroundColor: 'white', alignItems: 'center' }}>
+          <View
+            style={{
+              backgroundColor: '#76a991',
+              width: '100%',
+              height: window.height * 0.5,
+              borderBottomRightRadius: 50,
+              borderBottomLeftRadius: 50,
+              alignItems: 'center',
+            }}
+          >
             <Image
-              style={{ width: 77, height: 71, marginTop: '60%', marginBottom: '20%' }}
-              source={medisharpLogo}
+              style={{
+                width: window.width * 0.2,
+                height: window.width * 0.2,
+                resizeMode: 'center',
+                marginTop: window.height * 0.2,
+              }}
+              source={require('../../../assets/logoWhite.png')}
             />
-            <Text>약 정보를 가져오고 있습니다. 잠시만 기다려주세요.</Text>
-            <ActivityIndicator size={60} color="#6a9c90" />
+            <Text style={{ fontSize: 28, fontWeight: '200', color: 'white' }}>약올림</Text>
+          </View>
+          <View style={{ marginTop: '20%' }}>
+            <ActivityIndicator size={60} color="#76a991" />
           </View>
         </View>
       );
@@ -140,41 +153,47 @@ export default class MedicineDetailScreen extends React.Component {
         <View
           style={{
             backgroundColor: 'white',
-            height: window.height * 0.92 - 1,
-            paddingLeft: 20,
-            paddingTop: getStatusBarHeight(),
+            paddingTop: getStatusBarHeight() + verticalMargin,
+            height: window.height * 0.9,
           }}
         >
           {/* -- 상단 타이틀 -- */}
-          <Text
-            style={{
-              marginTop: 30,
-              fontSize: 24,
-            }}
-          >
-            약통
-          </Text>
           <View
             style={{
-              borderBottomStyle: 'solid',
-              borderBottomWidth: 5,
-              borderBottomColor: '#6a9c90',
               alignSelf: 'flex-start',
-              marginBottom: 15,
+              backgroundColor: '#76a991',
+              padding: 10,
+              paddingLeft: 25,
+              paddingRight: 25,
+              borderTopRightRadius: 35,
+              borderBottomRightRadius: 35,
+              marginBottom: 10,
             }}
           >
             <Text
               style={{
-                alignSelf: 'center',
+                fontSize: 28,
+                fontWeight: '200',
+                color: 'white',
+              }}
+            >
+              약통
+            </Text>
+            <Text
+              style={{
+                color: 'white',
                 marginTop: 5,
-                fontSize: 20,
+                fontSize: 24,
                 fontWeight: 'bold',
                 paddingBottom: 5,
               }}
             >
-              내가 복용하는 모든 약
+              나의 약 모두보기
             </Text>
           </View>
+
+          {/* -- 콘텐츠 시작 -- */}
+
           <ScrollView>
             {/* -- 약 사진 -- */}
             <Image
@@ -182,99 +201,75 @@ export default class MedicineDetailScreen extends React.Component {
               style={{
                 width: window.width - 40,
                 height: window.width - 40,
-                //resizeMode: 'contain', //실제로 구현될때는 바로 위 하이트 값 삭제하고 리사이즈모드를 살리면 될듯합니닷!
-                marginBottom: 10,
                 borderRadius: 50,
+                marginLeft: 20,
               }}
             />
 
             {/* -- 약 이름 뷰 -- */}
             <View
               style={{
-                marginBottom: window.height * 0.01,
-                width: window.width - 40,
+                width: window.width,
               }}
             >
               <Text
                 style={{
-                  paddingLeft: 10,
-                  fontSize: 22,
+                  fontSize: 28,
                   fontWeight: 'bold',
                   textAlign: 'center',
                   marginTop: 15,
-                  marginBottom: 15,
+                  color: '#76a991',
                 }}
               >
                 {this.state.MedicineName}
               </Text>
             </View>
 
-            {/* -- 약 효능/효과 뷰 -- */}
-            <View
-              style={{
-                marginBottom: window.height * 0.01,
-                borderBottomWidth: 1,
-                borderBottomColor: '#6A9C90',
-                borderStyle: 'solid',
-                width: window.width - 40,
-              }}
-            >
-              <Text style={styles.titleText}>효능/효과</Text>
-              <Text style={styles.bodyText}>{this.state.MedicineEffect}</Text>
-            </View>
+            {/* -- 약 정보 + 버튼 -- */}
+            <View style={{ marginLeft: 20 }}>
+              {/* -- 약 효능/효과 뷰 -- */}
+              <View style={styles.textInputBox}>
+                <Text style={styles.textInputTitle}>효능/효과</Text>
+                <Text style={styles.bodyText}>{this.state.MedicineEffect}</Text>
+              </View>
 
-            {/* -- 약 용법/용량 뷰 -- */}
-            <View
-              style={{
-                marginBottom: window.height * 0.01,
-                borderBottomWidth: 1,
-                borderBottomColor: '#6A9C90',
-                borderStyle: 'solid',
-                width: window.width - 40,
-              }}
-            >
-              <Text style={styles.titleText}>용법/용량</Text>
-              <Text style={styles.bodyText}>{this.state.MedicineCapacity}</Text>
-            </View>
+              {/* -- 약 용법/용량 뷰 -- */}
+              <View style={styles.textInputBox}>
+                <Text style={styles.textInputTitle}>용법/용량</Text>
+                <Text style={styles.bodyText}>{this.state.MedicineCapacity}</Text>
+              </View>
 
-            {/* -- 약 유효기간 뷰 -- */}
-            <View
-              style={{
-                marginBottom: window.height * 0.01,
-                borderBottomWidth: 1,
-                borderBottomColor: '#6A9C90',
-                borderStyle: 'solid',
-                width: window.width - 40,
-              }}
-            >
-              <Text style={styles.titleText}>유효기간</Text>
-              <Text style={styles.bodyText}>{this.state.MedicineValidity}</Text>
-            </View>
+              {/* -- 약 유효기간 뷰 -- */}
+              <View style={styles.textInputBox}>
+                <Text style={styles.textInputTitle}>유효기간</Text>
+                <Text style={styles.bodyText}>{this.state.MedicineValidity}</Text>
+              </View>
 
-            {/* -- 삭제하기 버튼 -- */}
-            <View style={{ alignItems: 'center', marginLeft: -20 }}>
-              <TouchableOpacity onPress={this.deletemymedicine}>
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    margin: 20,
-                    alignItems: 'center',
-                    width: window.width * 0.7,
-                    height: window.height * 0.075,
-                    backgroundColor: '#9a6464',
-                    borderRadius: 20,
-                  }}
-                >
-                  <Text
+              {/* -- 삭제하기 버튼 -- */}
+              <View style={{ alignItems: 'center', marginLeft: -20 }}>
+                <TouchableOpacity onPress={this.deletemymedicine}>
+                  <View
                     style={{
-                      fontSize: 20,
-                      color: 'white',
+                      justifyContent: 'center',
+                      margin: 20,
+                      alignItems: 'center',
+                      width: window.width * 0.7,
+                      height: window.height * 0.075,
+                      backgroundColor: '#ffaaaa',
+                      borderRadius: window.height * 0.075,
                     }}
                   >
-                    삭제하기
-                  </Text>
-                </View>
-              </TouchableOpacity>
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        color: 'white',
+                      }}
+                    >
+                      삭제하기
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
             </View>
           </ScrollView>
         </View>
@@ -284,28 +279,24 @@ export default class MedicineDetailScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  loginContainer: {
-    alignItems: 'center',
-    height: '100%',
-    position: 'relative',
-  },
-  viewBox: {
-    marginBottom: window.height * 0.005,
-    width: window.width - 40,
+  textInputBox: {
+    marginBottom: verticalMargin,
     borderBottomWidth: 1,
-    borderBottomColor: '#6A9C90',
+    borderBottomColor: '#76a991',
     borderStyle: 'solid',
+    width: window.width - 40,
+    paddingBottom: window.height * 0.015,
   },
-  titleText: {
-    paddingLeft: 10,
+  textInputTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 15,
+    fontWeight: '200',
+    color: '#626262',
+    paddingLeft: 5,
   },
   bodyText: {
-    paddingLeft: 10,
+    width: window.width - 40,
+    padding: 10,
+    paddingBottom: 5,
     fontSize: 18,
-    marginTop: 10,
-    marginBottom: 5,
   },
 });
