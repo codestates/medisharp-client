@@ -35,12 +35,12 @@
 - 복용여부에 따라, 각 일정의 색을 다르게 하여 편리하게 관리 가능
 
 ## 💊 사용 스택과 기능 플로우
-- Flow-chart
-- DB schema
-- wireframe
+- [Stacks](https://github.com/codestates/medisharp-client/wiki/Stacks)
+- [Flow-chart](https://github.com/codestates/medisharp-client/wiki/Flowchart)
+- [DB schema](https://github.com/codestates/medisharp-client/wiki/DB-Schema)
+- [WireFrame](https://github.com/codestates/medisharp-client/wiki/Wireframe)
 
-## 💊  주요 기능별 시연 GIF
-
+## 💊  [주요 기능별 시연 GIF](https://www.notion.so/2-Medi-Yag-Olim-f83b1c3112a840cb918a0de152915cb0#9535c6225b224d50b4a9908c894c2ae5)
 - 회원 가입 후 로그인
 - 아이디, 비번찾기
 - 소셜 로그인
