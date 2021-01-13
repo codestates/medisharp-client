@@ -33,7 +33,6 @@ Notifications.setNotificationHandler({
 const HomeScreen = ({ navigation }) => {
   const [GetTodayChecked, setGetTodayChecked] = useState([]);
   const [alarmList, setTodayAlarm] = useState([]);
-  const [expoPushToken, setExpoPushToken] = useState('');
   const useEffectForToday = () => {
     async function get_token() {
       const token = await getItem();
@@ -42,17 +41,19 @@ const HomeScreen = ({ navigation }) => {
     get_token().then((token) => {
       axios({
         method: 'get',
-        url: 'http://127.0.0.1:5000/schedules-dates/check/today',
+        url: 'http://127.0.0.1:5000/schedules-dates/today',
         headers: {
           Authorization: token,
         },
         params: {
-          start_day: moment().subtract(8, 'd').format('YYYY-MM-DD'),
-          end_day: moment().subtract(1, 'd').format('YYYY-MM-DD'),
+          startDay: moment().subtract(8, 'd').format('YYYY-MM-DD'),
+          endDay: moment().subtract(1, 'd').format('YYYY-MM-DD'),
+          date: moment().format('YYYY-MM-DD'), //2020-11-22
         },
       })
         .then((data) => {
-          setGetTodayChecked(data.data.results);
+          setGetTodayChecked(data.data.results.todayCheck);
+          setTodayAlarm(data.data.results.todayAlarm);
         })
         .catch((err) => {
           console.error(err);
@@ -68,35 +69,6 @@ const HomeScreen = ({ navigation }) => {
             { cancelable: false },
           );
         });
-      get_token().then((token) => {
-        axios({
-          method: 'get',
-          url: `http://127.0.0.1:5000/schedules-dates/schedules-commons/alarm`,
-          headers: {
-            Authorization: token,
-          },
-          params: {
-            date: moment().format('YYYY-MM-DD'), //2020-11-22
-          },
-        })
-          .then((data) => {
-            setTodayAlarm(data.data.results); //변경 후 상태를 axios 응답결과로 변경해줍니다.
-          })
-          .catch((err) => {
-            console.error(err);
-            Alert.alert(
-              '에러가 발생했습니다!',
-              '다시 시도해주세요',
-              [
-                {
-                  text: '다시시도하기',
-                  onPress: () => useEffectForToday(),
-                },
-              ],
-              { cancelable: false },
-            );
-          });
-      });
     });
   };
   useEffect(() => {
