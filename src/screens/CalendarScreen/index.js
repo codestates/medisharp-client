@@ -28,24 +28,7 @@ const CalendarMain = ({ navigation }) => {
   const [selectedMonth, setSelectedMonth] = useState(moment().format('YYYY-MM'));
   const [nextMonth, setNextMonth] = useState(moment().add(1, 'M').format('YYYY-MM'));
   const [clickedDate, setClickedDate] = useState(todayDate);
-  const [clickedList, setClickedList] = useState([
-    {
-      title: '비타민',
-      cycle: 1,
-      memo: '아침마다',
-      schedules_common_id: 2,
-      time: '22:00',
-      check: true,
-    },
-    {
-      title: '처방받은 관절약',
-      cycle: 2,
-      memo: '자기 전에 꼭 먹어',
-      schedules_common_id: 5,
-      time: '23:30',
-      check: false,
-    },
-  ]);
+  const [clickedList, setClickedList] = useState([]);
   const [markedDates, setMarkedDates] = useState({});
 
   useEffect(() => {
@@ -67,8 +50,8 @@ const CalendarMain = ({ navigation }) => {
           Authorization: token,
         },
         params: {
-          start_day: `${selectedMonth}-01`,
-          end_day: `${nextMonth}-01`,
+          startDay: `${selectedMonth}-01`,
+          endDay: `${nextMonth}-01`,
         },
       })
         .then((data) => {
@@ -80,15 +63,6 @@ const CalendarMain = ({ navigation }) => {
             } else {
               monthCheckObj[selectedMonth + '-' + ele['alarmdate']].push(ele['check']);
             }
-            // } else {
-            //   if (
-            //     monthCheckObj.hasOwnProperty(selectedMonth + '-' + '0' + [ele['date']]) === false
-            //   ) {
-            //     monthCheckObj[selectedMonth + '-' + '0' + ele['date']] = [ele['check']];
-            //   } else {
-            //     monthCheckObj[selectedMonth + '-' + '0' + ele['date']].push(ele['check']);
-            //   }
-            // }
           });
           setMonthCheck(monthCheckObj);
 

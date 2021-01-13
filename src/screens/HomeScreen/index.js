@@ -52,8 +52,8 @@ const HomeScreen = ({ navigation }) => {
         },
       })
         .then((data) => {
-          setGetTodayChecked(data.data.results.todayCheck);
-          setTodayAlarm(data.data.results.todayAlarm);
+          setGetTodayChecked(data.data.results.today_check);
+          setTodayAlarm(data.data.results.today_alarm);
         })
         .catch((err) => {
           console.error(err);
