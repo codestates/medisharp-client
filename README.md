@@ -40,7 +40,7 @@
 - [DB schema](https://github.com/codestates/medisharp-client/wiki/DB-Schema)
 - [WireFrame](https://github.com/codestates/medisharp-client/wiki/Wireframe)
 
-## 💊  [주요 기능별 시연 GIF](https://www.notion.so/2-Medi-Yag-Olim-f83b1c3112a840cb918a0de152915cb0#9535c6225b224d50b4a9908c894c2ae5)
+## 💊  [주요 기능별 시연 GIF](https://github.com/codestates/medisharp-client/wiki/Web-View/b12d812ad8a02e91b22eded48bdb794f2bcc8566)
 - 회원 가입 후 로그인
 - 아이디, 비번찾기
 - 소셜 로그인
